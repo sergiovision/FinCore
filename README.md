@@ -39,8 +39,14 @@
   To build as a docker image:
   Run: `docker.sh`
 
-4. If you fail to build or do not want to build on your machine then there is an option to get docker image from my docker hub. Run this command:
-  `docker pull dockersergio/fincore:latest`
+4. If you fail to build or do not want to build on your machine then there is an option to get docker image from my docker hub. Run this commands:
+
+`git clone https://github.com/sergiovision/FinCore.git`
+
+`docker pull dockersergio/fincore:latest`
+
+`docker-compose run --service-ports fincore`
+
 
 To make build succeeded the following apps should be installed: Visual Studio 2019, Visual Studio 2019 Build tools, latest NPM from http://nodejs.org.
 Applications need to be installed to run server properly: 
