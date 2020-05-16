@@ -39,6 +39,5 @@ FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
 COPY --from=client /app/dist /app/dist
-# COPY --from=build /DB /DB
 COPY --from=build /src/FinCore/appsettings.Docker.json /app/appsettings.json
 ENTRYPOINT ["dotnet", "FinCore.dll"]

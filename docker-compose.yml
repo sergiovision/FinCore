@@ -7,7 +7,7 @@ services:
         - 2020:2020
         - 2021:2021
     volumes:
-      - ./DB:/app/DB
+      - ./DB:/DB
     environment:
         - ASPNETCORE_ENVIRONMENT=Production
     build:
