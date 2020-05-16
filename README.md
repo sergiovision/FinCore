@@ -45,7 +45,7 @@
 
 `docker pull dockersergio/fincore:latest`
 
-`docker-compose run --service-ports fincore`
+`docker-compose up`
 
 
 To make build succeeded the following apps should be installed: Visual Studio 2019, Visual Studio 2019 Build tools, latest NPM from http://nodejs.org.
