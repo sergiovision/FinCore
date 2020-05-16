@@ -56,7 +56,7 @@ Applications need to be installed to run server properly:
 
 SQLite database located in `/DB` folder. By default SQLite DB file used, but MySQL also supported, you can switch to MySQL in `/FinCore/appSettings.json` file.
 
-Open `xtrade_empty.sqlite` file in any DB editor that works with SQLite ( like Navicat ).
+Open `fincore_empty.sqlite` file in any DB editor that works with SQLite ( like Navicat ).
 
 Open Settings screen and set the following variables
 
@@ -126,7 +126,7 @@ FinCore folders structure:
   `netsh interface portproxy add v4tov4 listenport=2020 listenaddress=127.0.0.1 connectport=2020 connectaddress='docker container address'`
   After that all experts in Metatrader will use be able to synchronize with FinCore app running in Docker or on another machine/OS.
 
-  Default login for xtrade_empty file is: <br>mail: `test@test.com`<br>
+  Default login for fincore_empty file is: <br>mail: `test@test.com`<br>
   password: `test`
   <br>
   <img src="/FinCore/ClientApp/src/assets/img/doc/login.png"/>
