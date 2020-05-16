@@ -1,0 +1,22 @@
+<div class="animated fadeIn">
+  <div class="card">
+    <div class="card-body">
+      <dx-scheduler
+        [dataSource]="dataSource"
+        [views]='["day", "workWeek"]'
+        currentView="day"
+        [currentDate]="viewDate"
+        [startDayHour]="startHour"
+        (onCellClick)="onCellClick()"
+        >
+
+        <dxi-resource
+        fieldExpr="importance"
+        [allowMultiple]="false"
+        [dataSource]="importanceData"
+        label="Importance">
+        </dxi-resource>
+      </dx-scheduler>
+    </div>
+  </div>
+</div>

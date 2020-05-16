@@ -1,0 +1,27 @@
+<dx-data-grid #dealsContainer id="dealsContainer"
+    [dataSource]="dataSource"
+    keyExpr="Ticket"
+    [showRowLines]="true"
+    [showColumnLines]="false"
+    [showBorders]="true">
+    <dxo-paging [enabled]="true" [pageSize]="50"></dxo-paging>
+    <dxi-column dataField="AccountName" [allowSorting]="true" [width]="180"></dxi-column>
+    <dxi-column dataField="CloseTime" [allowSorting]="true" format="datetime" [width]="160"></dxi-column>
+    <dxi-column dataField="Ticket" [width]="120" [hidingPriority]="1"></dxi-column>
+    <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolCellTemplate">
+    </dxi-column>
+    <dxi-column dataField="Lots" format="#0.##" [width]="120" [hidingPriority]="2"></dxi-column>
+    <dxi-column dataField="Profit" [allowSorting]="true" [width]="120" format="#0.##"></dxi-column>
+
+    <div *dxTemplate="let cell of 'symbolCellTemplate'" [class.inc]="cell.data.Type === 0" [class.dec]="cell.data.Type === 1">
+      <span class="arrow"></span>
+      <span class="current-value">{{cell.text}}</span>
+    </div>
+
+    <dxo-summary>
+      <dxi-total-item
+          column="Ticket"
+          summaryType="count">
+      </dxi-total-item>
+    </dxo-summary>
+</dx-data-grid>

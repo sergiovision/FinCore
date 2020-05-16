@@ -1,0 +1,37 @@
+
+<dx-data-grid id="personContainer"
+    [dataSource]="dataSource"
+    [focusedRowEnabled]="false"
+    keyExpr="Id"
+    [repaintChangesOnly]="true"
+    (onCellClick)="onClickParentCell($event)"
+    [showBorders]="true">
+
+    <dxo-paging [enabled]="false"></dxo-paging>
+    <dxi-column [width]="300" caption="Props" dataField="Mail" alignment="center"
+                cellTemplate="cellTemplateMS" [allowFiltering]="false" [allowSorting]="true">
+      <div *dxTemplate="let data of 'cellTemplateMS'">
+        <dx-button [width]="250">{{ data.value }}</dx-button>
+      </div>
+    </dxi-column>
+    <!-- <dxi-column dataField="Credential" [allowSorting]="true"></dxi-column> -->
+    <dxi-column dataField="Privilege" [allowSorting]="true"></dxi-column>
+    <dxi-column dataField="Created" [allowSorting]="true"></dxi-column>
+    <dxi-column dataField="Activated" [allowSorting]="true"></dxi-column>
+    <dxi-column dataField="Retired" [allowSorting]="true"></dxi-column>
+</dx-data-grid>
+
+<dx-popup
+[width]="1000"
+[height]="700"
+showTitle="true"
+[title]="getCurrentTitle()"
+[closeOnOutsideClick]="true"
+[dragEnabled]="false"
+[(visible)]="showProperties">
+    <dx-button text="Save" (onClick)="onSave()"></dx-button>
+    <dx-scroll-view #scrollView id="scrollview" scrollByContent="true" showScrollbar="always">
+        <app-properties #propsContainer [(parentVisible)]="showProperties">
+        </app-properties>
+    </dx-scroll-view>
+</dx-popup>

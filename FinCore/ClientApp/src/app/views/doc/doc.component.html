@@ -1,0 +1,141 @@
+<div id="welcome-section">
+  <h1 class="welcome-header">FinCore {{version}}
+  </h1>
+  <h2 class="welcome-header">Documentation</h2>
+  <img src="assets/img/brand/logo.png" class="image-header"/>
+</div>
+<ul>
+  <li>FinCore Features</li>
+    <p></p>
+    <p><a href="#doc_about">About FinCore</a></p>
+    <p><a href="#doc_dashboard">Realtime Dashboard</a></p>
+    <p><a href="#doc_wallets">Wallets book</a></p>
+    <p><a href="#doc_mt">Metatrader integration</a></p>
+    <p><a href="#doc_advisers">Multiple Terminals/Brokers and Advisers Management</a></p>
+    <p><a href="#doc_metasymbols">Metasymbols management</a></p>
+    <p><a href="#doc_rates">Realtime exchange rates</a></p>
+    <p><a href="#doc_instruments">Trading Statistics and Risk management</a></p>
+    <p><a href="#doc_deals">Deals history</a></p>
+    <p><a href="#doc_log">Application logs</a></p>
+    <p><a href="#doc_investments">Investments Pie</a></p>
+    <p><a href="#doc_jobs">Background Jobs</a></p>
+    <p><a href="#doc_performance">Earning/Spending Performance per day/month</a></p>
+    <p><a href="#doc_capital">Yearly Capital State</a></p>
+  <li><a href="#doc_install">Installation</a></li>
+</ul>
+<div id="content">
+  <p id="doc_about">About FinCore</p>
+  FinCore is a great free application to take care of personal finances.<br>
+  Program fits for anybody. <br>
+  1) For usual merchant<br>
+  If one lazy to take risks on trading and investing then can stick to <a href="#doc_wallets">Wallets book</a> and <a href="#doc_rates">Realtime exchange rates</a> <br>
+  In this case one can control and observe his wallets state in different currencies with current exchange rates and track performance here <a href="#doc_performance">Earning/Spending Performance per day/month</a>.<br>
+  2) For trader<br>
+  If one wants to remove emotions and use risk restriction and analyze trading statistics then these screens
+  <a href="#doc_instruments">Trading Statistics and Risk management</a> and <a href="#doc_dashboard">Realtime Dashboard</a> might help to evolve into profitable trader.<br>
+   This will help to make trading less emotional and will help to create trading strategy and find favourite and most profitable instruments.<br>
+  3) For Investor<br>
+  If one wants to track investment portfolio and observe shares/stock prices then these screens will help  <a href="#doc_dashboard">Realtime Dashboard</a>
+  and <a href="#doc_investments">Investments Pie</a> and <a href="#doc_capital">Yearly Capital State</a>.
+  <br>
+  <p>Using this app one can grow in all 3 directions - on constant usage one can become better and smart consumer/merchant, then better trader and finally wise investor.
+  These screens will show and track in time your performance and personal relations with finances <a href="#doc_capital">Yearly Capital State</a> and
+  <a href="#doc_performance">Earning/Spending Performance per day/month</a>.</p>
+
+  This version is free of charge but if you want a better and secured version you can write me to hi@sergego.com we can talk about improving/installation/support and agree about $.
+  Also I am available for hire.
+  <br>
+  <br>
+  <br>
+  <p id="doc_install">Installation</p>
+  Generally application should be installed on your Virtual Private Server (VPS). Where your trading/investment terminals run.
+  FinCore application is completely crossplatform.
+  You can biuld it for Windows, MacOS, Linux/Docker and run it there. <br>
+  There are 3 options to run FinCore application:<br>
+  <p>As a Windows Service</p>
+  <p>As an usual console application</p>
+  <p>As a Docker image in a Docker container</p>
+
+  When application started it becomes accessible by this link: http://localhost:2020 <br>
+  Websockets port uses port 2021.
+  Make sure ports 2020 and 2021 are opened to make FinCore accesible outside of VPS.
+  If you run application in docker to connect it to Windows where Metatrader terminals live - you should activate ports forwarding in Windows to docker address:<br>
+  Run this command in windows command line:<br>
+  netsh interface portproxy add v4tov4 listenport=2020 listenaddress=127.0.0.1 connectport=2020 connectaddress='docker container address'
+  After that all experts in Metatrader will use be able to synchronize with FinCore app running in Docker or on another machine/OS.
+
+  Default login for xtrade_empty file is: <br>mail: test@test.com<br>
+  password: test
+  <br>
+  <img src="assets/img/doc/login.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_wallets">Wallets book</p>
+  <img src="assets/img/doc/w.jpg" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_dashboard">Realtime Dashboard</p>
+  Dashboard shows current positions and investments performance in realtime. Used high performance websocket driven engine to update instruments in realtime.
+  <br>
+  Mobile friendly and no need to login to your VPS and focus in terminal apps to see all positions. This is very convenient to have an eye on your assets and trading anytime.
+  <br>
+  <img src="assets/img/doc/dashboard.png" [width]="width" class="doc-img"/>
+  <p>Settings</p>
+  <img src="assets/img/doc/settings.png" [width]="width" class="doc-img"/>
+  <p>Adding Adviser in Metatrader</p>
+  To add Adviser on a chart just right click and selet Objective template. FinCore will make all the rest. <br>
+  But before adding template make sure you have added this symbol into <a href="#doc_metasymbols">Metasymbols management</a> screen.<br>
+  <img src="assets/img/doc/add_adviser.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_mt">Metatrader Settings</p>
+  Expert Adviser interacts with app server through WebAPI.
+  <br>
+  To make Objective Expert Adviser work you need to set the following settings in Metatrader settings:
+  <br>
+  <img src="assets/img/doc/mt5settings.png" [width]="width" class="doc-img"/>
+  <p>Adviser</p>
+  Adviser has a panel in top left corner of the chart. Adviser settings can be edited on this screen <a href="#doc_advisers">Advisers Management</a><br>
+  <img src="assets/img/doc/adviser.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_advisers">Multiple Terminals/Brokers and Advisers Management</p>
+  <img src="assets/img/doc/adviser_properties.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_capital">Yearly Capital State</p>
+  Summary Capital state through the year<br>
+  <img src="assets/img/doc/capital.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_instruments">Trading Statistics and Risk management</p>
+  Useful screen for trader/investor. Here you can see which instruments perform better and select favourite ones for your next trade/investment.<br>
+  <img src="assets/img/doc/instruments.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_investments">Investments Pie</p>
+  Observe your investment portfolio pie on this screen.
+  <img src="assets/img/doc/investments.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_log">Application logs</p>
+    Colorful logging from all trading terminals in one log roll. No need to open each terminal log.<br>
+    All problems and events can be seen on this page in FinCore app.<br>
+  <br>
+  <img src="assets/img/doc/logs.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_performance">Earning/Spending Performance per day/month</p>
+  This very useful screen shows how you earn/spend money in life and on market.
+  <img src="assets/img/doc/performance.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_deals">Deals history</p>
+  Completed/closed trades history.<br>
+  <img src="assets/img/doc/deals.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_jobs">Background Jobs</p>
+  View and control Jobs. Here you can call various duty jobs.
+  Jobs schedule implemented using Quartz library and set using cron expressions in DB.
+  <br>
+  <img src="assets/img/doc/jobs.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_metasymbols">Metasymbols management</p>
+  To Add new Symbol to FinCore add new MetaSymbol and then Add new Symbol on this screen. Then Adviser can be created for this symbol.
+  <img src="assets/img/doc/metasymbols.png" [width]="width" class="doc-img"/>
+  <br>
+  <p id="doc_rates">Realtime exchange rates</p>
+  To Update Exchange rates open and connect your Metatrader terminal with Fincore and start ExhangeRatesJob in <a href="#doc_jobs">Background Jobs</a>
+  <img src="assets/img/doc/rates.png" [width]="width" class="doc-img"/>
+  <br>
+</div>

@@ -1,0 +1,166 @@
+{
+  "format": 1,
+  "restore": {
+    "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj": {}
+  },
+  "projects": {
+    "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj",
+        "projectName": "BusinessLogic",
+        "projectPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj",
+        "packagesPath": "/Users/sergeizhuravlev/.nuget/packages/",
+        "outputPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/sergeizhuravlev/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {},
+          "https://nuget.stocksharp.com/411c86b7-6d59-49ac-a7f6-002de64b9210": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {
+              "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj": {
+                "projectPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj"
+              }
+            }
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "Antlr3.Runtime": {
+              "target": "Package",
+              "version": "[3.5.1, )"
+            },
+            "AutoMapper": {
+              "target": "Package",
+              "version": "[9.0.0, )"
+            },
+            "Autofac": {
+              "target": "Package",
+              "version": "[5.1.2, )"
+            },
+            "FluentNHibernate": {
+              "target": "Package",
+              "version": "[2.1.2, )"
+            },
+            "HtmlAgilityPack": {
+              "target": "Package",
+              "version": "[1.11.23, )"
+            },
+            "Microsoft.Extensions.Configuration": {
+              "target": "Package",
+              "version": "[3.1.3, )"
+            },
+            "MySql.Data": {
+              "target": "Package",
+              "version": "[8.0.19, )"
+            },
+            "NHibernate": {
+              "target": "Package",
+              "version": "[5.2.7, )"
+            },
+            "Newtonsoft.Json": {
+              "target": "Package",
+              "version": "[12.0.3, )"
+            },
+            "Quartz": {
+              "target": "Package",
+              "version": "[3.0.7, )"
+            },
+            "System.Data.SQLite.Core": {
+              "target": "Package",
+              "version": "[1.0.112.1, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.202/RuntimeIdentifierGraph.json"
+        }
+      }
+    },
+    "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj": {
+      "version": "1.0.0",
+      "restore": {
+        "projectUniqueName": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj",
+        "projectName": "BusinessObjects",
+        "projectPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj",
+        "packagesPath": "/Users/sergeizhuravlev/.nuget/packages/",
+        "outputPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/obj/",
+        "projectStyle": "PackageReference",
+        "configFilePaths": [
+          "/Users/sergeizhuravlev/.config/NuGet/NuGet.Config"
+        ],
+        "originalTargetFrameworks": [
+          "netcoreapp3.1"
+        ],
+        "sources": {
+          "https://api.nuget.org/v3/index.json": {},
+          "https://nuget.stocksharp.com/411c86b7-6d59-49ac-a7f6-002de64b9210": {}
+        },
+        "frameworks": {
+          "netcoreapp3.1": {
+            "projectReferences": {}
+          }
+        },
+        "warningProperties": {
+          "warnAsError": [
+            "NU1605"
+          ]
+        }
+      },
+      "frameworks": {
+        "netcoreapp3.1": {
+          "dependencies": {
+            "Autofac": {
+              "target": "Package",
+              "version": "[5.1.2, )"
+            }
+          },
+          "imports": [
+            "net461",
+            "net462",
+            "net47",
+            "net471",
+            "net472",
+            "net48"
+          ],
+          "assetTargetFallback": true,
+          "warn": true,
+          "frameworkReferences": {
+            "Microsoft.NETCore.App": {
+              "privateAssets": "all"
+            }
+          },
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.202/RuntimeIdentifierGraph.json"
+        }
+      }
+    }
+  }
+}

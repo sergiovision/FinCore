@@ -1,0 +1,66 @@
+# See http://help.github.com/ignore-files/ for more about ignoring files.
+
+# compiled output
+
+/dist-server
+/tmp
+/out-tsc
+
+# dependencies
+/node_modules
+package-lock.json
+
+# IDEs and editors
+/.idea
+.project
+.classpath
+.c9/
+*.launch
+.settings/
+*.sublime-workspace
+
+# IDE - VSCode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# misc
+/.sass-cache
+/connect.lock
+/coverage
+/libpeerconnection.log
+npm-debug.log
+yarn-error.log
+testem.log
+/typings
+
+# e2e
+/e2e/*.js
+/e2e/*.map
+
+# System Files
+.DS_Store
+Thumbs.db
+
+#*.ex5
+*.ex4
+*.h5
+
+/packages
+/BusinessObjects/obj
+/MainServer/obj
+/XTradeConnector/obj
+/UnitTests/obj
+/MQL.zip
+/BusinessObjects/gen-nodejs
+/.vs
+/BusinessLogic/obj/Debug
+/BusinessLogic/obj/Release
+/UnitTests/bin/Release
+/ML/core/__pycache__
+/BusinessLogic/bin/Debug/netcoreapp3.1
+/BusinessObjects/bin/Debug/netcoreapp3.1
+/BusinessLogic/bin/Release/netcoreapp3.1
+/BusinessObjects/bin/Release/netcoreapp3.1

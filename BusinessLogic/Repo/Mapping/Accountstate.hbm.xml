@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Accountstate" table="accountstate" lazy="true" >
+    <id name="Id" column="Id" />
+    <many-to-one name="Account">
+      <column name="AccountId" sql-type="int(11)" not-null="true" />
+    </many-to-one>
+    <property name="Date">
+      <column name="Date" sql-type="datetime" not-null="true" />
+    </property>
+    <property name="Balance">
+      <column name="Balance" sql-type="decimal(10,2)" not-null="true" />
+    </property>
+    <property name="Comment">
+      <column name="Comment" sql-type="varchar(4096)" not-null="false" />
+    </property>
+  </class>
+</hibernate-mapping>

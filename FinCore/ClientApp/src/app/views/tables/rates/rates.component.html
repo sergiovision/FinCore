@@ -1,0 +1,48 @@
+<dx-data-grid id="ratesContainer"
+    [dataSource]="dataSource"
+    [focusedRowEnabled]="false"
+    keyExpr="Id"
+    [repaintChangesOnly]="true"
+    (onToolbarPreparing)="onToolbarPreparing($event)"
+    (onCellClick)="onClickParentCell($event)"
+    [showBorders]="true">
+
+    <dxo-paging [enabled]="false"></dxo-paging>
+    <dxi-column [width]="160" caption="Props" dataField="MetaSymbol" alignment="center"
+    cellTemplate="cellTemplateMS" [allowFiltering]="false" [allowSorting]="true">
+      <div *dxTemplate="let data of 'cellTemplateMS'">
+        <dx-button [width]="100">{{ data.value }}</dx-button>
+      </div>
+    </dxi-column>
+<!--    <dxi-column [width]="100" caption="Intern Chart" dataField="MetaSymbol" alignment="center" cellTemplate="cellTemplateIxS"
+    [allowFiltering]="false" [allowSorting]="false">
+    <div *dxTemplate="let data of 'cellTemplateIxS'">
+      <a href="#/chart?symbol={{data.value}}">{{ data.value }}</a>
+    </div>
+    </dxi-column> -->
+    <dxi-column [width]="100" caption="Extern Chart" dataField="MetaSymbol" alignment="center" cellTemplate="cellTemplateExS"
+      [allowFiltering]="false" [allowSorting]="false" [hidingPriority]="2">
+      <div *dxTemplate="let data of 'cellTemplateExS'">
+        <a [href]="this.experts.externChartURL(data.value)" target="_blank">{{ data.value }}</a>
+      </div>
+    </dxi-column>
+    <dxi-column dataField="Ratebid" [allowSorting]="true"></dxi-column>
+    <dxi-column dataField="Rateask" [allowSorting]="true"></dxi-column>
+    <dxi-column dataField="Lastupdate" [allowSorting]="true"></dxi-column>
+    <dxi-column dataField="Retired" [allowSorting]="true" [hidingPriority]="1"></dxi-column>
+</dx-data-grid>
+
+<dx-popup
+[width]="1000"
+[height]="700"
+showTitle="true"
+[title]="getCurrentTitle()"
+[closeOnOutsideClick]="true"
+[dragEnabled]="false"
+[(visible)]="showProperties">
+    <dx-button text="Save" (onClick)="onSave()"></dx-button>
+    <dx-scroll-view #scrollView id="scrollview" scrollByContent="true" showScrollbar="always">
+        <app-properties #propsContainer [(parentVisible)]="showProperties">
+        </app-properties>
+    </dx-scroll-view>
+</dx-popup>

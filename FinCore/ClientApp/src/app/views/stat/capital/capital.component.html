@@ -1,0 +1,79 @@
+<div class="card" id="mainChart">
+<dx-chart
+#walletChart
+id="walletChart"
+palette="violet"
+[dataSource]="store">
+    <dxi-series
+        valueField="Balance"
+
+        name="Total">
+    </dxi-series>
+    <dxo-scroll-bar [visible]="true"></dxo-scroll-bar>
+    <dxo-common-series-settings #seriesSettings
+        argumentField="Date"
+
+        type="spline">
+    </dxo-common-series-settings>
+    <dxo-margin [right]="30"></dxo-margin>
+    <dxo-zoom-and-pan
+    valueAxis="both"
+    argumentAxis="both"
+    [dragToZoom]="true"
+    [allowMouseWheel]="true"
+    panKey="shift"
+    ></dxo-zoom-and-pan>
+
+    <dxo-argument-axis
+        [valueMarginsEnabled]="false"
+        argumentType="datetime">
+        <dxo-label [visible]="true" ></dxo-label>
+        <dxo-grid [visible]="true"></dxo-grid>
+    </dxo-argument-axis>
+    <dxi-value-axis [valueMarginsEnabled]="false" argumentType="currency">
+        <dxo-label [visible]="true" format="currency"></dxo-label>
+    </dxi-value-axis>
+    <dxo-legend
+        verticalAlignment="bottom"
+        horizontalAlignment="center"
+        itemTextPosition="bottom">
+    </dxo-legend>
+    <dxo-title
+        text="Capital" horizontalAlignment="left">
+        <dxo-subtitle [text]="customizeTitle()" horizontalAlignment="left">
+        </dxo-subtitle>
+    </dxo-title>
+    <dxo-export [enabled]="false"></dxo-export>
+    <dxo-tooltip
+        [enabled]="true"
+        [customizeTooltip]="customizeTooltip">
+    </dxo-tooltip>
+</dx-chart>
+<div class="action">
+        <dx-select-box
+      horizontalAlignment="left"
+      id="selectbox"
+      [items]="years"
+      [width]="150"
+      [value]="0"
+      valueExpr="id"
+      displayExpr="name"
+      (onValueChanged)="onValueChanged($event)"
+    ></dx-select-box>
+    <div class="label">  Choose year: </div>
+</div>
+
+<!--
+<dx-load-panel
+    #loadPanel
+    shadingColor="rgba(0,0,0,0.4)"
+    [position]="{ of: '#mainChart' }"
+    [(visible)]="loadingVisible"
+    [showIndicator]="true"
+    [showPane]="true"
+    [shading]="true"
+    [closeOnOutsideClick]="false">
+</dx-load-panel>
+</div>
+-->
+

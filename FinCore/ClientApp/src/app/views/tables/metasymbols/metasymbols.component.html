@@ -1,0 +1,102 @@
+<dx-data-grid id="metasymbolContainer"
+    [dataSource]="dataSource"
+    [focusedRowEnabled]="false"
+    keyExpr="Id"
+    [masterDetail]="masterDetailInfo"
+    [repaintChangesOnly]="true"
+    (onRowExpanding)="onRowExpanding($event)"
+    (onToolbarPreparing)="onToolbarPreparing($event)"
+    (onCellClick)="onClickParentCell($event)"
+    [showBorders]="true">
+
+    <dxo-paging [enabled]="false"></dxo-paging>
+    <dxi-column [width]="160" caption="Props" dataField="Name" alignment="center"
+    cellTemplate="cellTemplateMS" [allowFiltering]="false" [allowSorting]="true">
+      <div *dxTemplate="let data of 'cellTemplateMS'">
+        <dx-button [width]="100">{{ data.value }}</dx-button>
+      </div>
+    </dxi-column>
+    <dxi-column dataField="Description" [allowSorting]="true" [hidingPriority]="2"></dxi-column>
+
+<!--    <dxi-column [width]="100" caption="Intern Chart" dataField="Name" alignment="center" cellTemplate="cellTemplateIxS"
+    [allowFiltering]="false" [allowSorting]="false">
+    <div *dxTemplate="let data of 'cellTemplateIxS'">
+      <a href="#/chart?symbol={{data.value}}">{{ data.value }}</a>
+    </div>
+    </dxi-column> -->
+    <dxi-column [width]="100" caption="Extern Chart" dataField="Name" alignment="center" cellTemplate="cellTemplateExS"
+      [allowFiltering]="false" [allowSorting]="false" [hidingPriority]="2">
+      <div *dxTemplate="let data of 'cellTemplateExS'">
+        <a [href]="this.experts.externChartURL(data.value)" target="_blank">{{ data.value }}</a>
+      </div>
+    </dxi-column>
+    <dxi-column dataField="Typ" caption="Type" [allowSorting]="true" cellTemplate="cellTemplateT" [hidingPriority]="1">
+      <div *dxTemplate="let data of 'cellTemplateT'">
+        {{ SymbolInfo(data.value) }}
+      </div>
+    </dxi-column>
+    <dxi-column dataField="Retired" [allowSorting]="true" [hidingPriority]="1"></dxi-column>
+
+    <div *dxTemplate="let metasymbol of 'detail'">
+      <dx-tab-panel>
+        <dxi-item title="Advisers" template="expertsTab"></dxi-item>
+        <div *dxTemplate="let expertsTabItem of 'expertsTab'">
+            <dx-data-grid [dataSource]="this.loadAdvisersChildData(metasymbol.data.Id)" [showBorders]="true" [columnAutoWidth]="true"
+            (onCellClick)="onClickAdvisersCell($event)">
+              <dxo-paging [enabled]="false"></dxo-paging>
+              <dxi-column [width]="160" caption="Props" dataField="Symbol" alignment="center"
+              cellTemplate="cellTemplateA" [allowFiltering]="false" [allowSorting]="true">
+                <div *dxTemplate="let data of 'cellTemplateA'">
+                  <dx-button [width]="100">{{ data.value }}</dx-button>
+                </div>
+              </dxi-column>
+              <dxi-column dataField="Id" width="80"></dxi-column>
+              <dxi-column dataField="Name" width="180"></dxi-column>
+              <dxi-column dataField="Broker" width="180"></dxi-column>
+              <dxi-column dataField="IsMaster" width="80"></dxi-column>
+              <dxi-column dataField="Running" width="80"></dxi-column>
+              <dxi-column dataField="Retired" width="80"></dxi-column>
+          </dx-data-grid>
+        </div>
+        <dxi-item title="Symbols" template="symbolsTab"></dxi-item>
+        <div *dxTemplate="let symbolsTabItem of 'symbolsTab'">
+            <dx-data-grid
+            [dataSource]="this.loadSymbolsChildData(metasymbol.data.Id)"
+            [showBorders]="true"
+            [columnAutoWidth]="true"
+            (onToolbarPreparing)="onToolbarPreparingSymbol($event, metasymbol.data.Id)"
+            id="symbolContainer"
+            (onCellClick)="onClickSymbolsCell($event)">
+                <dxo-paging [enabled]="true"></dxo-paging>
+                <dxi-column [width]="160" caption="Props" dataField="Name" alignment="center"
+                cellTemplate="cellTemplateS" [allowFiltering]="false" [allowSorting]="true">
+                  <div *dxTemplate="let data of 'cellTemplateS'">
+                    <dx-button [width]="100">{{ data.value }}</dx-button>
+                  </div>
+                </dxi-column>
+                <dxi-column dataField="Id" width="80"></dxi-column>
+                <!-- <dxi-column dataField="Name" [allowSorting]="true"></dxi-column> -->
+                <dxi-column dataField="Description" [allowSorting]="true"></dxi-column>
+                <dxi-column dataField="Expiration" [allowSorting]="true"></dxi-column>
+                <dxi-column dataField="Retired" [allowSorting]="true"></dxi-column>
+            </dx-data-grid>
+        </div>
+    </dx-tab-panel>
+    </div>
+
+</dx-data-grid>
+
+<dx-popup
+[width]="1000"
+[height]="700"
+showTitle="true"
+[title]="getCurrentTitle()"
+[closeOnOutsideClick]="true"
+[dragEnabled]="false"
+[(visible)]="showProperties">
+    <dx-button text="Save" (onClick)="onSave()"></dx-button>
+    <dx-scroll-view #scrollView id="scrollview" scrollByContent="true" showScrollbar="always">
+        <app-properties #propsContainer [(parentVisible)]="showProperties">
+        </app-properties>
+    </dx-scroll-view>
+</dx-popup>

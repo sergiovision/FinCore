@@ -1,0 +1,23 @@
+::ng-deep .master-detail-caption {
+  padding: 0 0 5px 10px;
+  font-size: 14px;
+  font-weight: bold;
+}
+
+::ng-deep #scrollview  {
+  padding: 10px 10px 5px 5px;
+  // margin-right: 5px;
+}
+
+::ng-deep #setContainer .dx-datagrid-header-panel .dx-selectbox {
+  margin: 5px 10px;
+}
+
+::ng-deep #setContainer .dx-datagrid-header-panel .dx-button {
+  margin: 5px 0;
+}
+
+::ng-deep #setContainer .dx-datagrid-header-panel .dx-toolbar-before .dx-toolbar-item:last-child {
+  padding-left: 10px;
+}
+

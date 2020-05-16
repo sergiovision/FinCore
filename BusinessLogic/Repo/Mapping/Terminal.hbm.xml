@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Terminal" table="terminal" lazy="true" >
+    <id name="Id" column="Id" />
+    <many-to-one name="Account">
+      <column name="AccountId" sql-type="int(11)" not-null="false" />
+    </many-to-one>
+    <property name="Accountnumber">
+      <column name="AccountNumber" sql-type="int(11)" not-null="false" />
+    </property>
+    <property name="Broker">
+      <column name="Broker" sql-type="varchar(128)" not-null="true" />
+    </property>
+    <property name="Fullpath">
+      <column name="Fullpath" sql-type="longtext" not-null="true" />
+    </property>
+    <property name="Codebase">
+      <column name="Codebase" sql-type="varchar(4096)" not-null="false" />
+    </property>
+    <property name="Retired">
+      <column name="Retired" sql-type="bit(1)" not-null="false" />
+    </property>
+    <property name="Demo">
+      <column name="Demo" sql-type="bit(1)" not-null="false" />
+    </property>
+    <bag name="Account">
+      <key column="" />
+      <one-to-many class="Account" />
+    </bag>
+    <bag name="Adviser">
+      <key column="" />
+      <one-to-many class="Adviser" />
+    </bag>
+  </class>
+</hibernate-mapping>

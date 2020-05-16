@@ -1,0 +1,100 @@
+﻿using BusinessObjects;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Net.Http;
+using System.Net;
+using Newtonsoft.Json;
+using System.IO;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
+
+namespace FinCore.Controllers
+{
+    [AllowAnonymous]
+    [ApiController]
+    [Route("/api/[controller]")]
+    public class MTController : BaseController
+    {
+        [HttpGet]
+        [Route("[action]")]
+        [AcceptVerbs("GET")]
+        public ActionResult SendSignal()
+        {
+            try
+            {
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var response = reader.ReadToEndAsync();
+                    if (string.IsNullOrEmpty(response.Result))
+                        return Problem("Empty data passed as a parameter", "Error", StatusCodes.Status500InternalServerError);
+                    SignalInfo signal = JsonConvert.DeserializeObject<SignalInfo>(response.Result);
+                    var result = MainService.SendSignal(signal);
+                    return Ok(result);
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+                return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpPost]
+        [AcceptVerbs("POST")]
+        [Route("[action]")]
+        public ActionResult PostSignal()
+        {
+            try
+            {
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var response = reader.ReadToEndAsync();
+                    if (string.IsNullOrEmpty(response.Result))
+                        return Problem("NULL Signal passed as a parameter", "Error", StatusCodes.Status500InternalServerError);
+                    SignalInfo signal = JsonConvert.DeserializeObject<SignalInfo>(response.Result);
+
+                    if (signal == null)
+                        return Problem("Broken Signal passed as a parameter", "Error", StatusCodes.Status500InternalServerError);
+                    MainService.PostSignalTo(signal);
+                }
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+                return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
+            }
+        }
+
+        [HttpGet]
+        [AcceptVerbs("GET")]
+        [Route("[action]")]
+        public ActionResult ListenSignal()
+        {
+            try
+            {
+                using (var reader = new StreamReader(Request.Body))
+                {
+                    var response = reader.ReadToEndAsync();
+                    if (string.IsNullOrEmpty(response.Result))
+                        return Ok();
+                    SignalInfo signal = JsonConvert.DeserializeObject<SignalInfo>(response.Result);
+                    if (signal == null)
+                        return Problem("NULL Signal passed as a parameter", "Error", StatusCodes.Status500InternalServerError);
+                    var result = MainService.ListenSignal(signal.ObjectId, signal.Flags);
+                    return Ok(result);
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e.ToString());
+                return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
+            }
+        }
+    }
+}

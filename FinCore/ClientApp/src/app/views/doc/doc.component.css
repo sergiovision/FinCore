@@ -1,0 +1,32 @@
+#welcome-section {
+  align-items: center;
+  justify-content: center;
+}
+
+.welcome-header {
+  text-align: center;
+}
+
+.image-header {
+
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  width: 10%;
+}
+
+.doc-img {
+  height: 100%;
+  padding-left: 10px;
+}
+
+
+ul {
+  font-size: 16px;
+  font-weight: bold;
+}
+
+#content {
+  margin: 5px 5px 5px 5px;
+  padding-left: 10px;
+}

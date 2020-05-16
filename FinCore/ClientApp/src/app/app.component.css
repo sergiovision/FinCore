@@ -1,0 +1,18 @@
+
+::ng-deep #summary {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+::ng-deep #button {
+  display: block;
+}
+
+::ng-deep #gridContainer {
+  height: 440px;
+}
+
+::ng-deep .master-detail-caption {
+  padding: 0 0 5px 10px;
+  font-size: 14px;
+  font-weight: bold;
+}

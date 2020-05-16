@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Metasymbol" table="metasymbol" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Name">
+      <column name="Name" sql-type="varchar(50)" not-null="true" />
+    </property>
+    <property name="Description">
+      <column name="Description" sql-type="varchar(500)" not-null="false" />
+    </property>
+    <property name="C1">
+      <column name="C1" sql-type="varchar(32)" not-null="false" />
+    </property>
+    <property name="C2">
+      <column name="C2" sql-type="varchar(32)" not-null="false" />
+    </property>
+    <property name="Typ">
+      <column name="Typ" sql-type="smallint(6)" not-null="false" />
+    </property>
+    <property name="Retired">
+      <column name="Retired" sql-type="bit(1)" not-null="false" />
+    </property>
+    <bag name="Expertcluster">
+      <key column="" />
+      <one-to-many class="Expertcluster" />
+    </bag>
+    <bag name="Rates">
+      <key column="" />
+      <one-to-many class="Rates" />
+    </bag>
+    <bag name="Statsymbol">
+      <key column="" />
+      <one-to-many class="Statsymbol" />
+    </bag>
+    <bag name="Symbol">
+      <key column="" />
+      <one-to-many class="Symbol" />
+    </bag>
+  </class>
+</hibernate-mapping>

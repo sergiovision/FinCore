@@ -1,0 +1,171 @@
+<dx-data-grid id="walletsContainer"
+    [dataSource]="dataSource"
+    keyExpr="Id"
+    [masterDetail]="masterDetailInfo"
+    [repaintChangesOnly]="true"
+    (onRowExpanding)="onRowExpanding($event)"
+    (onToolbarPreparing)="onToolbarPreparing($event)"
+    (onCellClick)="onClickParentCell($event)">
+
+    <dxo-paging [enabled]="false"></dxo-paging>
+
+    <dxi-column [width]="160" caption="Wallet Props" dataField="Name" alignment="center"
+    cellTemplate="cellTemplateWN" [allowFiltering]="false" [allowSorting]="false">
+      <div *dxTemplate="let data of 'cellTemplateWN'">
+        <dx-button [width]="100">{{ data.value }}</dx-button>
+      </div>
+    </dxi-column>
+
+    <!-- <dxi-column dataField="Name" [allowSorting]="true" sortOrder="asc"></dxi-column> -->
+    <dxi-column dataField="Balance" [allowSorting]="true" format="currency"></dxi-column>
+
+    <div *dxTemplate="let wallet of 'detail'">
+      <dx-tab-panel>
+        <dxi-item title="Accounts" template="accounts"></dxi-item>
+        <div *dxTemplate="let account of 'accounts'">
+          <dx-data-grid
+          [dataSource]="this.loadAccountsChildData(wallet.data.Id)"
+          [showBorders]="true"
+          [columnAutoWidth]="true"
+          (onToolbarPreparing)="onToolbarPreparingAccount($event, wallet.data.Id)"
+          (onCellClick)="onClickAccountCell($event)">
+              <dxo-paging [enabled]="false"></dxo-paging>
+              <dxi-column [width]="160" caption="Update" dataField="Balance" alignment="center"
+                          cellTemplate="cellTemplateEx" [allowFiltering]="false" [allowSorting]="false">
+                <div *dxTemplate="let data of 'cellTemplateEx'">
+                  <dx-button [width]="150">{{ data.value.toFixed(4) }}</dx-button>
+                </div>
+              </dxi-column>
+              <dxi-column [width]="160" caption="Account Props" dataField="Description" alignment="center"
+                          cellTemplate="cellTemplateP" [allowFiltering]="false" [allowSorting]="false">
+                <div *dxTemplate="let data of 'cellTemplateP'">
+                  <dx-button [width]="150">{{ data.value }}</dx-button>
+                </div>
+              </dxi-column>              <dxi-column dataField="Equity" width="0"></dxi-column>
+              <!-- <dxi-column dataField="Balance" width="120">
+                  <dxo-format type="fixedPoint" [precision]="4"></dxo-format>
+              </dxi-column> -->
+              <dxi-column dataField="CurrencyStr" caption="Curr" width="80"></dxi-column>
+
+              <dxi-column dataField="Typ" caption="Type" [allowSorting]="true" cellTemplate="cellTemplateTT">
+                <div *dxTemplate="let data of 'cellTemplateTT'">
+                  {{ AccountInfo(data.value) }}
+                </div>
+              </dxi-column>
+
+
+              <dxi-column dataField="Number" width="80"></dxi-column>
+          </dx-data-grid>
+        </div>
+        <dxi-item title="Terminals" template="terminalTab"></dxi-item>
+        <div *dxTemplate="let terminal of 'terminalTab'">
+            <dx-data-grid id="terminalsContainer"
+            [dataSource]="this.loadTerminalChildData(wallet.data.Id)"
+            [showBorders]="true"
+            [columnAutoWidth]="true"
+            (onToolbarPreparing)="onToolbarPreparingTerminal($event, wallet.data.Id)"
+            id="terminalContainer"
+            (onCellClick)="onClickTerminalsCell($event)">
+                <dxo-paging [enabled]="true"></dxo-paging>
+                <dxi-column dataField="Broker"></dxi-column>
+                <dxi-column [width]="160" caption="Terminal Props" dataField="AccountNumber" alignment="center"
+                cellTemplate="cellTemplateAN" [allowFiltering]="false" [allowSorting]="false">
+                  <div *dxTemplate="let data of 'cellTemplateAN'">
+                    <dx-button [width]="100">{{ data.value }}</dx-button>
+                  </div>
+                </dxi-column>
+                <dxi-column dataField="Retired" [allowSorting]="true" [hidingPriority]="1"></dxi-column>
+                <dxi-column dataField="Stopped" [allowSorting]="true"></dxi-column>
+                <dxi-column [width]="160" caption="Deploy" [hidingPriority]="2"
+                  cellTemplate="cellTemplateDeploy" [allowFiltering]="false" [allowSorting]="false">
+                </dxi-column>
+                <div *dxTemplate="let data of 'cellTemplateDeploy'">
+                  <dx-button text="Deploy"></dx-button>
+                </div>
+            </dx-data-grid>
+        </div>
+      </dx-tab-panel>
+    </div>
+    <dxo-summary>
+      <dxi-total-item
+          column="Balance"
+          summaryType="sum"
+          valueFormat="currency">
+      </dxi-total-item>
+    </dxo-summary>
+</dx-data-grid>
+<dx-pie-chart *ngIf="pieSource"
+  id="pie"
+  title="Assets Distribution"
+  palette="bright"
+  [dataSource]="pieSource">
+  <dxo-legend
+      orientation="horizontal"
+      itemTextPosition="right"
+      horizontalAlignment="center"
+      verticalAlignment="bottom"
+      [columnCount]="4">
+  </dxo-legend>
+  <dxo-export [enabled]="true"></dxo-export>
+  <dxi-series
+      argumentField="Name"
+      valueField="Value">
+      <dxo-label
+          [visible]="true"
+          position="columns"
+          [customizeText]="customizePieLabel">
+          <dxo-font [size]="14"></dxo-font>
+          <dxo-connector
+              [visible]="true"
+              [width]="0.5"></dxo-connector>
+      </dxo-label>
+  </dxi-series>
+</dx-pie-chart>
+
+<dx-popup
+id="statePopup"
+class="popup"
+[width]="300"
+[height]="250"
+[showTitle]="true"
+title="Update Account State"
+[dragEnabled]="false"
+[closeOnOutsideClick]="false"
+[(visible)]="popupVisible">
+
+<div class="dx-field" >
+    <div class="dx-field-label">Balance</div>
+      <div class="dx-field-value">
+          <dx-text-box id="popupBalance" [(visible)]="popupVisible" mode="currency" [(value)]="currentState.Balance">
+          </dx-text-box>
+      </div>
+      <div class="dx-field-label">Comment</div>
+      <div class="dx-field-value">
+          <dx-text-box [(visible)]="popupVisible" [(value)]="currentState.Comment">
+          </dx-text-box>
+      </div>
+      <!--
+        <div class="dx-field-label">Formula</div>
+        <div class="dx-field-value">
+            <dx-text-box [(visible)]="popupVisible" [(value)]="currentState.Formula">
+            </dx-text-box>
+        </div> -->
+    </div>
+    <dx-button [(visible)]="popupVisible" text="Update" (onClick)="updateAccountState()"></dx-button>
+</dx-popup>
+
+<dx-popup
+id="propsPopup"
+[width]="1000"
+[height]="700"
+showTitle="true"
+[title]="getCurrentTitle()"
+[closeOnOutsideClick]="true"
+[dragEnabled]="false"
+[(visible)]="showProperties">
+    <dx-button text="Save" (onClick)="onSave()"></dx-button>
+    <dx-scroll-view #scrollView id="scrollview" scrollByContent="true" showScrollbar="always">
+        <app-properties #propsContainer [(parentVisible)]="showProperties">
+        </app-properties>
+    </dx-scroll-view>
+</dx-popup>

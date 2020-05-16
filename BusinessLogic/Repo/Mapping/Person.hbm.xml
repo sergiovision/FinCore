@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Person" table="person" lazy="true" >
+    <id name="Id" column="Id" />
+    <many-to-one name="Country">
+      <column name="CountryId" sql-type="int(11)" not-null="false" />
+    </many-to-one>
+    <property name="Created">
+      <column name="Created" sql-type="datetime" not-null="true" />
+    </property>
+    <property name="Languageid">
+      <column name="LanguageId" sql-type="mediumint(9)" not-null="true" />
+    </property>
+    <property name="Credential">
+      <column name="Credential" sql-type="longtext" not-null="true" />
+    </property>
+    <property name="Regip">
+      <column name="RegIp" sql-type="longtext" not-null="true" />
+    </property>
+    <property name="Mail">
+      <column name="Mail" sql-type="varchar(255)" not-null="true" />
+    </property>
+    <property name="Privilege">
+      <column name="Privilege" sql-type="varchar(50)" not-null="false" />
+    </property>
+    <property name="Uuid">
+      <column name="Uuid" sql-type="longtext" not-null="false" />
+    </property>
+    <property name="Activated">
+      <column name="Activated" sql-type="bit(1)" not-null="false" />
+    </property>
+    <property name="Retired">
+      <column name="Retired" sql-type="bit(1)" not-null="false" />
+    </property>
+    <bag name="Account">
+      <key column="" />
+      <one-to-many class="Account" />
+    </bag>
+    <bag name="Wallet">
+      <key column="" />
+      <one-to-many class="Wallet" />
+    </bag>
+  </class>
+</hibernate-mapping>

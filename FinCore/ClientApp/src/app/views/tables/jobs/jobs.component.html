@@ -1,0 +1,34 @@
+<dx-data-grid id="jobsContainer"
+    [dataSource]="dataSource"
+    keyExpr="Id"
+    [hoverStateEnabled]="true"
+    [showBorders]="true"
+    (onCellClick)="onClickCell($event)"
+    [columnHidingEnabled]="true">
+    <dxo-paging [enabled]="false"></dxo-paging>
+    <dxo-selection mode="single"></dxo-selection>
+    <dxo-grouping #expand [autoExpandAll]="true"></dxo-grouping>
+    <dxo-group-panel [visible]="false"></dxo-group-panel>
+    <dxi-column dataField="IsRunning" [groupIndex]="0"></dxi-column>
+    <!--<dxi-column dataField="Group"></dxi-column>-->
+    <dxi-column dataField="Name"></dxi-column>
+    <dxi-column dataField="Log" [hidingPriority]="1"></dxi-column>
+    <dxi-column dataField="Schedule" [hidingPriority]="2"></dxi-column>
+    <!-- <dxi-column dataField="PrevDate"></dxi-column> -->
+    <dxi-column dataField="NextDate" [hidingPriority]="3"></dxi-column>
+    <dxi-column [width]="120" caption="Run"
+    cellTemplate="cellTemplateRun" [allowFiltering]="false" [allowSorting]="false"></dxi-column>
+    <dxi-column [width]="120" caption="Stop"
+    cellTemplate="cellTemplateStop" [allowFiltering]="false" [allowSorting]="false"></dxi-column>
+    <div *dxTemplate="let data of 'cellTemplateRun'">
+      <dx-button
+      hint="Run Job"
+      text="Run Now"></dx-button>
+    </div>
+    <div *dxTemplate="let data of 'cellTemplateStop'">
+      <dx-button
+      hint="Stop Job"
+      text="Stop"></dx-button>
+    </div>
+
+</dx-data-grid>

@@ -1,0 +1,116 @@
+<form *ngIf="dataSource">
+  <div class="dx-field">
+    <div class="dx-field-value">
+      <dx-date-box [value]="this.UpdatedProperty" type="datetime" [disabled]="true">
+      </dx-date-box>
+    </div>
+  </div>
+  <div class="dx-fieldset" *ngFor="let group of defs">
+    <div class="dx-fieldset-header">{{ group[0] }}</div>
+    <div class="dx-fieldset" *ngFor="let def of group[1]" [ngSwitch]="def['control']">
+      <div *ngSwitchCase="'hidden'">
+      </div>
+      <div *ngSwitchCase="'GeneralDouble'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+            <dx-number-box #doubleNumberBox="ngModel" format="#0.####" [(ngModel)]="dataSource[ def['name'] ].value"
+              [name]="def['name']" showSpinButtons="true">
+            </dx-number-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'LabelInteger'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+            <dx-number-box #labelBox="ngModel" [ngModel]="dataSource[ def['name'] ].value" [name]="def['name']"
+              [disabled]="true" showSpinButtons="false">
+            </dx-number-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'LabelText'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+              <dx-text-box #textBox="ngModel" [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value" [disabled]="true" [readOnly]="true">
+              </dx-text-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'GeneralInteger'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+            <dx-number-box #numberBox="ngModel" [(ngModel)]="dataSource[ def['name'] ].value" [name]="def['name']"
+              showSpinButtons="true" [disabled]="false">
+            </dx-number-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'TextBox'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+              <dx-text-box #textBox="ngModel" [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value" [readOnly]="false">
+              </dx-text-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'TextArea'">
+        <div class="dx-field-label">{{ def['name'] }}</div>
+        <div class="dx-field-value">
+            <dx-text-area #textArea="ngModel" [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value"
+              height="60" [disabled]="false" (onValueChanged)="onValueChanged($event)">
+            </dx-text-area>
+        </div>
+      </div>
+      <div *ngSwitchCase="'GeneralCheckbox'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <dx-check-box [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value">
+          </dx-check-box>
+        </div>
+      </div>
+      <div *ngSwitchCase="'GeneralColorbox'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+            <dx-color-box [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value">
+            </dx-color-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'GenericEnum'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+            <dx-select-box [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value" valueExpr="ID"
+              displayExpr="name" [items]="def['items']">
+            </dx-select-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'GeneralTime'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+            <dx-date-box [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value" type="time">
+            </dx-date-box>
+          </div>
+        </div>
+      </div>
+      <div *ngSwitchCase="'GeneralDate'">
+        <div class="dx-field">
+          <div class="dx-field-label">{{ def['name'] }}</div>
+          <div class="dx-field-value">
+            <dx-date-box [name]="def['name']" [(ngModel)]="dataSource[ def['name'] ].value" type="date">
+            </dx-date-box>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</form>

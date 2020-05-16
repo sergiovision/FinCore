@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Site" table="site" lazy="true" >
+    <id name="Id" column="ID" />
+    <property name="Name">
+      <column name="Name" sql-type="varchar(50)" not-null="false" />
+    </property>
+    <property name="Description">
+      <column name="Description" sql-type="varchar(255)" not-null="false" />
+    </property>
+    <property name="Url">
+      <column name="URL" sql-type="varchar(1024)" not-null="false" />
+    </property>
+    <bag name="Wallet">
+      <key column="" />
+      <one-to-many class="Wallet" />
+    </bag>
+  </class>
+</hibernate-mapping>

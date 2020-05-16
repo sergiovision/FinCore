@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Settings" table="settings" lazy="true" >
+    <id name="Id" column="ID" />
+    <property name="Propertyname">
+      <column name="Propertyname" sql-type="varchar(255)" not-null="true" />
+    </property>
+    <property name="Value">
+      <column name="Value" sql-type="longtext" not-null="false" />
+    </property>
+    <property name="Description">
+      <column name="Description" sql-type="longtext" not-null="false" />
+    </property>
+  </class>
+</hibernate-mapping>

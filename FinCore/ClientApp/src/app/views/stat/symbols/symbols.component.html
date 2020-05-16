@@ -1,0 +1,47 @@
+<div class="card" id="mainSymbolsChart">
+  <dx-chart
+  id="chartInstruments"
+  title="Instruments Profit Summary in USD"
+  [dataSource]="dataSource"
+  >
+  <dxi-series valueField="TotalProfit" name="Total Profit"></dxi-series>
+  <dxi-series valueField="ProfitPerTrade" name="Profit Per Trade"></dxi-series>
+  <!--<dxi-series valueField="NumOfTrades" name="Count Trades"></dxi-series> -->
+  <dxo-common-series-settings
+      argumentField="Name"
+      type="bar"
+      hoverMode="allArgumentPoints"
+      selectionMode="allArgumentPoints">
+      <dxo-label
+          [visible]="true"
+          [format]="{
+              type: 'fixedPoint',
+              precision: '2'
+          }">
+      </dxo-label>
+  </dxo-common-series-settings>
+  <dxi-value-axis
+        [visible]="true"
+        >
+  </dxi-value-axis>
+  <dxo-legend
+      verticalAlignment="bottom"
+      horizontalAlignment="center">
+  </dxo-legend>
+  <dxo-export [enabled]="true"></dxo-export>
+</dx-chart>
+</div>
+<div class="action">
+  <dx-select-box
+  horizontalAlignment="left"
+  id="selectbox"
+  [items]="AccountType"
+  [width]="150"
+  [value]="0"
+  valueExpr="id"
+  displayExpr="name"
+  (onValueChanged)="onValueChanged($event)"
+  ></dx-select-box>
+<div class="label">Account Type: </div>
+</div>
+

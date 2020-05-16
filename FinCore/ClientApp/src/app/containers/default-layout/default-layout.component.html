@@ -1,0 +1,41 @@
+<app-header [fixed]="true"
+  [navbarBrandFull]="{src: 'assets/img/brand/logo.png', width: 150, height: 40, alt: 'FinCore Logo'}"
+  [navbarBrandMinimized]="{src: 'assets/img/brand/logo.png', width: 30, height: 30, alt: 'FinCore Logo'}"
+  [sidebarToggler]="'lg'" [asideMenuToggler]="'lg'">
+  <ul class="nav navbar-nav d-md-down-none">
+    <li class="nav-item px-3">
+      <a class="nav-link" href="#">Dashboard</a>
+    </li>
+  </ul>
+  <ul class="nav navbar-nav ml-auto">
+    <li class="nav-item dropdown" dropdown placement="bottom right">
+      <a class="nav-link" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"
+        dropdownToggle (click)="false">
+        <img src="assets/img/avatars/1.jpg" class="img-avatar" alt="admin@bootstrapmaster.com" />
+      </a>
+      <div class="dropdown-menu dropdown-menu-right" *dropdownMenu aria-labelledby="simple-dropdown">
+        <div class="dropdown-header text-center"><strong>Settings</strong></div>
+        <a class="dropdown-item" href="#"><i class="fa fa-user"></i> Profile</a>
+        <a class="dropdown-item" href="#"><i class="fa fa-wrench"></i> Setting</a>
+        <a class="dropdown-item" routerLink="/logout"><i class="fa fa-lock"></i> Logout</a>
+      </div>
+    </li>
+  </ul>
+</app-header>
+<div class="app-body">
+  <app-sidebar [fixed]="true" [display]="'lg'" minimized="true">
+    <app-sidebar-nav [navItems]="navItems" [perfectScrollbar] [disabled]="sidebarMinimized"></app-sidebar-nav>
+    <app-sidebar-minimizer> </app-sidebar-minimizer>
+  </app-sidebar>
+  <!-- Main content -->
+  <main class="main" #mainview>
+    <div class="container-fluid">
+      <router-outlet></router-outlet>
+    </div>
+  </main>
+</div>
+<!--
+  <app-footer>
+  <span><a href="https://www.sergego.com">Copyright XTradeWeb</a> &copy; 2018.</span>
+</app-footer>
+-->

@@ -1,0 +1,28 @@
+<dx-pie-chart
+  #mainInvestmentsChart
+  id="mainInvestmentsChart"
+  [title]="calcTitle()"
+  palette="bright"
+  [dataSource]="dataSource">
+  <dxo-legend
+      orientation="horizontal"
+      itemTextPosition="right"
+      horizontalAlignment="center"
+      verticalAlignment="bottom"
+      [columnCount]="4">
+  </dxo-legend>
+  <dxo-export [enabled]="true"></dxo-export>
+  <dxi-series
+      argumentField="Symbol"
+      valueField="Value">
+      <dxo-label
+          [visible]="true"
+          position="columns"
+          [customizeText]="customizePieLabel">
+          <dxo-font [size]="14"></dxo-font>
+          <dxo-connector
+              [visible]="true"
+              [width]="0.5"></dxo-connector>
+      </dxo-label>
+  </dxi-series>
+</dx-pie-chart>

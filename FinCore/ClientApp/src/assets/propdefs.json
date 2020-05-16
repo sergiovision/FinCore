@@ -1,0 +1,883 @@
+{
+    "MetaSymbol": {
+       "Specification": [
+        {   "type": "string",
+            "name": "Levels",
+            "group": "Specification",
+            "control": "TextArea",
+            "defaultValue": "0",
+            "description": "Levels of the Symbol"
+        }
+      ],
+      "System": [
+        {   "type": "integer",
+            "name": "Id",
+            "group": "System",
+            "control": "LabelInteger",
+            "defaultValue": -1,
+            "description": "Id in Database"
+        },
+        {
+          "type": "string",
+          "name": "Name",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Name"
+        },
+        {
+          "type": "string",
+          "name": "Description",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Description"
+        },
+        {
+          "type": "string",
+          "name": "C1",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Currency 1"
+        },
+        {
+          "type": "string",
+          "name": "C2",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Currency 2"
+        },
+        {
+          "type": "integer",
+          "name": "Typ",
+          "group": "System",
+          "control": "GenericEnum",
+          "defaultValue": 0,
+          "items": [ {"ID":0, "name": "Currencies"}, {"ID": 1,"name": "Metals" }, {"ID":2, "name": "Indexes"},
+            {"ID":3, "name": "Commodities"}, {"ID":4, "name": "Cryptos"}, {"ID":5, "name": "Stocks"}, {"ID":6, "name": "ETF"}],
+          "description": "Asset type"
+        },
+        {
+        "type": "boolean",
+         "name": "Retired",
+         "group": "System",
+         "control": "GeneralCheckbox",
+         "defaultValue": false,
+         "description": "Retired"
+        }
+      ]
+    },
+    "Terminal": {
+      "System": [
+        {   "type": "integer",
+          "name": "Id",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "Id in Database"
+        },
+        {
+          "type": "string",
+          "name": "AccountNumber",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": "",
+          "description": "Name"
+        },
+        {
+          "type": "string",
+          "name": "Broker",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Broker"
+        },
+        {
+          "type": "string",
+          "name": "FullPath",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Path to MT terminal"
+        },
+        {
+          "type": "string",
+          "name": "CodeBase",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Codebase path in MT"
+        },
+        {
+          "type": "boolean",
+           "name": "Retired",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Retired"
+        },
+        {
+          "type": "boolean",
+           "name": "Demo",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Demo"
+        },
+        {
+          "type": "boolean",
+           "name": "Stopped",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Stopped"
+        }
+    ],
+      "Specification": [
+        {   "type": "double",
+            "name": "Risk Per Day",
+            "group": "Specification",
+            "control": "GeneralDouble",
+            "defaultValue": "0.02",
+            "description": "Risk Per Day"
+        }
+    ]
+    },
+    "Adviser": {
+        "System": [
+        {
+            "type": "integer",
+            "name": "Id",
+            "group": "System",
+            "control": "LabelInteger",
+            "defaultValue": -1,
+            "description": "Property ID in DB"
+        },
+        {
+          "type": "string",
+          "name": "Name",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Name"
+        },
+        {
+          "type": "string",
+          "name": "AccountNumber",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": "",
+          "description": "AccountNumber"
+        },
+        {
+          "type": "string",
+          "name": "Broker",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "",
+          "description": "Broker"
+        },
+        {
+          "type": "boolean",
+           "name": "IsMaster",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "IsMaster"
+        },
+        {
+          "type": "boolean",
+           "name": "Retired",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Retired"
+        },
+        {
+          "type": "boolean",
+           "name": "Running",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Retired"
+        },
+        {
+          "type": "string",
+          "name": "Comments",
+          "group": "System",
+          "control": "TextArea",
+          "defaultValue": "",
+          "description": "Comments"
+        }
+      ],
+      "Volume":[
+        {
+          "type": "double",
+          "name": "LotsBUY",
+          "group": "Volume",
+          "control": "GeneralDouble",
+          "defaultValue": 0.01,
+          "description": "Lowest lot value allowed"
+        },
+        { "type": "double",
+          "name": "LotsSELL",
+          "group": "Volume",
+          "control": "GeneralDouble",
+          "defaultValue": 0.01,
+          "description": "Highest lot value allowed"
+        },
+        { "type": "double",
+          "name": "CoeffSL",
+          "group": "Volume",
+          "control": "GeneralDouble",
+          "defaultValue": 1.0,
+          "description": "Coeff Stop Loss in Bricks Number"
+        },
+        { "type": "double",
+          "name": "CoeffTP",
+          "group": "Volume",
+          "control": "GeneralDouble",
+          "defaultValue": 2.0,
+          "description": "Coeff Take Profit in Bricks Number"
+        },
+        { "type": "double",
+          "name": "CoeffBE",
+          "group": "Volume",
+          "control": "GeneralDouble",
+          "defaultValue": 1.0,
+          "description": "Coeff Break Even in Bricks Number"
+        },
+        { "type": "integer",
+          "name": "PendingOrderStep",
+          "group": "Volume",
+          "control": "GeneralInteger",
+          "defaultValue": 4,
+          "description": "PendingOrderStep"
+        }
+        ],
+        "Renko": [
+          { "type": "boolean",
+            "name": "EnableRenko",
+            "group": "Renko",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "EnableRenko"
+          },
+          { "type": "boolean",
+            "name": "EnableRenkoMA",
+            "group": "Renko",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "EnableRenko Moving Averages Lines"
+          },
+          { "type": "double",
+            "name": "BrickSize",
+            "group": "Renko",
+            "control": "GeneralInteger",
+            "defaultValue": 100,
+            "description": "Bricks Size"
+          },
+          { "type": "integer",
+            "name": "RenkoType",
+            "group": "Renko",
+            "control": "GenericEnum",
+            "defaultValue": 3,
+            "items": [ {"ID":0, "name": "cbtCustom"}, {"ID": 1,"name": "cbtRenko" }, {"ID":2, "name": "cbtMedianRenko"},
+              {"ID":3, "name": "cbtPointO"}, {"ID":4, "name": "cbtTurboRenko075"},{"ID":5, "name": "cbtHybridRenko075"} ],
+            "description": "Renko Type"
+          },
+          { "type": "boolean",
+            "name": "Wicks",
+            "group": "Renko",
+            "control": "GeneralCheckbox",
+            "defaultValue": true,
+            "description": "Show Wicks"
+          },
+          { "type": "hexinteger",
+            "name": "InfoTextColor",
+            "group": "Renko",
+            "control": "GeneralColorbox",
+            "defaultValue": 0,
+            "description": "Text color"
+          }
+        ],
+        "Limits": [
+          { "type": "integer",
+            "name": "TrailingType",
+            "group": "Limits",
+            "control": "GenericEnum",
+            "defaultValue": 1,
+            "items": [ {"ID":0, "name": "TrailingDefault"}, {"ID": 1,"name": "TrailingManual" }, {"ID":2, "name": "TrailingStairs"},
+              {"ID":3, "name": "TrailingFilter"}, {"ID":4, "name": "TrailingSignal"},{"ID":5, "name": "TrailingByFractals"},
+              {"ID":6, "name": "TrailingByShadows"},{"ID":7, "name": "TrailingByATR"},{"ID":8, "name": "TrailingUdavka"},
+              {"ID":9, "name": "TrailingByTime"},{"ID":10, "name": "TrailingByPriceChannel"},
+              {"ID":11, "name": "TrailingFiftyFifty"},{"ID":12, "name": "TrailEachNewBar"} ],
+            "description": "Trailing Type"
+          },
+          {
+            "type": "integer",
+            "name": "TrailingIndent",
+            "group": "Limits",
+            "control": "GeneralInteger",
+            "defaultValue": 0,
+            "description": "Trailing Indent"
+          },
+          {
+            "type": "integer",
+            "name": "PanelSize",
+            "group": "Limits",
+            "control": "GenericEnum",
+            "defaultValue": 0,
+            "items": [ {"ID":0, "name": "PanelNormal"}, {"ID": 1,"name": "PanelSmall" }, {"ID":2, "name": "None"} ],
+            "description": "Panel Size"
+          },
+          {
+            "type": "integer",
+            "name": "RefreshTimeFrame",
+            "group": "Limits",
+            "control": "GenericEnum",
+            "defaultValue": 1,
+            "items": [ {"ID":1, "name": "PERIOD_M1"}, {"ID": 5,"name": "PERIOD_M5" }, {"ID":15, "name": "PERIOD_M15"} , {"ID":30, "name": "PERIOD_M30"}, {"ID":60, "name": "PERIOD_H1"}],
+            "description": "Refresh TimeFrame"
+          },
+          {
+            "type": "boolean",
+            "name": "AllowBUY",
+            "group": "Limits",
+            "control": "GeneralCheckbox",
+            "defaultValue": true,
+            "description": "Allow BUY"
+          },
+          {
+            "type": "boolean",
+            "name": "AllowSELL",
+            "group": "Limits",
+            "control": "GeneralCheckbox",
+            "defaultValue": true,
+            "description": "Allow SELL"
+          },
+          {
+            "type": "string",
+            "name": "BUYBegin",
+            "group": "Limits",
+            "control": "GeneralTime",
+            "defaultValue": "03:00",
+            "description": "BUY Begin time"
+          },
+          { "type": "string",
+            "name": "BUYEnd",
+            "group": "Limits",
+            "control": "GeneralTime",
+            "defaultValue": "22:00",
+            "description": "BUY End Time"
+          },
+          { "type": "string",
+            "name": "SELLBegin",
+            "group": "Limits",
+            "control": "GeneralTime",
+            "defaultValue": "03:00",
+            "description": "SELL Begin Time"
+          },
+          {
+            "type": "string",
+            "name": "SELLEnd",
+            "group": "Limits",
+            "control": "GeneralTime",
+            "defaultValue": "22:00",
+            "description": "SELL End Time"
+          },
+          {
+            "type": "boolean",
+            "name": "AllowVirtualStops",
+            "group": "Limits",
+            "control": "GeneralCheckbox",
+            "defaultValue": true,
+            "description": "Allow Virtual Stops"
+          },
+          {
+            "type": "boolean",
+            "name": "MoreTriesOpenOrder",
+            "group": "Limits",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "MoreTriesOpenOrder"
+          },
+          {
+            "type": "boolean",
+            "name": "AllowMarketOrders",
+            "group": "Limits",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "MoreTriesOpenOrder"
+          },
+          { "type": "integer",
+            "name": "Slippage",
+            "group": "Limits",
+            "control": "GeneralInteger",
+            "defaultValue": 10,
+            "description": "Slippage"
+          }
+        ],
+        "Indicators":[
+          { "type": "integer",
+            "name": "FilterIndicator",
+            "group": "Indicators",
+            "control": "GenericEnum",
+            "defaultValue": 5,
+            "items": [ {"ID":0, "name": "NoIndicator"}, {"ID": 1,"name": "CandleIndicator" }, {"ID":2, "name": "IshimokuIndicator"},
+              {"ID":3, "name": "IchimokuRenkoIndicator"}, {"ID":4, "name": "OsMAIndicator"}, {"ID":5, "name": "DefaultIndicator"},
+              {"ID":6, "name": "HeikenAshiIndicator"} ],
+            "description": "Filter Indicator"
+          },
+          { "type": "integer",
+            "name": "SignalIndicator",
+            "group": "Indicators",
+            "control": "GenericEnum",
+            "defaultValue": 0,
+            "items": [ {"ID":0, "name": "NoIndicator"}, {"ID": 1,"name": "CandleIndicator" }, {"ID":2, "name": "IshimokuIndicator"},
+              {"ID":3, "name": "IchimokuRenkoIndicator"}, {"ID":4, "name": "OsMAIndicator"}, {"ID":5, "name": "DefaultIndicator"} ],
+            "description": "Signal Indicator"
+          },
+          {
+            "type": "integer",
+            "name": "WeightCalculation",
+            "group": "Indicators",
+            "control": "GenericEnum",
+            "defaultValue": 1,
+            "items": [ {"ID":0, "name": "WeightByFilter"}, {"ID": 1,"name": "WeightBySignal" }, {"ID":2, "name": "WeightBySum"},
+              {"ID":3, "name": "WeightByMultiply"}, {"ID":4, "name": "WeightByAND"} ],
+            "description": "Weight Calculation"
+          },
+          { "type": "integer",
+            "name": "NumBarsToAnalyze",
+            "group": "Indicators",
+            "control": "GeneralInteger",
+            "defaultValue": 5,
+            "description": "NumBarsToAnalyze"
+          },
+          { "type": "integer",
+            "name": "IshimokuPeriod1",
+            "group": "Indicators",
+            "control": "GeneralInteger",
+            "defaultValue": 7,
+            "description": "IshimokuPeriod1 Tenkan Sen"
+          },
+          { "type": "integer",
+            "name": "IshimokuPeriod2",
+            "group": "Indicators",
+            "control": "GeneralInteger",
+            "defaultValue": 35,
+            "description": "IshimokuPeriod2 Kijun Sen"
+          },
+          { "type": "integer",
+            "name": "IshimokuPeriod3",
+            "group": "Indicators",
+            "control": "GeneralInteger",
+            "defaultValue": 105,
+            "description": "IshimokuPeriod3 Senkou Span B"
+          },
+          { "type": "integer",
+            "name": "BandsPeriod",
+            "group": "Indicators",
+            "control": "GeneralInteger",
+            "defaultValue": 20,
+            "description": "Bands Period"
+          },
+          { "type": "double",
+            "name": "BandsDeviation",
+            "group": "Indicators",
+            "control": "GeneralDouble",
+            "defaultValue": 1.6,
+            "description": "Bands Deviation"
+          },
+          { "type": "boolean",
+            "name": "EnableBBands",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove BBands indicator on chart"
+          },
+          { "type": "boolean",
+            "name": "EnableStochastic",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove Stochastic indicator on chart"
+          },
+          { "type": "boolean",
+            "name": "EnableRSI",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove RSI indicator on chart"
+          },
+          { "type": "boolean",
+            "name": "EnableHistogram",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove Price Histogram on chart"
+          },
+          { "type": "boolean",
+            "name": "EnableFChannel",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove Fractal Channel on chart"
+          }
+       ]
+
+    },
+    "Symbol": {
+        "System": [
+        {   "type": "integer",
+            "name": "Id",
+            "group": "System",
+            "control": "LabelInteger",
+            "defaultValue": -1,
+            "description": "Property ID in DB"
+        },
+        {
+          "type": "integer",
+          "name": "MetasymbolId",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "MetasymbolId in DB"
+        },
+        {
+          "type": "string",
+          "name": "Name",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Name"
+        },
+        {
+          "type": "string",
+          "name": "Description",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Description"
+        },
+        { "type": "string",
+          "name": "Expiration",
+          "group": "System",
+          "control": "GeneralDate",
+          "defaultValue": "00/00/00",
+          "description": "Expiration Date"
+        },
+        {
+           "type": "boolean",
+           "name": "Retired",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Retired"
+        }
+        ],
+        "Specification":[
+        {   "type": "double",
+            "name": "LotMinLimit",
+            "group": "Specification",
+            "control": "GeneralDouble",
+            "defaultValue": 0.00,
+            "description": "Lowest lot value allowed"
+        },
+        {   "type": "double",
+            "name": "LotMaxLimit",
+            "group": "Specification",
+            "control": "GeneralDouble",
+            "defaultValue": 0.00,
+            "description": "Highest lot value allowed"
+        } ]
+    },
+    "Wallet": {
+      "System": [
+        {
+          "type": "integer",
+          "name": "Id",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "Id in Database"
+        },
+        {
+          "type": "string",
+          "name": "Name",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Name"
+        },
+        {
+          "type": "string",
+          "name": "Shortname",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Shortname"
+        },
+        {
+          "type": "boolean",
+           "name": "Retired",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Retired"
+        }
+      ]
+    },
+    "Account": {
+      "System": [
+        {
+          "type": "integer",
+          "name": "Id",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "Id in Database"
+        },
+        {
+          "type": "string",
+          "name": "Description",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Description"
+        },
+        { "type": "integer",
+          "name": "CurrencyId",
+          "group": "System",
+          "control": "GenericEnum",
+          "defaultValue": 1,
+          "items": [ {"ID":1, "name": "USD"}, {"ID": 2,"name": "EUR" }, {"ID":3, "name": "GBP"},
+            {"ID":4, "name": "AUD"}, {"ID":5, "name": "CHF"},{"ID":6, "name": "CAD"},
+            {"ID":11, "name": "MXN"},{"ID":18, "name": "BTC"},{"ID":19, "name": "ETH"},
+            {"ID":21, "name": "RUB"},{"ID":22, "name": "BYN"},
+            {"ID":23, "name": "XAU"} ],
+          "description": "Currency"
+        },
+        {
+          "type": "integer",
+           "name": "Number",
+           "group": "System",
+           "control": "GeneralInteger",
+           "defaultValue": false,
+           "description": "Number"
+        },
+        { "type": "integer",
+          "name": "Typ",
+          "group": "System",
+          "control": "GenericEnum",
+          "defaultValue": 1,
+          "items": [ {"ID":0, "name": "Checking"}, {"ID": 1,"name": "Investing" } ],
+          "description": "Account type"
+        },
+        {
+          "type": "boolean",
+           "name": "Retired",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Retired"
+        }
+      ]
+    },
+
+    "Rates": {
+      "System": [
+        {
+          "type": "integer",
+          "name": "Id",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "Id in Database"
+        },
+        {
+          "type": "string",
+          "name": "MetaSymbol",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "",
+          "description": "Property Name"
+        },
+        {
+          "type": "string",
+          "name": "C1",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "C1"
+        },
+        {
+          "type": "string",
+          "name": "C2",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "C2"
+        },
+        {
+          "type": "string",
+          "name": "Ratebid",
+          "group": "System",
+          "control": "GeneralDouble",
+          "defaultValue": 1.0,
+          "description": "Ratebid"
+        },
+        {
+          "type": "string",
+          "name": "Rateask",
+          "group": "System",
+          "control": "GeneralDouble",
+          "defaultValue": 1.0,
+          "description": "Rateask"
+        },
+        { "type": "string",
+          "name": "Lastupdate",
+          "group": "System",
+          "control": "GeneralDate",
+          "defaultValue": "00/00/00",
+          "description": "Lastupdate"
+        },
+        {
+          "type": "boolean",
+           "name": "Retired",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Retired"
+        }
+      ]
+    },
+
+    "Settings": {
+      "System": [
+        {
+          "type": "integer",
+          "name": "Id",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "Id in Database"
+        },
+        {
+          "type": "string",
+          "name": "Propertyname",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Property Name"
+        },
+        {
+          "type": "string",
+          "name": "Value",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Value"
+        },
+        {
+          "type": "string",
+          "name": "Description",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Description"
+        }
+
+      ]
+    },
+    "Person": {
+      "System": [
+        {
+          "type": "integer",
+          "name": "Id",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "Id in Database"
+        },
+        {
+          "type": "string",
+          "name": "Mail",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Login Mail"
+        },
+        {
+          "type": "integer",
+          "name": "Privilege",
+          "group": "System",
+          "control": "GenericEnum",
+          "defaultValue": "GUEST",
+          "items": [ {"ID":"OWNER", "name": "OWNER"}, {"ID": "GUEST","name": "GUEST" } ],
+          "description": "Account type"
+        },
+        {
+          "type": "string",
+          "name": "Created",
+          "group": "System",
+          "control": "GeneralDate",
+          "defaultValue": "",
+          "description": "Privilege"
+        }
+      ]
+    },
+
+    "Position": {
+      "System": [
+        {
+          "type": "integer",
+          "name": "Ticket",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": -1,
+          "description": "Ticket"
+        },
+        {
+          "type": "integer",
+          "name": "Role",
+          "group": "System",
+          "control": "GenericEnum",
+          "defaultValue": "0",
+          "items": [ {"ID":"RegularTrail", "name": "RegularTrail"}, {"ID": "GridHead","name": "GridHead" }, {"ID": "GridTail","name": "GridTail" },
+            {"ID": "ShouldBeClosed","name": "ShouldBeClosed" }, {"ID": "History","name": "History" }, {"ID": "PendingLimit","name": "PendingLimit" },
+            {"ID": "PendingStop","name": "PendingStop" }, {"ID": "LongInvestment","name": "LongInvestment" }, {"ID": "ShortInvestment","name": "ShortInvestment" } ],
+          "description": "Account type"
+        },
+        {
+          "type": "string",
+          "name": "AccountName",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "",
+          "description": "AccountName"
+        },
+        {
+          "type": "string",
+          "name": "Symbol",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "",
+          "description": "Symbol"
+        },
+        {
+          "type": "string",
+          "name": "Lots",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": "",
+          "description": "Lots"
+        }
+
+      ]
+    }
+
+}

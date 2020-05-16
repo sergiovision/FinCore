@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Adviser" table="adviser" lazy="true" >
+    <id name="Id" column="Id" />
+    <many-to-one name="Terminal">
+      <column name="TerminalId" sql-type="int(11)" not-null="false" />
+    </many-to-one>
+    <many-to-one name="Symbol">
+      <column name="SymbolId" sql-type="int(11)" not-null="false" />
+    </many-to-one>
+    <property name="Name">
+      <column name="Name" sql-type="varchar(128)" not-null="false" />
+    </property>
+    <property name="Timeframe">
+      <column name="Timeframe" sql-type="varchar(64)" not-null="false" />
+    </property>
+    <property name="IsMaster">
+      <column name="IsMaster" sql-type="bit(1)" not-null="false" />
+    </property>
+    <property name="Running">
+      <column name="Running" sql-type="bit(1)" not-null="false" />
+    </property>
+    <property name="Retired">
+      <column name="Retired" sql-type="bit(1)" not-null="false" />
+    </property>
+    <property name="State">
+      <column name="State" sql-type="text" not-null="false" />
+    </property>
+    <property name="Lastupdate">
+      <column name="Lastupdate" sql-type="datetime" not-null="false" />
+    </property>
+    <property name="Closereason">
+      <column name="Closereason" sql-type="int(11)" not-null="false" />
+    </property>
+    <bag name="Deals">
+      <key column="" />
+      <one-to-many class="Deals" />
+    </bag>
+    <bag name="Expertcluster">
+      <key column="" />
+      <one-to-many class="Expertcluster" />
+    </bag>
+  </class>
+</hibernate-mapping>

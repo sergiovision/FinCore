@@ -1,0 +1,54 @@
+<div class="app-body">
+  <main class="main d-flex align-items-center">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-8 mx-auto">
+          <div class="card-group">
+            <div class="card p-4">
+              <div class="card-body">
+                <form (submit)="onSubmit()">
+                    <div class="dx-fieldset">
+                        <div class="dx-fieldset-header">Credentials</div>
+                        <div class="dx-field">
+                            <div class="dx-field-label">Email</div>
+                            <div class="dx-field-value">
+                                <dx-text-box mode="email" [(value)]="username">
+                                    <dx-validator>
+                                        <dxi-validation-rule type="required" message="Email is required"></dxi-validation-rule>
+                                        <dxi-validation-rule type="email" message="Email is invalid"></dxi-validation-rule>
+                                    </dx-validator>
+                                </dx-text-box>
+                            </div>
+                        </div>
+                        <div class="dx-field">
+                            <div class="dx-field-label">Password</div>
+                            <div class="dx-field-value">
+                                <dx-text-box
+                                    mode="password"
+                                    [(value)]="password">
+                                    <dx-validator>
+                                        <dxi-validation-rule type="required" message="Password is required"></dxi-validation-rule>
+                                    </dx-validator>
+                                </dx-text-box>
+                            </div>
+                        </div>
+                  </div>
+                  <div class="dx-fieldset">
+                      <dx-validation-summary id="summary"></dx-validation-summary>
+                      <dx-button
+                          id="button"
+                          text="Login"
+                          type="success"
+                          [useSubmitBehavior]="true">
+                      </dx-button>
+                      <!-- <a routerLink="/register" class="btn btn-link">Register</a> -->
+                  </div>
+              </form>
+              </div>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+</div>

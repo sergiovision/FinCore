@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
+  <class name="Currency" table="currency" lazy="true" >
+    <id name="Id" column="Id" />
+    <property name="Name">
+      <column name="Name" sql-type="varchar(32)" not-null="true" />
+    </property>
+    <property name="Enabled">
+      <column name="Enabled" sql-type="tinyint(1)" not-null="false" />
+    </property>
+    <bag name="Account">
+      <key column="" />
+      <one-to-many class="Account" />
+    </bag>
+    <bag name="Country">
+      <key column="" />
+      <one-to-many class="Country" />
+    </bag>
+    <bag name="Newsevent">
+      <key column="" />
+      <one-to-many class="Newsevent" />
+    </bag>
+  </class>
+</hibernate-mapping>
