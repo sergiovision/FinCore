@@ -3,8 +3,10 @@
 # About FinCore
 <p id="doc_about">
 </p>
-  FinCore is a cool and free cross-platform personal finances manager written in .NET Core 3.1 with Angular 9 frontend. 
-  Program fits for anybody. <br>
+  FinCore is a cool and free cross-platform personal finances manager written in .NET Core 3.1 with Angular 9 frontend. <br>
+  This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.<br>
+  
+Program fits for anybody. <br>
   1. For merchant/consumer<br>
   If one lazy to take risks on trading and investing then can stick to <a href="#doc_wallets">Wallets book</a> and <a href="#doc_rates">Realtime exchange rates</a> <br>
   In this case one can control and observe his wallets state in different currencies with current exchange rates and track performance here <a href="#doc_performance">Earning/Spending Performance per day/month</a>.<br>
@@ -46,7 +48,6 @@
 `docker pull dockersergio/fincore:latest`
 
 `docker-compose up`
-
 
 To make build succeeded the following apps should be installed: Visual Studio 2019, Visual Studio 2019 Build tools, latest NPM from http://nodejs.org.
 Applications need to be installed to run server properly: 
@@ -132,8 +133,10 @@ FinCore folders structure:
   <img src="/FinCore/ClientApp/src/assets/img/doc/login.png"/>
   <br>
   <p id="doc_wallets">Wallets book</p>
+  
   <img src="assets/img/doc/w.jpg"/>
-  <br>
+  _For some reason GitHub doesn't want to load wallets image because it contains very intimate image about how large your relationships with money :))) _
+<br>
   <p id="doc_dashboard">Realtime Dashboard</p>
   Dashboard shows current positions and investments performance in realtime. Used high performance websocket driven engine to update instruments in realtime.
   <br>
