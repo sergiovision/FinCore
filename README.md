@@ -4,7 +4,8 @@
 <p id="doc_about">
 </p>
   FinCore is a cool and free cross-platform personal finances manager written in .NET Core 3.1 with Angular 9 frontend. <br>
-  This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.<br>
+
+  <p>This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.</p>
   
 Program fits for anybody. <br>
   1. For merchant/consumer<br>
@@ -135,7 +136,7 @@ FinCore folders structure:
   <p id="doc_wallets">Wallets book</p>
   
   <img src="assets/img/doc/w.jpg"/>
-  _For some reason GitHub doesn't want to load wallets image because it contains very intimate image about how large your relationships with money :))) _
+  **For some reason GitHub doesn't want to load wallets image because it contains very intimate image about how large your relationships with money :)))**
 <br>
   <p id="doc_dashboard">Realtime Dashboard</p>
   Dashboard shows current positions and investments performance in realtime. Used high performance websocket driven engine to update instruments in realtime.
