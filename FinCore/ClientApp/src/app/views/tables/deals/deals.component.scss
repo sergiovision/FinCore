@@ -4,8 +4,6 @@
   font-weight: bold;
 }
 
-
-
 ::ng-deep #dealsContainer span.current-value {
   display: inline-block;
   margin-right: 5px;
@@ -24,7 +22,10 @@
   color: #f00;
 }
 
-
+::ng-deep #dealsContainer .dx-datagrid-header-panel .dx-toolbar-after .dx-toolbar-item:first-child {
+  padding-top: 5px;
+  padding-right: 10px;
+}
 
 ::ng-deep #dealsContainer .inc .arrow,
 ::ng-deep #dealsContainer .dec .arrow {

@@ -71,22 +71,29 @@ namespace BusinessLogic.BusinessObjects
                     break;
                 case EnumSignals.SIGNAL_UPDATE_RATES:
                     {
-                        List<RatesInfo> rates = null;
-                        if (signal.Data != null)
-                            rates = JsonConvert.DeserializeObject<List<RatesInfo>>(signal.Data.ToString());
-                        if (rates != null)
-                        {
-                            double usdbynrate = GetBYNRates();
-                            if (usdbynrate > 0)
+                        try { 
+                            List<RatesInfo> rates = null;
+                            if (signal.Data != null)
+                                rates = JsonConvert.DeserializeObject<List<RatesInfo>>(signal.Data.ToString());
+                            if (rates != null)
                             {
-                                RatesInfo rate = new RatesInfo();
-                                rate.Ask = usdbynrate;
-                                rate.Bid = usdbynrate;
-                                rate.Symbol = "USDBYN";
-                                rates.Add(rate);
+                                var usdbynrateTask = GetBYNRates();
+                                double usdbynrate = usdbynrateTask.Result;
+                                if (usdbynrate > 0)
+                                {
+                                    RatesInfo rate = new RatesInfo();
+                                    rate.Ask = usdbynrate;
+                                    rate.Bid = usdbynrate;
+                                    rate.Symbol = "USDBYN";
+                                    rates.Add(rate);
+                                }
                             }
+                            xtrade.UpdateRates(rates);
                         }
-                        xtrade.UpdateRates(rates);
+                        catch (Exception e)
+                        {
+                            log.Info(String.Format($"GetBYNUSDRates Error: {0}", e.ToString()));
+                        }
                     }
                     break;
                 case EnumSignals.SIGNAL_ACTIVE_ORDERS:
@@ -231,15 +238,14 @@ namespace BusinessLogic.BusinessObjects
             }
         }
 
-        public double GetBYNRates()
+        public async Task<double> GetBYNRates()
         {
-            try
-            {
                 const string url = "https://www.nbrb.by/api/exrates/rates?periodicity=0";
                 var client = new HttpClient();
                 var stringTask = client.GetStringAsync(url);
-                double result = 0;
-                if (stringTask != null)
+                // double result = 0;
+                await stringTask;
+                if (stringTask.Result != null)
                 {
                     string stringData = stringTask.Result;
                     List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(stringData);
@@ -260,13 +266,7 @@ namespace BusinessLogic.BusinessObjects
 
                     }
                 }
-                return result;
-            }
-            catch (Exception e)
-            {
-                log.Info(String.Format($"GetBYNUSDRates Error: {0}", e.ToString()));
                 return 0;
-            }
         }
 
 

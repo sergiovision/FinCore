@@ -1,0 +1,39 @@
+<div class="row">
+  <div class="block">
+    <dx-bar-gauge
+      #gaugeGainers
+      id="gaugeGainers"
+      [startValue]="0"
+      [endValue]="maxGain"
+      [baseValue]="0"
+      [values]="GainersProfits"
+      [palette]="['#caff45', '#88ff21', '#00ff00', '#00db4d', '#069c3a', '#2d6d1b', '#225614']">
+      <dxo-label [customizeText]="customizeTextGainers" [indent]="5">
+        <dxo-font [size]="10" color="black"></dxo-font>
+      </dxo-label>
+      <dxo-export [enabled]="false"></dxo-export>
+      <dxo-title [text]="titleGainers()" verticalAlignment="bottom" >
+        <dxo-font [size]="10" color="#225614"></dxo-font>
+      </dxo-title>
+    </dx-bar-gauge>
+  </div>
+
+  <div class="block">
+    <dx-bar-gauge
+      #gaugeLoosers
+      id="gaugeLoosers"
+      [startValue]="0"
+      [endValue]="maxLoose"
+      [baseValue]="0"
+      [values]="LoosersProfits"
+      [palette]="['#ffa1a1', '#ff7070', '#ff0000','#a03c3b', '#8e3535', '#682627', '#5c1c1c']">
+      <dxo-label [customizeText]="customizeTextLoosers" [indent]="5">
+        <dxo-font [size]="10" color="black"></dxo-font>
+      </dxo-label>
+      <dxo-export [enabled]="false"></dxo-export>
+      <dxo-title [text]="titleLoosers()" verticalAlignment="bottom" >
+        <dxo-font [size]="10" color="#5c1c1c"></dxo-font>
+      </dxo-title>
+    </dx-bar-gauge>
+  </div>
+</div>

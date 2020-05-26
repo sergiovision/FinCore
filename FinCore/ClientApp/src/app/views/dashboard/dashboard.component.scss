@@ -18,6 +18,14 @@
   color: #f00;
 }
 
+::ng-deep #positionsContainer .inc a {
+  color: #2ab71b;
+}
+
+::ng-deep #positionsContainer .dec a {
+  color: #f00;
+}
+
 ::ng-deep #positionsContainer .dx-datagrid-header-panel {
   padding: 0;
   background-color:lightgray;
@@ -62,7 +70,6 @@
   margin: 0;
 }
 
-
 ::ng-deep #positionsContainer .inc .arrow,
 ::ng-deep #positionsContainer .dec .arrow {
   display: inline-block;
@@ -79,6 +86,7 @@
 ::ng-deep #positionsContainer .dec .arrow {
   background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAUCAYAAACNiR0NAAAABGdBTUEAAK/INwWK6QAAABl0RVh0U29mdHdhcmUAQWRvYmUgSW1hZ2VSZWFkeXHJZTwAAADJSURBVHjaYvzPgBfgkhYA4o8QFahKmBioDEYNHIQGsgBxIBCLkqgvAYi/g1mMjMjir0EJzR6If/6HpChKMMgMe3DKBeIcKhiY8x/MYoDj+RQYNgdkGLqBbEB8kgzDToL1YjEQhKWB+BUJhj0H64Eahs1AELYhMpJ+gtUiGYbLQBBOI8LANLBaIg1kAAc0vkiAqSPBQFAkHcNi2DGoHMkGgrAENOCRI0ECRQ2JBoKwJTQCfkLZDPgMZPxPXN5NhtJzMSsJVBMAAgwAyWSY2svfmrwAAAAASUVORK5CYII=');
 }
+
 
 ::ng-deep .master-detail-caption {
   padding: 0 0 5px 10px;
@@ -110,6 +118,9 @@
 ::ng-deep #dealsContainer .dec {
   color: #f00;
 }
+
+
+
 
 
 

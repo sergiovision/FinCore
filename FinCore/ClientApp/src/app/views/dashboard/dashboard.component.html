@@ -1,4 +1,10 @@
 <div>
+  <app-dgauge #dgauge id="dgauge">
+
+  </app-dgauge>
+</div>
+
+<div>
   <dx-data-grid #positionsContainer id="positionsContainer" [dataSource]="dataSource" [showBorders]="true"
     [columnHidingEnabled]="true" [repaintChangesOnly]="true" [highlightChanges]="true"
     (onCellClick)="onClickCell($event)" (onToolbarPreparing)="onToolbarPreparing($event)">
@@ -12,13 +18,18 @@
       </div>
     </dxi-column>
 
-    <!-- <dxi-column dataField="Ticket" [allowSorting]="true" [hidingPriority]="2"></dxi-column> -->
-
     <dxi-column dataField="Role" caption="Role" [allowSorting]="true" groupIndex="0"></dxi-column>
 
     <dxi-column dataField="AccountName" caption="Account Type" [allowSorting]="true" sortOrder="asc"></dxi-column>
 
-    <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolCellTemplate"></dxi-column>
+    <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolCellTemplate">
+      <div *dxTemplate="let cell of 'symbolCellTemplate'" [class.inc]="cell.data.Type === 0" [class.dec]="cell.data.Type === 1">
+        <span class="arrow"></span>
+        <a [href]="this.deals.externChartURL(cell.value)" target="_blank" >
+          <span class="current-value">{{cell.text}}</span>
+        </a>
+      </div>
+    </dxi-column>
 
     <dxi-column dataField="Lots" [allowSorting]="true" [hidingPriority]="1"></dxi-column>
     <dxi-column dataField="ProfitStopsPercent" caption="%" format="#0.##'%'" [allowSorting]="true"
@@ -27,6 +38,10 @@
     </dxi-column>
     <dxi-column dataField="Profit" caption="$" format="#0.##" [allowSorting]="true" cellTemplate="priceCellTemplate">
       <dxo-format type="fixedPoint" [precision]="2"></dxo-format>
+      <div *dxTemplate="let cell of 'priceCellTemplate'" [class.inc]="cell.data.Profit > 0"
+        [class.dec]="cell.data.Profit < 0">
+        <span class="current-value">{{cell.text}}</span>
+      </div>
     </dxi-column>
 
     <dxi-column [width]="160" dataField="Role" caption="Commands" cellTemplate="cellTemplateClose" [allowFiltering]="false"
@@ -36,16 +51,6 @@
       </div>
     </dxi-column>
 
-    <div *dxTemplate="let cell of 'priceCellTemplate'" [class.inc]="cell.data.Profit > 0"
-      [class.dec]="cell.data.Profit < 0">
-      <span>{{cell.text}}</span>
-    </div>
-
-    <div *dxTemplate="let cell of 'symbolCellTemplate'" [class.inc]="cell.data.Type === 0"
-      [class.dec]="cell.data.Type === 1">
-      <span class="arrow"></span>
-      <span class="current-value">{{cell.text}}</span>
-    </div>
 
     <div *dxTemplate="let data of 'totalStat'">
       <div>

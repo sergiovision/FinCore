@@ -9,21 +9,23 @@
     (onCellClick)="onClickParentCell($event)"
     [showBorders]="true">
 
+    <dxo-search-panel
+        [visible]="true"
+        [width]="240"
+        placeholder="Search..."></dxo-search-panel>
+
     <dxo-paging [enabled]="false"></dxo-paging>
     <dxi-column [width]="160" caption="Props" dataField="Name" alignment="center"
     cellTemplate="cellTemplateMS" [allowFiltering]="false" [allowSorting]="true">
       <div *dxTemplate="let data of 'cellTemplateMS'">
         <dx-button [width]="100">{{ data.value }}</dx-button>
       </div>
+      <dxo-header-filter [allowSearch]="true"></dxo-header-filter>
     </dxi-column>
-    <dxi-column dataField="Description" [allowSorting]="true" [hidingPriority]="2"></dxi-column>
+    <dxi-column dataField="Description" [allowSorting]="true" [hidingPriority]="2">
+      <dxo-header-filter [allowSearch]="true"></dxo-header-filter>
+    </dxi-column>
 
-<!--    <dxi-column [width]="100" caption="Intern Chart" dataField="Name" alignment="center" cellTemplate="cellTemplateIxS"
-    [allowFiltering]="false" [allowSorting]="false">
-    <div *dxTemplate="let data of 'cellTemplateIxS'">
-      <a href="#/chart?symbol={{data.value}}">{{ data.value }}</a>
-    </div>
-    </dxi-column> -->
     <dxi-column [width]="100" caption="Extern Chart" dataField="Name" alignment="center" cellTemplate="cellTemplateExS"
       [allowFiltering]="false" [allowSorting]="false" [hidingPriority]="2">
       <div *dxTemplate="let data of 'cellTemplateExS'">
@@ -75,7 +77,6 @@
                   </div>
                 </dxi-column>
                 <dxi-column dataField="Id" width="80"></dxi-column>
-                <!-- <dxi-column dataField="Name" [allowSorting]="true"></dxi-column> -->
                 <dxi-column dataField="Description" [allowSorting]="true"></dxi-column>
                 <dxi-column dataField="Expiration" [allowSorting]="true"></dxi-column>
                 <dxi-column dataField="Retired" [allowSorting]="true"></dxi-column>

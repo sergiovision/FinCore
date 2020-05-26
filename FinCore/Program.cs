@@ -24,8 +24,17 @@ namespace FinCore
 
         public static ILifetimeScope Container { get; set; }
 
+        private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
+        {
+            String message = "Caught TaskScheduler_UnobservedTaskException!!!!" + sender.ToString();
+            Console.Write(message);
+            Log.Error(message);
+        }
+
         public static void Main(string[] args)
         {
+            TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+
             var rc = HostFactory.Run(x =>
             {
                 x.SetDescription(Configuration.ServiceDescription);
@@ -39,7 +48,8 @@ namespace FinCore
                 });
             });
             var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
-            Log.Info("**** Service Exited with code: " + exitCode + " ****");
+            string msg = string.Format("------------------------------- FinCore Exited with code: (%d) --------------------------------", exitCode);
+            Log.Info(msg);
             Environment.ExitCode = exitCode;            
         }
 

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj": {}
+    "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessLogic/BusinessLogic.csproj": {}
   },
   "projects": {
-    "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj": {
+    "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessLogic/BusinessLogic.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj",
+        "projectUniqueName": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessLogic/BusinessLogic.csproj",
         "projectName": "BusinessLogic",
-        "projectPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/BusinessLogic.csproj",
+        "projectPath": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessLogic/BusinessLogic.csproj",
         "packagesPath": "/Users/sergeizhuravlev/.nuget/packages/",
-        "outputPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessLogic/obj/",
+        "outputPath": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessLogic/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/sergeizhuravlev/.config/NuGet/NuGet.Config"
@@ -26,8 +26,8 @@
         "frameworks": {
           "netcoreapp3.1": {
             "projectReferences": {
-              "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj": {
-                "projectPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj"
+              "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessObjects/BusinessObjects.csproj": {
+                "projectPath": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessObjects/BusinessObjects.csproj"
               }
             }
           }
@@ -51,7 +51,7 @@
             },
             "Autofac": {
               "target": "Package",
-              "version": "[5.1.2, )"
+              "version": "[5.2.0, )"
             },
             "FluentNHibernate": {
               "target": "Package",
@@ -63,11 +63,11 @@
             },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
-              "version": "[3.1.3, )"
+              "version": "[3.1.4, )"
             },
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.0.19, )"
+              "version": "[8.0.20, )"
             },
             "NHibernate": {
               "target": "Package",
@@ -83,7 +83,7 @@
             },
             "System.Data.SQLite.Core": {
               "target": "Package",
-              "version": "[1.0.112.1, )"
+              "version": "[1.0.112.2, )"
             }
           },
           "imports": [
@@ -101,18 +101,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.202/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.300/RuntimeIdentifierGraph.json"
         }
       }
     },
-    "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj": {
+    "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessObjects/BusinessObjects.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj",
+        "projectUniqueName": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessObjects/BusinessObjects.csproj",
         "projectName": "BusinessObjects",
-        "projectPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/BusinessObjects.csproj",
+        "projectPath": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessObjects/BusinessObjects.csproj",
         "packagesPath": "/Users/sergeizhuravlev/.nuget/packages/",
-        "outputPath": "/Users/sergeizhuravlev/Documents/Projects/XTrade/FinCore/BusinessObjects/obj/",
+        "outputPath": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessObjects/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/Users/sergeizhuravlev/.config/NuGet/NuGet.Config"
@@ -140,7 +140,7 @@
           "dependencies": {
             "Autofac": {
               "target": "Package",
-              "version": "[5.1.2, )"
+              "version": "[5.2.0, )"
             }
           },
           "imports": [
@@ -158,7 +158,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.202/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.300/RuntimeIdentifierGraph.json"
         }
       }
     }

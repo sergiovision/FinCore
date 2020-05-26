@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Http;
 using Autofac.Extensions.DependencyInjection;
 using System.Text.RegularExpressions;
 using AutoMapper;
+using System.Threading.Tasks;
 
 namespace FinCore
 {
@@ -95,7 +96,9 @@ namespace FinCore
 
             services.AddHostedService<MessagingBackgroundService>();
             services.AddSingleton<IMessagingService, MessagingService>();
+
         }
+
 
         public string GetApplicationRoot()
         {

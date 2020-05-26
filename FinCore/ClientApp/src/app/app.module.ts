@@ -7,7 +7,7 @@ import { PerfectScrollbarModule } from 'ngx-perfect-scrollbar';
 import { PERFECT_SCROLLBAR_CONFIG } from 'ngx-perfect-scrollbar';
 import { PerfectScrollbarConfigInterface } from 'ngx-perfect-scrollbar';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
-import { DevExtremeModule } from 'devextreme-angular';
+import { DevExtremeModule, DxBarGaugeModule, DxBoxModule } from 'devextreme-angular';
 import { DatePipe } from '@angular/common';
 import {
   DxSelectBoxModule,
@@ -63,6 +63,7 @@ import { TablesModule } from './views/tables/tables.module';
 import { PropsService } from './services/props.service';
 import { PropertiesComponent } from './views/tables/properties/properties.component';
 import { DocComponent } from './views/doc/doc.component';
+import { DGaugeComponent } from './views/dgauge/dgauge.component';
 // import { PropertiesComponent } from './views/tables/properties/properties.component';
 
 @NgModule({
@@ -91,7 +92,9 @@ import { DocComponent } from './views/doc/doc.component';
     DxValidationSummaryModule,
     DxDataGridModule,
     DxTemplateModule,
-    TablesModule
+    TablesModule,
+    DxBarGaugeModule,
+    DxBoxModule
   ],
   declarations: [
     BaseComponent,
@@ -105,6 +108,7 @@ import { DocComponent } from './views/doc/doc.component';
     ChartComponent,
     TviewComponent,
     DocComponent,
+    DGaugeComponent,
     DashboardComponent
   ],
   providers: [

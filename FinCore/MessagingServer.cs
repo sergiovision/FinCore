@@ -2,14 +2,9 @@
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 using Autofac;
 using BusinessObjects;
-using BusinessObjects.BusinessObjects;
 using log4net;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 using NetCoreServer;
 using Newtonsoft.Json;
 
@@ -29,12 +24,12 @@ namespace FinCore
 
         public override void OnWsConnected(HttpRequest request)
         {
-            log.Info($"WebSocket sessionId {Id} connected!");
+            // log.Info($"WebSocket sessionId {Id} connected!");
         }
 
         public override void OnWsDisconnected()
         {
-            log.Info($"WebSocket sessionId {Id} disconnected!");
+            // log.Info($"WebSocket sessionId {Id} disconnected!");
         }
 
         public override void OnWsReceived(byte[] buffer, long offset, long size)

@@ -7,6 +7,7 @@ import notify from 'devextreme/ui/notify';
 import { BaseComponent } from '../../base/base.component';
 import { DxDataGridComponent } from 'devextreme-angular';
 import { PropertiesComponent } from '../tables/properties/properties.component';
+import { DGaugeComponent } from '../dgauge/dgauge.component';
 
 @Component({
   templateUrl: 'dashboard.component.html',
@@ -15,6 +16,7 @@ import { PropertiesComponent } from '../tables/properties/properties.component';
 export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy, IWebsocketCallback {
   @ViewChild('positionsContainer') positionsContainer: DxDataGridComponent;
   @ViewChild(PropertiesComponent) propsContainer: PropertiesComponent;
+  @ViewChild('dgauge') dgauge: DGaugeComponent;
 
   dataSource: CustomStore;
   connectionStarted: boolean;
@@ -23,6 +25,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   users: UserToken[] = [];
   stat: TodayStat;
   currentObject: any;
+  private timerId: any;
 
   _showProperties = false;
 
@@ -45,7 +48,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
 
     this.UpdateDeals();
     this.connectionStarted = true;
-    console.log('connected dashboard\n');
+    // console.log('connected dashboard\n');
     this.loadData();
   }
 
@@ -54,7 +57,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   }
 
   public onClose() {
-    console.log('disconnected dashboard\n');
+    // console.log('disconnected dashboard\n');
 
   }
 
@@ -80,6 +83,8 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
             load: () => data,
             key: 'Ticket'
           });
+          this.dgauge.updateData(data);
+          this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
         }
           break;
         case WsMessageType.UpdatePosition:
@@ -139,19 +144,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     this.ws.doConnect(this);
   }
 
-  /* onRowPrepared(e): void {
-    if (e.data) {
-      if (e.isExpanded && (!e.groupKey) && (e.rowType === 'group')) {
-         if (e.data.key === 'LongInvestment') { /// e.rowIndex === 0
-           // console.log('data: ' + JSON.stringify(e.data));
-           // console.log('key: ' + e.key);
-           // console.log('rowIndex: ' + e.rowIndex);
-           // this.positionsContainer.instance.collapseRow(e.key);
-         }
-      }
-    }
-  } */
-
   getCurrentTitle(): string {
     if (this.propsContainer && this.propsContainer.entityName) {
       return `${this.propsContainer.entityName} Properties`;
@@ -161,6 +153,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
 
 
   ngOnDestroy(): void {
+    clearInterval(this.timerId);
     this.ws.doDisconnect();
     super.ngOnDestroy();
   }
@@ -209,6 +202,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   }
 
   public syncAll(e) {
+    this.loadData();
     this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
       data => {
         window.location.reload();
@@ -256,6 +250,10 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       // console.log(this.currentObject);
     }
     return this.currentObject;
+  }
+
+  symbolClick(sym) {
+    window.location.href = this.deals.externChartURL(sym);
   }
 
   onSave() {

@@ -1,6 +1,5 @@
 ﻿using BusinessLogic.BusinessObjects;
 using BusinessObjects;
-using BusinessObjects.BusinessObjects;
 using Newtonsoft.Json;
 using NHibernate;
 using NHibernate.Type;

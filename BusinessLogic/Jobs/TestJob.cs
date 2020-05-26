@@ -26,7 +26,7 @@ namespace BusinessLogic.Jobs
             log.Debug("TestJob c-tor");
         }
 
-        protected void CleanMemory()
+        protected Task CleanMemory()
         {
             long before = GC.GetTotalMemory(false);
             // Collect all generations of memory.
@@ -34,6 +34,7 @@ namespace BusinessLogic.Jobs
             long after = GC.GetTotalMemory(true);
             log.Log(String.Format("Memory Cleanup From: {0:N0} => To {1:N0}",
                                 before, after));
+            return Task.CompletedTask;
         }
 
         public override async Task Execute(IJobExecutionContext context)
@@ -52,8 +53,7 @@ namespace BusinessLogic.Jobs
 
                 //var log = MainService.thisGlobal.Container.Resolve<IWebLog>();
                 //log.Log("Hello world");
-                CleanMemory();
-
+                await CleanMemory();
 
                 // MainService.thisGlobal.ClearPositions();
                 //PositionInfo position = new PositionInfo();
