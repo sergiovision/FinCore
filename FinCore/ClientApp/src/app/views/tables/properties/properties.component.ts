@@ -162,16 +162,18 @@ export class PropertiesComponent extends BaseComponent implements OnInit, OnDest
       data => {
             // console.log('Data saved: ');
             // console.log(this.responseData);
-            this.dataSource = undefined;
-            this.parentVisibleChange.emit(false);
+            this.close();
       },
       error => this.logNotifyError(error));
     } else {
-      this.dataSource = undefined;
-      this.parentVisibleChange.emit(false);
+      this.close();
     }
 
   }
 
+  public close() {
+    this.dataSource = undefined;
+    this.parentVisibleChange.emit(false);
+  }
 
 }

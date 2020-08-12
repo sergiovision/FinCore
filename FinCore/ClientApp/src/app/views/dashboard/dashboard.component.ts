@@ -57,8 +57,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   }
 
   public onClose() {
-    // console.log('disconnected dashboard\n');
-
+    this.propsContainer.close();
   }
 
   allowClosePositions(data): boolean {

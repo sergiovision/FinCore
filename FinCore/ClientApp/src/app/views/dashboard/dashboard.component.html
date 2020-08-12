@@ -18,9 +18,9 @@
       </div>
     </dxi-column>
 
-    <dxi-column dataField="Role" caption="Role" [allowSorting]="true" groupIndex="0"></dxi-column>
+    <dxi-column dataField="Role" caption="Role" [allowSorting]="true" groupIndex="0" sortOrder="desc"></dxi-column>
 
-    <dxi-column dataField="AccountName" caption="Account Type" [allowSorting]="true" sortOrder="asc"></dxi-column>
+    <dxi-column dataField="AccountName" caption="Account Type" [allowSorting]="true"></dxi-column>
 
     <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolCellTemplate">
       <div *dxTemplate="let cell of 'symbolCellTemplate'" [class.inc]="cell.data.Type === 0" [class.dec]="cell.data.Type === 1">
@@ -88,14 +88,20 @@
 </div>
 
 <dx-popup
-[width]="1000"
-[height]="700"
+width="100%"
+height="100%"
 showTitle="true"
 [title]="getCurrentTitle()"
 [closeOnOutsideClick]="true"
 [dragEnabled]="false"
 [(visible)]="showProperties">
+    <dxo-position
+        my="center"
+        at="center"
+        of="#targetElement">
+    </dxo-position>
     <dx-button text="Save" (onClick)="onSave()"></dx-button>
+    <dx-button text="Close" (onClick)="onClose()"></dx-button>
     <dx-scroll-view #scrollView id="scrollview" scrollByContent="true" showScrollbar="always">
         <app-properties #propsContainer [(parentVisible)]="showProperties">
         </app-properties>

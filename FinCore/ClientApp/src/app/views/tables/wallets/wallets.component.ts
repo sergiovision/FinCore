@@ -316,4 +316,9 @@ export class WalletsComponent extends BaseComponent implements OnInit {
 
   }
 
+  public onClose() {
+    this.propsContainer.close();
+  }
+
+
 }

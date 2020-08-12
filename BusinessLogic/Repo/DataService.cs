@@ -1060,7 +1060,7 @@ namespace BusinessLogic.Repo
                     {
                         var dtObj = mapper.Map(item, t.Item1, t.Item2);
                         result.Add(dtObj);
-                    });
+                    }); 
                 return result;
             }
         }

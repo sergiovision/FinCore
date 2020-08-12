@@ -243,6 +243,10 @@ export class MetasymbolComponent extends BaseComponent implements OnInit {
 
   }
 
+  public onClose() {
+    this.propsContainer.close();
+  }
+
   public updateAdviser(obj: Adviser) {
     // const strData: string = JSON.stringify(this.adviserState);
     // this.currentAdviser.State = strData;

@@ -101,7 +101,7 @@ namespace FinCore
                     {
                         notcontains.AccountName = terminals[AccountNumber].Broker;
                         notcontains.Profit = (double)xtrade.ConvertToUSD(new decimal(notcontains.Profit), terminals[AccountNumber].Currency);
-                        notcontains.Value = notcontains.Profit + (double)xtrade.ConvertToUSD(new decimal(notcontains.calculateValue()), notcontains.cur);
+                        notcontains.Value = (double)xtrade.ConvertToUSD(new decimal(notcontains.calculateValue()), notcontains.cur);// + notcontains.Profit;
                         positionsToAdd.Add(notcontains.Ticket, notcontains);
                     }
 

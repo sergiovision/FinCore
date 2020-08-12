@@ -20,14 +20,20 @@
 </dx-data-grid>
 
 <dx-popup
-[width]="1000"
-[height]="700"
+width="100%"
+height="100%"
 showTitle="true"
 [title]="getCurrentTitle()"
 [closeOnOutsideClick]="true"
 [dragEnabled]="false"
 [(visible)]="showProperties">
+    <dxo-position
+      my="center"
+      at="center"
+      of="#targetElement">
+    </dxo-position>
     <dx-button text="Save" (onClick)="onSave()"></dx-button>
+    <dx-button text="Close" (onClick)="onClose()"></dx-button>
     <dx-scroll-view #scrollView id="scrollview" scrollByContent="true" showScrollbar="always">
         <app-properties #propsContainer [(parentVisible)]="showProperties">
         </app-properties>

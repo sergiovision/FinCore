@@ -120,6 +120,10 @@ export class SettingsComponent extends BaseComponent implements OnInit {
     return this.currentObject;
   }
 
+  public onClose() {
+    this.propsContainer.close();
+  }
+
   onSave() {
     const key = this.propsContainer.objId;
     if (key) {

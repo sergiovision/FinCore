@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { DealsService } from '../../../services/deals.service';
 import { MetaSymbolStat } from '../../../models/Entities';
 import { BaseComponent } from '../../../base/base.component';
+// import DevExpress from 'devextreme/bundles/dx.all';
 
 export class SelectAccountType {
   id: number;
@@ -38,10 +39,21 @@ export class SymbolsComponent extends BaseComponent implements OnInit  {
   loadData() {
     this.loadingVisible = true;
 
+    const nElements = 18;
+    // console.log(DevExpress.devices);
+    // const device = DevExpress.devices.current.name;
+    // console.log('Device: ' + device);
+    // if (device === 'desktop') {
+    //  nElements = 20;
+    // } else  {
+    //  nElements = 10;
+    // }
+
     this.subs.sink = this.deals.getStat(this.currentAccountType)
       .subscribe(
           data => {
-            this.dataSource = data;
+            this.dataSource = data.slice(0, nElements);
+            // console.log(this.dataSource);
             this.loadingVisible = false;
           },
           error => this.logConsoleError(error));

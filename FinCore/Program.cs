@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.ExceptionServices;
+using System.Security;
+using System.Threading;
 using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
@@ -14,6 +17,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Topshelf;
+using static System.Net.Mime.MediaTypeNames;
 using Host = Microsoft.Extensions.Hosting.Host;
 
 namespace FinCore
@@ -31,9 +35,40 @@ namespace FinCore
             Log.Error(message);
         }
 
-        public static void Main(string[] args)
+        static void HanldeGlobalExceptions()
         {
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
+            //Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
+            //Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
+            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+        }
+
+        [HandleProcessCorruptedStateExceptions]
+        [SecurityCritical]
+        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            Debug.Fail("Error " + (e.ExceptionObject as Exception).Message);
+            try
+            {
+                Log.Error(e.ToString());
+            }
+            catch { }
+        }
+
+        static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+        {
+            try
+            {
+                Log.Error(e.ToString());
+            }
+            catch { }
+        }
+
+        [HandleProcessCorruptedStateExceptions]
+        [SecurityCritical]
+        public static void Main(string[] args)
+        {
+            HanldeGlobalExceptions();
 
             var rc = HostFactory.Run(x =>
             {

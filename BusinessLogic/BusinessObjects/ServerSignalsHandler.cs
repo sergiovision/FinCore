@@ -120,7 +120,7 @@ namespace BusinessLogic.BusinessObjects
                  */
                 case EnumSignals.SIGNAL_WARN_NEWS:
                     break;
-                    case EnumSignals.SIGNAL_DEINIT_EXPERT:
+                case EnumSignals.SIGNAL_DEINIT_EXPERT:
                     {
                         ExpertInfo expert = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
                         xtrade.DeInitExpert(expert);

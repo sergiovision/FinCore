@@ -191,6 +191,10 @@ namespace BusinessLogic.BusinessObjects
 
             InitScheduler(true);
             SetVersion();
+
+            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STARTSERVER);
+            PostSignalTo(signal_startServer);
+
             Initialized = true;
             // doMigration();
         }
@@ -256,6 +260,9 @@ namespace BusinessLogic.BusinessObjects
 
         public void Dispose()
         {
+            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STOPSERVER);
+            PostSignalTo(signal_startServer);
+
             if (_gSchedulerService != null)
                 _gSchedulerService.Shutdown();
            
@@ -610,9 +617,6 @@ namespace BusinessLogic.BusinessObjects
                 }
             }
         }
-
-        //[DllImport("user32.dll")]
-        //static extern bool PostMessage(IntPtr hWnd, uint Msg, int wParam, int lParam);
 
         public ExpertInfo InitExpert(ExpertInfo expert)
         {
@@ -1204,7 +1208,12 @@ namespace BusinessLogic.BusinessObjects
         public void SubscribeToSignals(long objectId)
         {
             ConcurrentQueue<SignalInfo> que = new ConcurrentQueue<SignalInfo>();
-            signalQue.AddOrUpdate(objectId, que, (oldkey, oldvalue) => que);
+            //signalQue.AddOrUpdate(objectId, que, (oldkey, oldvalue) => que);
+            if (signalQue.TryAdd(objectId, que))
+                log.Log($"Object {objectId} added to signals que.");
+            else
+                log.Log($"Object {objectId} already existed in signals que.");
+
         }
 
         public void UnSubscribeFromSignals(long objectId)
