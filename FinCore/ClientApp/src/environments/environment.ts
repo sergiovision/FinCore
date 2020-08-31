@@ -2,8 +2,8 @@ import { Env } from '../app/models/Entities';
 
 export const environment = {
   production: false,
-  baseURL: 'http://localhost:2020',
-  wsURL: 'ws://localhost:2021',
+  baseURL: 'http://127.0.0.1:2020',
+  wsURL: 'ws://127.0.0.1:2021',
   // wsURL: 'ws://www.sergego.com:2021',
   dateFormat: "yyyy-MM-dd'T'HH:mm:ss'Z'",
   shortDateFormat: 'yyyy-MM-dd'
