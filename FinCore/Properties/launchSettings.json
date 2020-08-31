@@ -7,7 +7,7 @@
       "sslPort": 0
     },
     "iisExpress": {
-      "applicationUrl": "http://localhost:2020",
+      "applicationUrl": "http://127.0.0.1:2020",
       "sslPort": 0
     }
   },
@@ -35,8 +35,7 @@
     },
     "Azure Dev Spaces": {
       "commandName": "AzureDevSpaces",
-      "launchBrowser": true,
-      "environmentVariables": {}
+      "launchBrowser": true
     }
   }
 }
