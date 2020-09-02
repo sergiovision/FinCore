@@ -126,6 +126,8 @@ FinCore folders structure:
   If you run application in docker on a separate address to connect it to Windows where Metatrader terminals live - you should activate ports forwarding in Windows:<br>
   Run this command in windows command line:<br>
   `netsh interface portproxy add v4tov4 listenport=2020 listenaddress=127.0.0.1 connectport=2020 connectaddress='docker container address'`
+  `netsh interface portproxy add v4tov4 listenport=2022 listenaddress=127.0.0.1 connectport=2022 connectaddress='docker container address'`
+
   After that all experts in Metatrader will use be able to synchronize with FinCore app running in Docker or on another machine/OS.
 
   Default login for fincore_empty file is: <br>mail: `test@test.com`<br>
