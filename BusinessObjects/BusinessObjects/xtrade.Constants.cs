@@ -9,6 +9,7 @@ namespace BusinessObjects
 {
     public static class xtradeConstants
     {
+        public const string FINCORE_VERSION = "0.9.4";
         public const double GAP_VALUE = -125;
         public const string MTDATETIMEFORMAT = "yyyy.MM.dd HH:mm";
         public const string MYSQLDATETIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -35,9 +36,9 @@ namespace BusinessObjects
         public const string SETTINGS_PROPERTY_USERTIMEZONE = "UserTimeZone";
         public const string SETTINGS_PROPERTY_NETSERVERPORT = "XTrade.NETServerPort";
         public const string SETTINGS_PROPERTY_ENDHISTORYDATE = "NewsEvent.EndHistoryDate";
-        public const string SETTINGS_PROPERTY_THRIFTPORT = "XTrade.ThriftPort";
-        public const string SETTINGS_PROPERTY_INSTALLDIR = "XTrade.InstallDir";
-        public const string SETTINGS_PROPERTY_RUNTERMINALUSER = "XTrade.TerminalUser";
+        // public const string SETTINGS_PROPERTY_THRIFTPORT = "XTrade.ThriftPort";
+        public const string SETTINGS_PROPERTY_INSTALLDIR = "InstallDir";
+        public const string SETTINGS_PROPERTY_RUNTERMINALUSER = "TerminalUser";
         public const string SETTINGS_PROPERTY_MTCOMMONFILES = "Metatrader.CommonFiles";
         public const string SETTINGS_PROPERTY_MQLSOURCEFOLDER = "MQL.Sources";
         // Max Amount in % you may loose daily

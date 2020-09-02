@@ -9,9 +9,12 @@ using log4net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FinCore.Controllers
 {
+    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     public class BaseController : ControllerBase
     {
         protected static readonly ILog log = LogManager.GetLogger(typeof(BaseController));
@@ -159,11 +162,13 @@ namespace FinCore.Controllers
             }
         }
 
+        #endregion
+
         [HttpGet]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{name}")]
-        public object GetGlobalProp([FromRoute]string name)
+        public object GetGlobalProp([FromRoute] string name)
         {
             try
             {
@@ -178,9 +183,47 @@ namespace FinCore.Controllers
                 return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
             }
         }
-        #endregion
 
 
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Route("[action]")]
+        public object LogList()
+        {
+            try
+            {
+                object result = MainService.LogList();
+                if (result != null)
+                    return Ok(result);
+                return Problem(String.Format("Failed to LogList {0}", result), "Error", StatusCodes.Status417ExpectationFailed);
+            }
+            catch (Exception e)
+            {
+                log.Info(e.ToString());
+                return e.ToString();
+            }
+        }
 
+        [AllowAnonymous]
+        [HttpGet]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        [Route("[action]")]
+        public string GetLogContent([FromQuery]string logName, [FromQuery]int size)
+        {
+            try
+            {
+                string result = MainService.GetLogContent(logName, size);
+                if (result != null)
+                    return result;
+                return "no log file content";
+            }
+            catch (Exception e)
+            {
+                log.Info(e.ToString());
+                return e.ToString();
+            }
+        }
     }
 }

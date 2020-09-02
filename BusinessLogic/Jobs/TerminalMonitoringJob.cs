@@ -40,13 +40,13 @@ namespace BusinessLogic.Jobs
 
                 DataService dataService = MainService.thisGlobal.Container.Resolve<DataService>();
 
-                IEnumerable<Terminal> results = (IEnumerable<Terminal>)dataService.GetObjects(EntitiesEnum.Terminal);
+                IEnumerable<object> results = (IEnumerable<object>)dataService.GetObjects(EntitiesEnum.Terminal);
 
-                results = results.Where(x => (x.Retired == false) &&
-                                (x.Stopped == false));
+                results = results.Where(x  => ((x as Terminal).Retired == false) &&
+                                ((x as Terminal).Stopped == false));
                 foreach (var resRow in results)
                 {
-                    var oPath = resRow.FullPath;
+                    var oPath = (resRow as Terminal).FullPath;
                     if (oPath != null)
                     {
                         strPath = oPath;

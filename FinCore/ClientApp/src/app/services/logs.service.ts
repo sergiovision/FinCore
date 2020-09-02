@@ -8,4 +8,16 @@ export class LogsService extends BaseService {
       super(http);
   }
 
+  public GetLogContent(name: string, lines: number) {
+    const url = this.baseURL + '/api/wallets/GetLogContent?logName=' + name + '&size=' + lines;
+    // console.log(url);
+    return this.http.get(url, { headers: this.authHeaders, responseType: 'text'});
+  }
+
+  public GetLogList() {
+    const url = this.baseURL + '/api/wallets/LogList';
+    return this.http.get<any>(url, { headers: this.authHeaders });
+  }
+
+
 }

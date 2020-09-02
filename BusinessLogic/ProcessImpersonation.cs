@@ -168,8 +168,9 @@ namespace BusinessLogic
                         }
 
                         log.Info(string.Format("Process {0} started under user {1} successfully", AppName, userName));
+                        Thread.Sleep(300);
                         Process trayApp = Process.GetProcessById(Convert.ToInt32(pi.dwProcessId));
-                        trayApp.StartInfo.LoadUserProfile = true;
+                        //trayApp.StartInfo.LoadUserProfile = true;
                         return trayApp;
                         //break;
                     }

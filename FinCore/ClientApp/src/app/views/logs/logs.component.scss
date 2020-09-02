@@ -1,0 +1,26 @@
+
+::ng-deep dx-button {
+  margin: 5px;
+}
+
+::ng-deep .options {
+  margin: 5px;
+}
+
+
+::ng-deep .tabpanel-item {
+  margin: 5px;
+}
+
+.dx-tab-panel {
+  margin: 10px;
+  height: 100%;
+}
+
+ace-editor {
+  min-height: 600px;
+  width: 100%;
+  height: 100%;
+  overflow: scroll;
+}
+

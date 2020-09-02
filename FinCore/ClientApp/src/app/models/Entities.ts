@@ -458,3 +458,12 @@ export class Settings {
   }
 }
 
+export class LogItem {
+  Name: string;
+  TabTitle: string;
+  DataSource: string;
+  TextChangedEvent: string;
+  Theme: string;
+  Path: string;
+}
+

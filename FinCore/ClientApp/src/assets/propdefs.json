@@ -520,12 +520,21 @@
             "defaultValue": false,
             "description": "Add/Remove Price Histogram on chart"
           },
-          { "type": "boolean",
+          {
+            "type": "boolean",
             "name": "EnableFChannel",
             "group": "Indicators",
             "control": "GeneralCheckbox",
             "defaultValue": false,
             "description": "Add/Remove Fractal Channel on chart"
+          },
+          {
+            "type": "boolean",
+            "name": "EnableTrendForecast",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove SSA Fast Trend Forecast"
           }
        ]
 

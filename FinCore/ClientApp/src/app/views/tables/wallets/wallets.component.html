@@ -19,7 +19,7 @@
     <dxi-column dataField="Balance" [allowSorting]="true" format="currency"></dxi-column>
 
     <div *dxTemplate="let wallet of 'detail'">
-      <dx-tab-panel>
+      <dx-tab-panel [swipeEnabled]="false">
         <dxi-item title="Accounts" template="accounts"></dxi-item>
         <div *dxTemplate="let account of 'accounts'">
           <dx-data-grid

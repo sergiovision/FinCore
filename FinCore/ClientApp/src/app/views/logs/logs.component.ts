@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ViewChild, OnInit, OnDestroy } from '@angular/core';
+import { AfterViewInit, Component, ViewChild, OnInit, OnDestroy, ViewChildren, QueryList } from '@angular/core';
 
 import 'brace/index';
 import 'brace/theme/eclipse';
@@ -9,30 +9,56 @@ import 'brace/ext/language_tools.js';
 import { LogsService } from '../../services/logs.service';
 import notify from 'devextreme/ui/notify';
 import { BaseComponent } from '../../base/base.component';
-import { WsMessage, WsMessageType, IWebsocketCallback } from '../../models/Entities';
+import { WsMessage, WsMessageType, IWebsocketCallback, LogItem } from '../../models/Entities';
 import { environment } from '../../../environments/environment';
 import { WebsocketService } from '../../services/websocket.service';
+import { AceEditorComponent } from 'ng2-ace-editor';
+import { DxTabPanelComponent } from 'devextreme-angular';
+import 'brace/theme/terminal';
+import 'brace/theme/solarized_dark';
+import 'brace/theme/vibrant_ink';
+import 'brace/theme/github';
+import 'brace/theme/solarized_light';
+import 'brace/mode/yaml';
+
 
 @Component({
   templateUrl: 'logs.component.html',
+  styleUrls: ['logs.component.scss'],
   providers: [LogsService, WebsocketService]
 })
 export class LogsComponent extends BaseComponent implements AfterViewInit, OnInit, OnDestroy, IWebsocketCallback {
-  // @ViewChild('editor') editor;
-  // text: string = defaults.markdown;
+  @ViewChild('tabPanel0') tabPanel0: DxTabPanelComponent;
+  @ViewChildren('editor') viewChildren: QueryList<AceEditorComponent>;
 
+
+  // https://ace.c9.io/#nav=higlighter
+  // tester https://ace.c9.io/build/kitchen-sink.html
+  // https://codepen.io/ryancat/pen/mMyvpx/?css-preprocessor=sass
   options: any = {
     // maxLines: 1000,
     printMargin: false,
+    theme: 'ace/theme/solarized_dark',
+    mode: 'ace/mode/yaml',
     wrap: true,
-    showGutter: false
+    readOnly: true,
+    showGutter: false,
+    highlightActiveLine: true,
+    cursorStyle: 'ace',
+    animatedScroll: true,
+    showLineNumbers: false,
+    showInvisibles: false,
+    newLineMode: 'auto'
   };
 
-  public text: string;
+  public NumberOfLines = 500;
+  public selectedIndex  = 0;
+
+  public logz: LogItem[];
 
   constructor(public logS: LogsService, public ws: WebsocketService) {
     super();
-    this.text = '';
+    // this.text = '';
   }
 
   public doConnect() {
@@ -43,15 +69,22 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
 
   ngOnInit() {
     super.ngOnInit();
-    this.doConnect();
+
+    this.subs.sink = this.logS.GetLogList()
+    .subscribe(data  => {
+        this.logz = data;
+        this.doConnect();
+      },
+        error => this.logConsoleError(error)
+      );
   }
 
   public getText(): string {
-    return this.text;
+    return this.logz[0].DataSource;
   }
 
   public ClearLogs() {
-    this.text = '';
+    this.logz[0].DataSource = '';
     this.ws.doSend({ Type: WsMessageType.ClearLog, From: this.logS.currentUserToken.userName, Message: '' });
   }
 
@@ -65,9 +98,6 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
   }
 
   ngAfterViewInit() {
-    // this.editor.setMode('markdown');
-    // this.editor.setTheme('eclipse');
-    // this.editor.setReadOnly(true);
   }
 
   public writeToScreen(message) {
@@ -76,7 +106,44 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
 
   public onOpen(evt: MessageEvent) {
     this.ws.doSend({ Type: WsMessageType.GetAllText, From: this.logS.currentUserToken.userName, Message: '' });
+
     this.writeToScreen('connected logs\n');
+  }
+
+  public selectTab(e) {
+    const logitem = this.logz[this.selectedIndex];
+    console.log('Click MainLog tab index: ' + this.selectedIndex + ', name: ' + logitem.Name);
+
+    this.subs.sink = this.logS.GetLogContent(logitem.Name, this.NumberOfLines)
+    .subscribe(data  => {
+        if (this.selectedIndex > 0) {
+          this.logz[this.selectedIndex].DataSource = data;
+        }
+
+        const editorX = this.viewChildren.find((element, index) => index === this.selectedIndex);
+        // console.log(' viewChildren.count = ' + this.viewChildren.length + ', item: ' + editorX);
+        const editor = editorX.getEditor();
+        if (this.selectedIndex > 0) {
+          editorX.setText(data);
+        }
+        let NumOfLines = this.NumberOfLines;
+        if (this.selectedIndex === 0)   {
+          NumOfLines = editor.session.doc.getAllLines().length;
+        } else {
+          NumOfLines = this.NumberOfLines;
+        }
+        if (editor) {
+          this.options.theme = this.logz[this.selectedIndex].Theme;
+          editorX.setOptions(this.options);
+          console.log('NumOfLines ' + NumOfLines);
+          editor.resize(true);
+          editor.scrollToLine(NumOfLines, true, true, function () {});
+          editor.gotoLine(NumOfLines, 10, true);
+        }
+
+      },
+      error => this.logConsoleError(error)
+    );
   }
 
   public onClose() {
@@ -86,11 +153,22 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
   public onMessage(msg: WsMessage) {
     if (msg) {
        switch (msg.Type) {
-        case WsMessageType.WriteLog:
-          this.text += msg.Message;
+        case WsMessageType.WriteLog: {
+          // tslint:disable-next-line: no-shadowed-variable
+          let str = msg.Message;
+          // const str = msg.Message.replace(/^"(.+(?="$))"$/, '$1');
+          if (str.charAt(0) === '"' && str.charAt(str.length - 1) === '"') {
+            str  = str.substr(1, str.length - 2);
+          }
+          str += '\r';
+          str = this.logz[0].DataSource + str;
+          this.logz[0].DataSource = str;
+          }
           break;
         case WsMessageType.GetAllText:
-          this.text = msg.Message;
+          this.logz[0].DataSource = msg.Message;
+          this.tabPanel0.selectedItem = 0;
+          this.selectTab(undefined);
           break;
        }
     }

@@ -42,6 +42,8 @@ namespace FinCore
                 builder.WithOrigins("http://localhost:" + Configuration["WebPort"], 
                                     Configuration["DebugClientURL"],
                                     Configuration["ExternalClientURL"],
+                                    "http://localhost:2020",
+                                    "http://localhost:4200",
                                     "wss://localhost:" + Configuration["MessagingPort"],
                                     "wss://www.sergego.com:" + Configuration["MessagingPort"],
                                     "http://www.sergego.com", "http://www.sergego.com/fincore")

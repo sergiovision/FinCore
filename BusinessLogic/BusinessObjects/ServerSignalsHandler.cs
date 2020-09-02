@@ -32,7 +32,7 @@ namespace BusinessLogic.BusinessObjects
             return xtrade.ListenSignal(flags, objectId);
         }
 
-        public void PostSignal(SignalInfo signal)
+        public void PostSignal(SignalInfo signal, IMessagingServer server)
         {
             if ((SignalFlags) signal.Flags == SignalFlags.Cluster)
             {
@@ -42,6 +42,13 @@ namespace BusinessLogic.BusinessObjects
 
             switch ((EnumSignals) signal.Id)
             {
+                case EnumSignals.SIGNAL_POST_LOG:
+                    {
+                        if (signal.Data == null)
+                            break;
+                        MainService.thisGlobal.DoLog(signal);
+                    }
+                    break;
                 case EnumSignals.SIGNAL_CHECK_HEALTH:
                     if (xtrade.IsDebug())
                         log.Info("CheckHealth: " + signal.Flags);
@@ -132,33 +139,31 @@ namespace BusinessLogic.BusinessObjects
                         xtrade.DeInitTerminal(expert);
                     }
                     break;
-               // case EnumSignals.SIGNAL_SAVE_EXPERT:
-               // {
-                        // deprecated
-                    //ExpertInfo expert = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
-                    //if (expert != null)
-                    //    xtrade.SaveExpert(expert);
-               // }
-               //     break;
-                case EnumSignals.SIGNAL_POST_LOG:
+                case EnumSignals.SIGNAL_LEVELS4SYMBOL:
                 {
-                    if (signal.Data == null)
-                        break;
-                    Dictionary<string, string> paramsList = JsonConvert.DeserializeObject<Dictionary<string, string>>(signal.Data.ToString());
-                    StringBuilder message = new StringBuilder();
-                    if (paramsList.ContainsKey("Account"))
-                        message.Append("<" + paramsList["Account"] + ">:");
-                    if (paramsList.ContainsKey("Magic"))
-                        message.Append("_" + paramsList["Magic"] + "_:");
-                    if (paramsList.ContainsKey("order"))
-                        message.Append("**" + paramsList["order"] + "**");
-                    if (paramsList.ContainsKey("message"))
-                        message.Append(paramsList["message"]);
-                    log.Log(message.ToString());
-                    // log.Info(message);
+                    string symbol = signal.Sym;
+                    string levelsString = xtrade.Levels4Symbol(symbol);
+                    var result = xtrade.CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
+                    result.Sym = symbol;
+                    result.Data = levelsString;
+                    var send = JsonConvert.SerializeObject(result);
+                    if (server != null)
+                       server.MulticastText(send);
                 }
                 break;
+                default:
+                    if (server != null)
+                    {
+                        var result = xtrade.SendSignal(signal);
+                        if (result != null)
+                        {
+                            var send = JsonConvert.SerializeObject(result);
+                            server.MulticastText(send);
+                        }
+                    }
+                    break;
             }
+
         }
 
         public void ProcessMessage(WsMessage wsMessage, IMessagingServer server)
@@ -228,6 +233,17 @@ namespace BusinessLogic.BusinessObjects
                             terminals.UpdatePositionFromClient(result);
                     }
                     break;
+                case WsMessageType.GetLevels:
+                    {
+                        wsMessage.From = "Server";
+                        wsMessage.Message = xtrade.Levels4Symbol(wsMessage.Message);
+                        wsMessage.Type = WsMessageType.GetLevels;
+                        var send = JsonConvert.SerializeObject(wsMessage);
+                        server.MulticastText(send);
+                    }
+                    break;
+
+
                 default:
                     {
                         log.Info("Undefined Message");

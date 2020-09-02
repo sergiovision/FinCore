@@ -35,6 +35,8 @@ namespace FinCore
             foreach (object t in (List<object>)xtrade.GetObjects(EntitiesEnum.Terminal))
             {
                 Terminal term = (Terminal)t;
+                if (term.Retired)
+                    continue;
                 terminals.Add(term.AccountNumber, term);
                 if (term.Retired == false)
                 {

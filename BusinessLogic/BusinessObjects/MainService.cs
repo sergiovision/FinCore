@@ -82,6 +82,15 @@ namespace BusinessLogic.BusinessObjects
             }
         }
 
+        public static string MainLogFilePath
+        {
+            get
+            {
+                string logfile = "FinCore.MainServer.log";
+                return Path.Combine(AssemblyDirectory, logfile);
+            }
+        }
+
         public static string RegistryInstallDir
         {
             get
@@ -192,7 +201,7 @@ namespace BusinessLogic.BusinessObjects
             InitScheduler(true);
             SetVersion();
 
-            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STARTSERVER);
+            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STARTSERVER, 0);
             PostSignalTo(signal_startServer);
 
             Initialized = true;
@@ -203,7 +212,7 @@ namespace BusinessLogic.BusinessObjects
         {
             string date = File.GetLastWriteTime((Assembly.GetExecutingAssembly().Location)).ToShortDateString();
 
-            SetGlobalProp("VERSION", "{\"version\": \"0.9.0 " + date + "\" }");
+            SetGlobalProp("VERSION", "{\"version\": \"" + xtradeConstants.FINCORE_VERSION + " " + date + "\" }");
         }
 
         /*protected void doMigration()
@@ -260,7 +269,7 @@ namespace BusinessLogic.BusinessObjects
 
         public void Dispose()
         {
-            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STOPSERVER);
+            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STOPSERVER, 0);
             PostSignalTo(signal_startServer);
 
             if (_gSchedulerService != null)
@@ -624,12 +633,15 @@ namespace BusinessLogic.BusinessObjects
             {
                 using (ISession Session = ConnectionHelper.CreateNewSession())
                 {
+                    string msg = "";
                     long accNumber = long.Parse(expert.Account);
                     Terminal terminal = data.getTerminalByNumber(Session, accNumber);
                     if (terminal == null)
                     {
-                        log.Log("Unknown AccountNumber " + expert.Account + " ERROR");
+                        msg = $"Unknown AccountNumber {expert.Account}. Please Register Account in DB.";
+                        log.Log(msg);
                         expert.Magic = 0;
+                        expert.Reason = msg; 
                         return expert;
                     }
 
@@ -639,7 +651,9 @@ namespace BusinessLogic.BusinessObjects
                     DBSymbol symbol = data.getSymbolByName(strSymbol);
                     if (symbol == null)
                     {
-                        log.Log("Unknown Symbol " + strSymbol + " ERROR");
+                        msg = $"Unknown Symbol {strSymbol}. Please register Symbol in DB.";
+                        log.Log(msg);
+                        expert.Reason = msg;
                         return expert;
                     }
 
@@ -706,8 +720,10 @@ namespace BusinessLogic.BusinessObjects
                     Terminal terminal = data.getTerminalByNumber(Session, accNumber);
                     if (terminal == null)
                     {
-                        log.Log("Unknown AccountNumber " + expert.Account + " ERROR");
+                        string msg = $"Unknown AccountNumber {expert.Account} ERROR";
+                        log.Log(msg);
                         expert.Magic = accNumber;
+                        expert.Reason = msg;
                         return expert;
                     }
                     SubscribeToSignals(accNumber);
@@ -742,12 +758,20 @@ namespace BusinessLogic.BusinessObjects
             SignalInfo result = null;
             switch ((EnumSignals) signal.Id)
             {
+                case EnumSignals.SIGNAL_POST_LOG:
+                    {
+                        if (signal.Data == null)
+                            break;
+                        DoLog(signal);
+                        result = signal;
+                    }
+                    break;
                 case EnumSignals.SIGNAL_INIT_EXPERT:
                     if (signal.Data != null)
                     {
                         ExpertInfo ei = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
                         var expertInfo = InitExpert(ei);
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id);
+                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id, signal.ChartId);
 
                         result.Data = JsonConvert.SerializeObject(expertInfo);
                     }
@@ -757,7 +781,7 @@ namespace BusinessLogic.BusinessObjects
                     {
                         ExpertInfo ei = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
                         var expertInfo = InitTerminal(ei);
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id);
+                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
                         result.Data = JsonConvert.SerializeObject(expertInfo);
                     }
                     break;
@@ -766,7 +790,7 @@ namespace BusinessLogic.BusinessObjects
                         var ds = Container.Resolve<ITerminalEvents>();
                         if (ds == null)
                             break;
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id);
+                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
                         var stat = ds.GetTodayStat();
                         result.Data = JsonConvert.SerializeObject(stat);
                     }
@@ -787,18 +811,30 @@ namespace BusinessLogic.BusinessObjects
                         result = signal;
                     }
                     break;
+                case EnumSignals.SIGNAL_GETMAINLOGPATH:
+                    {
+                        string path = GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_INSTALLDIR);
+                        //var di = new DirectoryInfo(path);
+                        //if (!di.Exists)
+                        //    path = MainLogFilePath;
+                        path = Path.Combine(path, "FinCore.MainServer.log");
+                        signal.Data = path;
+                        result = signal;
+                    }
+                    break;
                 case EnumSignals.SIGNAL_LEVELS4SYMBOL:
                     {
                         string symbol = signal.Data.ToString();
                         string levelsString = Levels4Symbol(symbol);
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id);
+                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
                         result.Data = levelsString;
                     }
                     break;
             }
             return result;
         }
-        private string Levels4Symbol(string strSymbol)
+
+        public string Levels4Symbol(string strSymbol)
         {
             string result = "";
             try
@@ -1057,9 +1093,12 @@ namespace BusinessLogic.BusinessObjects
         {
             try
             {
-                var terminals = (List<Terminal>)data.GetObjects(EntitiesEnum.Terminal);
-                foreach (var terminal in terminals)
+                var terminals = (List<object>)data.GetObjects(EntitiesEnum.Terminal);
+                foreach (var term in terminals)
                 {
+                    Terminal terminal = (Terminal)term;
+                    if (terminal.Retired)
+                        continue;
                     DirectoryInfo sourceDir = new DirectoryInfo(sourceFolder);
                     string fileName = string.Format(@"deployto_{0}.bat", terminal.AccountNumber);
                     StreamWriter SW = new StreamWriter(fileName);
@@ -1209,11 +1248,13 @@ namespace BusinessLogic.BusinessObjects
         {
             ConcurrentQueue<SignalInfo> que = new ConcurrentQueue<SignalInfo>();
             //signalQue.AddOrUpdate(objectId, que, (oldkey, oldvalue) => que);
-            if (signalQue.TryAdd(objectId, que))
-                log.Log($"Object {objectId} added to signals que.");
-            else
-                log.Log($"Object {objectId} already existed in signals que.");
-
+            if (!signalQue.ContainsKey(objectId))
+            {
+                if (signalQue.TryAdd(objectId, que))
+                    log.Log($"Object {objectId} added to signals que.");
+                else
+                    log.Log($"Object {objectId} already existed in signals que.");
+            }
         }
 
         public void UnSubscribeFromSignals(long objectId)
@@ -1246,7 +1287,7 @@ namespace BusinessLogic.BusinessObjects
             {
                 ISignalHandler handler = Container.Resolve<ISignalHandler>();
                 if (handler != null)
-                    handler.PostSignal(signal);
+                    handler.PostSignal(signal, null);
             }
             else if (to == SignalFlags.Cluster)
             {
@@ -1286,22 +1327,31 @@ namespace BusinessLogic.BusinessObjects
         public bool UpdateAdviser(Adviser adviser)
         {
             int result = data.UpdateObject(EntitiesEnum.Adviser, adviser.Id, JsonConvert.SerializeObject(adviser));
-            SignalInfo signal = CreateSignal(SignalFlags.Expert, adviser.Id, EnumSignals.SIGNAL_UPDATE_EXPERT);
+            SignalInfo signal = CreateSignal(SignalFlags.Expert, adviser.Id, EnumSignals.SIGNAL_UPDATE_EXPERT, 0);
             signal.Value = result;
             PostSignalTo(signal);
             return result > 0;
         }
 
-        public SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id)
+        public SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id, long chartId)
         {
             SignalInfo signal = new SignalInfo();
             signal.Flags = (long) flags;
             signal.Id = (int) Id;
-            signal.Name = Id.ToString();
             signal.ObjectId = ObjectId;
             signal.Value = 1;
-            signal.RaiseDateTime = DateTime.Now.ToString(xtradeConstants.MTDATETIMEFORMAT);
+            signal.ChartId = chartId;
             return signal;
+        }
+
+        public void DoLog(SignalInfo signal)
+        {
+            StringBuilder message = new StringBuilder();
+            message.Append("<" + signal.ObjectId + ">:");
+            message.Append("(" + signal.Sym + "):");
+            message.Append(signal.Data.ToString());
+            log.Log(message.ToString());
+            log.Info(message);
         }
 
         public void SaveDeals(List<DealInfo> deals)
@@ -1356,8 +1406,140 @@ namespace BusinessLogic.BusinessObjects
         {
             return data.DeleteObject(type, id);
         }
+
+        protected static List<LogItem> LogItems = new List<LogItem>();
+
+        public object LogList()
+        {
+            if (LogItems == null)
+            {
+                LogItems = new List<LogItem>();
+            }
+            if (LogItems.Count() > 0)
+                LogItems.Clear();
+
+            LogItem item0 = new LogItem();
+            item0.Name = "log0";
+            item0.TabTitle = "UI Log";
+            item0.DataSource = "";
+            item0.TextChangedEvent = "selectTab($event)";
+            item0.Theme = "ace/theme/terminal";
+            LogItems.Add(item0);
+
+            LogItem item1 = new LogItem();
+            item1.Name = "log1";
+            item1.TabTitle = "FinCore Log";
+            item1.DataSource = "";
+            item1.TextChangedEvent = "";
+            item1.Theme = "ace/theme/solarized_dark";
+            item1.Path = MainLogFilePath;
+            LogItems.Add(item1);
+
+            try
+            {
+                int i = 2;
+                var terminals = (List<object>)data.GetObjects(EntitiesEnum.Terminal);
+                foreach (var term in terminals)
+                {
+                    Terminal terminal = (Terminal)term;
+                    if (terminal.Retired)
+                        continue;
+                    // add expert log
+                    LogItem itemx = new LogItem();
+                    itemx.Name = $"log{i}";
+                    itemx.TabTitle = terminal.Broker + " Expert";
+                    itemx.DataSource = "";
+                    itemx.TextChangedEvent = "";
+                    itemx.Theme = "ace/theme/solarized_light";
+
+                    var directory = new DirectoryInfo(terminal.CodeBase + "/Logs");
+                    if (directory.Exists)
+                    {
+                        var logFile = (from f in directory.GetFiles()
+                                      orderby f.LastWriteTime descending
+                                      select f).First();
+                        if (logFile.Exists)
+                            itemx.Path = logFile.FullName; //  terminal.CodeBase + "/Logs";
+                    }
+                    LogItems.Add(itemx);
+                    i++;
+
+
+                    // Add sys log
+                    LogItem itemy = new LogItem();
+                    itemy.Name = $"log{i}";
+                    itemy.TabTitle = terminal.Broker + " System";
+                    itemy.DataSource = "";
+                    itemy.TextChangedEvent = "";
+                    itemy.Theme = "ace/theme/github";
+
+                    var directory2 = new DirectoryInfo(terminal.CodeBase);
+                    if (directory2.Exists)
+                    {
+                        directory2 = new DirectoryInfo(directory2.Parent.FullName + "/logs");
+                        var logFile2 = (from f in directory2.GetFiles()
+                                       orderby f.LastAccessTime descending
+                                       select f).First();
+                        if (logFile2.Exists)
+                            itemy.Path = logFile2.FullName; 
+                    }
+                    LogItems.Add(itemy);
+                    i++;
+                }
+            }
+            catch (Exception e)
+            {
+                log.Info("Failed to get Metatrader Logs: " + e.ToString());
+            }
+            return LogItems;
+        }
+
+        public string GetLogContent(string logName, long numberOfLines)
+        {
+            string result = "";
+            try
+            {
+                if (LogItems == null || LogItems.Count <= 0)
+                    return "No Logs Found";
+                var logitems = LogItems.Where(x => x.Name.CompareTo(logName) == 0);
+                if (logitems.Count() <= 0)
+                    return $"No log file with key name found: {logName}";
+                string logPath = logitems.FirstOrDefault().Path;
+                if (String.IsNullOrEmpty(logPath))
+                    return "";
+                if (!(new FileInfo(logPath)).Exists)
+                    return $"Log file with path {logPath} doesn't exists";
+
+                using (FileStream fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                {
+                    StreamReader reader = new StreamReader(fs);
+                    reader.BaseStream.Seek(0, SeekOrigin.End);
+                    long totallines = (numberOfLines <= 0) ? 1000000 : numberOfLines;
+                    int count = 0;
+                    while ((count < totallines) && (reader.BaseStream.Position > 0))
+                    {
+                        reader.BaseStream.Position--;
+                        int c = reader.BaseStream.ReadByte();
+                        if (reader.BaseStream.Position > 0)
+                            reader.BaseStream.Position--;
+                        if (c == Convert.ToInt32('\n'))
+                        {
+                            ++count;
+                        }
+                    }
+                    result = reader.ReadToEnd();
+                    //string[] arr = str.Replace("\r", "").Split('\n');
+                    reader.Close();
+                }
+                return result;
+
+            } catch(Exception e)
+            {
+                return e.ToString();
+            }
+        }
         #endregion
 
- 
+
     }
 }

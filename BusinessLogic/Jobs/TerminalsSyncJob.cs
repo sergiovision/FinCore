@@ -37,20 +37,20 @@ namespace BusinessLogic.Jobs
                 sched = context.Scheduler;
 
                 SignalInfo signal_ActiveOrders =
-                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_ACTIVE_ORDERS);
+                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_ACTIVE_ORDERS, 0);
                 MainService.thisGlobal.PostSignalTo(signal_ActiveOrders);
 
                 SignalInfo signal_UpdateRates =
-                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_UPDATE_RATES);
+                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_UPDATE_RATES, 0);
                 signal_UpdateRates.Data = MainService.thisGlobal.GetRatesList();
                 MainService.thisGlobal.PostSignalTo(signal_UpdateRates);
 
                 SignalInfo signal_checkBalance =
-                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_CHECK_BALANCE);
+                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_CHECK_BALANCE, 0);
                 MainService.thisGlobal.PostSignalTo(signal_checkBalance);
 
                 SignalInfo signal_History =
-                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_DEALS_HISTORY);
+                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_DEALS_HISTORY, 0);
                 signal_History.Value = 2;
                 MainService.thisGlobal.PostSignalTo(signal_History);
 

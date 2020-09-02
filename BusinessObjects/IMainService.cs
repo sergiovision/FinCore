@@ -73,7 +73,7 @@ namespace BusinessObjects
 
         void SubscribeToSignals(long objectId);
 
-        SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id);
+        SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id, long chartId);
 
         ConcurrentDictionary<string, Rates> GetRates(bool IsReread);
 
@@ -84,5 +84,11 @@ namespace BusinessObjects
         Tuple<Type, Type> EnumToType(EntitiesEnum entities);
 
         Dictionary<EntitiesEnum, Tuple<Type, Type>> GetTypes();
+
+        string Levels4Symbol(string strSymbol);
+
+        string GetLogContent(string logName, long size);
+
+        object LogList();
     }
 }

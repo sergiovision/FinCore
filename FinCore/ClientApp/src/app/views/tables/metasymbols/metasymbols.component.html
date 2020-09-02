@@ -40,7 +40,7 @@
     <dxi-column dataField="Retired" [allowSorting]="true" [hidingPriority]="1"></dxi-column>
 
     <div *dxTemplate="let metasymbol of 'detail'">
-      <dx-tab-panel>
+      <dx-tab-panel [swipeEnabled]="false">
         <dxi-item title="Advisers" template="expertsTab"></dxi-item>
         <div *dxTemplate="let expertsTabItem of 'expertsTab'">
             <dx-data-grid [dataSource]="this.loadAdvisersChildData(metasymbol.data.Id)" [showBorders]="true" [columnAutoWidth]="true"

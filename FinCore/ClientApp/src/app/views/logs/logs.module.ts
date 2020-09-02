@@ -9,15 +9,20 @@ import { AceEditorModule } from 'ng2-ace-editor';
 import { LogsRoutingModule } from './logs-routing.module';
 
 import { LogsComponent } from './logs.component';
-import { DxButtonModule } from 'devextreme-angular';
+
+import { DxButtonModule, DxTemplateModule, DxTabPanelModule } from 'devextreme-angular';
 import { WebsocketService } from '../../services/websocket.service';
+import { CommonModule } from '@angular/common';
 
 @NgModule({
   imports: [
+    CommonModule,
     FormsModule,
     LogsRoutingModule,
     AceEditorModule,
-    DxButtonModule
+    DxButtonModule,
+    DxTemplateModule,
+    DxTabPanelModule
   ],
   providers: [
     LogsService,

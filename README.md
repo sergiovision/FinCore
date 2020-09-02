@@ -135,9 +135,8 @@ FinCore folders structure:
   <br>
   <p id="doc_wallets">Wallets book</p>
   
-  <img src="assets/img/doc/w.jpg"/>
- <i> For some reason GitHub doesn't want to load wallets image because it contains very intimate image about how large  relationships with money :))) </i>
-<br>
+  <img src="/FinCore/ClientApp/src/assets/img/doc/wallets.jpg"/>
+  <br>
   <p id="doc_dashboard">Realtime Dashboard</p>
   Dashboard shows current positions and investments performance in realtime. Used high performance websocket driven engine to update instruments in realtime.
   <br>

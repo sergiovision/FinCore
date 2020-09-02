@@ -2,6 +2,7 @@ namespace BusinessObjects
 {
     public enum EnumSignals
     {
+        SIGNAL_FIRST = 1000,
         SIGNAL_CHECK_HEALTH = 1001,
         SIGNAL_DEALS_HISTORY = 1002,
         SIGNAL_CHECK_BALANCE = 1003,
@@ -24,5 +25,7 @@ namespace BusinessObjects
         SIGNAL_LEVELS4SYMBOL = 1023,
         SIGNAL_STARTSERVER = 1024,
         SIGNAL_STOPSERVER = 1025,
+        SIGNAL_GETMAINLOGPATH = 1026,
+        SIGNAL_LAST = 2000
     }
 }

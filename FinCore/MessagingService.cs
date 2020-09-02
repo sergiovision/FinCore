@@ -20,11 +20,17 @@ namespace FinCore
     class MessagingService : IMessagingService
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(MessagingService));
-        private static IMessagingServer _serv; 
+        private static IMessagingServer _serv;
+        private static IMessagingServer _localserv;
 
         public IMessagingServer Server
         {
             get { return _serv; }
+        }
+
+        public IMessagingServer LocalServer
+        {
+            get { return _localserv; }
         }
 
         public MessagingService(IConfiguration configuration)
@@ -51,6 +57,23 @@ namespace FinCore
                     log.Info(e.ToString());
                 }
             }
+
+            if (LocalServer == null)
+            {
+                try
+                {
+                    short Port = Int16.Parse(configuration["TcpPort"]);
+                    if (Port <= 0)
+                        Port = 2022;
+                    Thread.Sleep(100);
+                    _localserv = new TMessagingServer(IPAddress.Any, Port);
+                }
+                catch (Exception e)
+                {
+                    log.Info(e.ToString());
+                }
+            }
+
         }
 
         public void SendMessage(WsMessage wsMessage)
@@ -69,6 +92,24 @@ namespace FinCore
             var send = JsonConvert.SerializeObject(wsMessage);
             Server.MulticastText(send);
         }
+
+        public void SendTcpMessage(WsMessage wsMessage)
+        {
+            wsMessage.From = "TcpServer";
+            var send = JsonConvert.SerializeObject(wsMessage);
+            LocalServer.MulticastText(send);
+        }
+
+        public void SendTcpMessage<T>(WsMessageType type, T obj)
+        {
+            WsMessage wsMessage = new WsMessage();
+            wsMessage.Type = type;
+            wsMessage.From = "TcpServer";
+            wsMessage.Message = JsonConvert.SerializeObject(obj);
+            var send = JsonConvert.SerializeObject(wsMessage);
+            LocalServer.MulticastText(send);
+        }
+
     }
 
     public class MessagingBackgroundService : BackgroundService
@@ -87,12 +128,14 @@ namespace FinCore
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             service.Server.Start();
+            service.LocalServer.Start();
             log.Info("MessagingBackgroundService ExecuteAsync done.");
             await Task.CompletedTask;
         }
 
         public override async Task StopAsync(CancellationToken stoppingToken)
         {
+            service.LocalServer.Stop();
             service.Server.Stop();
             log.Info("MessagingBackgroundService is stopped.");
             await Task.CompletedTask;

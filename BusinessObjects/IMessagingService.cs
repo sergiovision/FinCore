@@ -18,7 +18,11 @@ namespace BusinessObjects
     public interface IMessagingService
     {
         public IMessagingServer Server { get; }
+        public IMessagingServer LocalServer { get; }
         public void SendMessage(WsMessage wsMessage);
         public void SendMessage<T>(WsMessageType type, T obj);
+
+        public void SendTcpMessage(WsMessage wsMessage);
+        public void SendTcpMessage<T>(WsMessageType type, T obj);
     }
 }

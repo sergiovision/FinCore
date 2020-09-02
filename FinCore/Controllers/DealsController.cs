@@ -108,10 +108,10 @@ namespace FinCore.Controllers
                 SignalInfo signalPos = null;
                 if (Ticket > 0)
                 {
-                    signalPos = MainService.CreateSignal(SignalFlags.Terminal, account, EnumSignals.SIGNAL_CLOSE_POSITION);
+                    signalPos = MainService.CreateSignal(SignalFlags.Terminal, account, EnumSignals.SIGNAL_CLOSE_POSITION, 0);
                 } else
                 {
-                    signalPos = MainService.CreateSignal(SignalFlags.Expert, Magic, EnumSignals.SIGNAL_CLOSE_POSITION);
+                    signalPos = MainService.CreateSignal(SignalFlags.Expert, Magic, EnumSignals.SIGNAL_CLOSE_POSITION, 0);
                 }
                 signalPos.Value = Ticket;
                 signalPos.Data = Magic.ToString();
@@ -142,7 +142,9 @@ namespace FinCore.Controllers
                 foreach (var m in mss)
                 {
                     MetaSymbol ms = (MetaSymbol)m;
-                    SignalInfo signalC = MainService.CreateSignal(SignalFlags.Cluster, ms.Id, EnumSignals.SIGNAL_ACTIVE_ORDERS);
+                    if (ms.Retired)
+                        continue;
+                    SignalInfo signalC = MainService.CreateSignal(SignalFlags.Cluster, ms.Id, EnumSignals.SIGNAL_ACTIVE_ORDERS, 0);
                     MainService.PostSignalTo(signalC);
                 }
 

@@ -20,8 +20,7 @@
           "netcoreapp3.1"
         ],
         "sources": {
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.stocksharp.com/411c86b7-6d59-49ac-a7f6-002de64b9210": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
@@ -47,7 +46,7 @@
             },
             "AutoMapper": {
               "target": "Package",
-              "version": "[9.0.0, )"
+              "version": "[10.0.0, )"
             },
             "Autofac": {
               "target": "Package",
@@ -59,19 +58,19 @@
             },
             "HtmlAgilityPack": {
               "target": "Package",
-              "version": "[1.11.23, )"
+              "version": "[1.11.24, )"
             },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
-              "version": "[3.1.4, )"
+              "version": "[3.1.6, )"
             },
             "MySql.Data": {
               "target": "Package",
-              "version": "[8.0.20, )"
+              "version": "[8.0.21, )"
             },
             "NHibernate": {
               "target": "Package",
-              "version": "[5.2.7, )"
+              "version": "[5.3.2, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -79,11 +78,11 @@
             },
             "Quartz": {
               "target": "Package",
-              "version": "[3.0.7, )"
+              "version": "[3.1.0, )"
             },
             "System.Data.SQLite.Core": {
               "target": "Package",
-              "version": "[1.0.112.2, )"
+              "version": "[1.0.113.1, )"
             }
           },
           "imports": [
@@ -101,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.300/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -121,8 +120,7 @@
           "netcoreapp3.1"
         ],
         "sources": {
-          "https://api.nuget.org/v3/index.json": {},
-          "https://nuget.stocksharp.com/411c86b7-6d59-49ac-a7f6-002de64b9210": {}
+          "https://api.nuget.org/v3/index.json": {}
         },
         "frameworks": {
           "netcoreapp3.1": {
@@ -158,7 +156,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.300/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
         }
       }
     }
