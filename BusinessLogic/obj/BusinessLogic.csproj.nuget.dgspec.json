@@ -14,7 +14,7 @@
         "outputPath": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessLogic/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/sergeizhuravlev/.config/NuGet/NuGet.Config"
+          "/Users/sergeizhuravlev/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -50,7 +50,7 @@
             },
             "Autofac": {
               "target": "Package",
-              "version": "[5.2.0, )"
+              "version": "[6.0.0, )"
             },
             "FluentNHibernate": {
               "target": "Package",
@@ -62,7 +62,7 @@
             },
             "Microsoft.Extensions.Configuration": {
               "target": "Package",
-              "version": "[3.1.6, )"
+              "version": "[3.1.8, )"
             },
             "MySql.Data": {
               "target": "Package",
@@ -70,7 +70,7 @@
             },
             "NHibernate": {
               "target": "Package",
-              "version": "[5.3.2, )"
+              "version": "[5.3.3, )"
             },
             "Newtonsoft.Json": {
               "target": "Package",
@@ -100,7 +100,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.402/RuntimeIdentifierGraph.json"
         }
       }
     },
@@ -114,7 +114,7 @@
         "outputPath": "/Users/sergeizhuravlev/Documents/Projects/GitHub/FinCore/BusinessObjects/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/Users/sergeizhuravlev/.config/NuGet/NuGet.Config"
+          "/Users/sergeizhuravlev/.nuget/NuGet/NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp3.1"
@@ -138,7 +138,7 @@
           "dependencies": {
             "Autofac": {
               "target": "Package",
-              "version": "[5.2.0, )"
+              "version": "[6.0.0, )"
             }
           },
           "imports": [
@@ -156,7 +156,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.401/RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "/usr/local/share/dotnet/sdk/3.1.402/RuntimeIdentifierGraph.json"
         }
       }
     }

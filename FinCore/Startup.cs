@@ -98,7 +98,6 @@ namespace FinCore
 
             services.AddHostedService<MessagingBackgroundService>();
             services.AddSingleton<IMessagingService, MessagingService>();
-
         }
 
 
@@ -123,14 +122,13 @@ namespace FinCore
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ILoggerFactory loggerFactory)
         {
             Program.Container = app.ApplicationServices.GetAutofacRoot();
-
             loggerFactory.AddLog4Net();
 
             string angularFolder = AngularPath(Configuration["AngularDir"]);
             QuartzServer.Server.Initialize(angularFolder, env.EnvironmentName);
 
             app.UseCors(MyAllowSpecificOrigins);
-
+            
             
             app.Use(async (context, next) =>
             {
@@ -186,6 +184,7 @@ namespace FinCore
                 //}
 #endif
             });
+
         }
 
         public void SetupStaticAngular(IApplicationBuilder app, string angularFolder)

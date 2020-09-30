@@ -535,6 +535,14 @@
             "control": "GeneralCheckbox",
             "defaultValue": false,
             "description": "Add/Remove SSA Fast Trend Forecast"
+          },
+          {
+            "type": "boolean",
+            "name": "EnableVolumes",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Average Volumes"
           }
        ]
 

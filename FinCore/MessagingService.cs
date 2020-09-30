@@ -22,6 +22,7 @@ namespace FinCore
         private static readonly ILog log = LogManager.GetLogger(typeof(MessagingService));
         private static IMessagingServer _serv;
         private static IMessagingServer _localserv;
+        private static IConfiguration configuration;
 
         public IMessagingServer Server
         {
@@ -33,7 +34,7 @@ namespace FinCore
             get { return _localserv; }
         }
 
-        public MessagingService(IConfiguration configuration)
+        public void Init()
         {
             if (Server == null)
             {
@@ -52,7 +53,8 @@ namespace FinCore
                     {
                         _serv = new MessagingServer(IPAddress.Any, Port);
                     }
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     log.Info(e.ToString());
                 }
@@ -73,7 +75,12 @@ namespace FinCore
                     log.Info(e.ToString());
                 }
             }
+        }
 
+        public MessagingService(IConfiguration config)
+        {
+            configuration = config;
+            //Init();
         }
 
         public void SendMessage(WsMessage wsMessage)
@@ -117,16 +124,17 @@ namespace FinCore
         private static readonly ILog log = LogManager.GetLogger(typeof(MessagingBackgroundService));
         private IMessagingService service;
 
-        public MessagingBackgroundService(IServiceProvider services, IMessagingService serv)
+        public MessagingBackgroundService(IServiceProvider services) 
         {
             Services = services;
-            service = serv;
         }
 
         public IServiceProvider Services { get; }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
+            service = (IMessagingService)Services.GetService(typeof(IMessagingService));
+            service.Init();
             service.Server.Start();
             service.LocalServer.Start();
             log.Info("MessagingBackgroundService ExecuteAsync done.");

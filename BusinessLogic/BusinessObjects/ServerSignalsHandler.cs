@@ -18,12 +18,12 @@ namespace BusinessLogic.BusinessObjects
     {
         private readonly MainService xtrade;
         private readonly IWebLog log;
-        private readonly ITerminalEvents terminals;
+        //private readonly ITerminalEvents terminals;
 
         public ServerSignalsHandler()
         {
             xtrade = MainService.thisGlobal; 
-            terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
+            //terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
             log = MainService.thisGlobal.Container.Resolve<IWebLog>();
         }
 
@@ -110,6 +110,7 @@ namespace BusinessLogic.BusinessObjects
                         positions = JsonConvert.DeserializeObject<List<PositionInfo>>(signal.Data.ToString());
                     else
                         positions = new List<PositionInfo>();
+                    var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
                     terminals.UpdatePositions(signal.ObjectId, signal.Value, positions);
                 }
                     break;
@@ -193,6 +194,7 @@ namespace BusinessLogic.BusinessObjects
                         WsMessage message = new WsMessage();
                         message.From = wsMessage.From;
                         message.Type = WsMessageType.GetAllPositions;
+                        var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
                         message.Message = JsonConvert.SerializeObject(terminals.GetAllPositions());
                         var send = JsonConvert.SerializeObject(message);
                         server.MulticastText(send);
@@ -230,7 +232,10 @@ namespace BusinessLogic.BusinessObjects
                     {
                         var result = JsonConvert.DeserializeObject<PositionInfo>(wsMessage.Message);
                         if (result != null)
+                        {
+                            var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
                             terminals.UpdatePositionFromClient(result);
+                        }
                     }
                     break;
                 case WsMessageType.GetLevels:

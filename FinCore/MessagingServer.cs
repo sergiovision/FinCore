@@ -57,9 +57,14 @@ namespace FinCore
 
         public MessagingServer(IPAddress address, int port) : base(address, port) { }
 
-        protected override TcpSession CreateSession() {
+        protected override TcpSession CreateSession()
+        {
+            if (Program.Container == null)
+                return null;
             ISignalHandler handler = Program.Container.Resolve<ISignalHandler>();
-            return new MessageSession(this, log, handler);
+            if (handler != null) 
+                return new MessageSession(this, log, handler);
+            return null;
         }
 
         protected override void OnError(SocketError error)

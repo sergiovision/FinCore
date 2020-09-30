@@ -64,6 +64,8 @@ namespace FinCore
             : base(ctx, address, port) { }
 
         protected override SslSession CreateSession() {
+            if (Program.Container == null)
+                return null;
             ISignalHandler handler = Program.Container.Resolve<ISignalHandler>();
             return new SMessageSession(this, log, handler);
         }

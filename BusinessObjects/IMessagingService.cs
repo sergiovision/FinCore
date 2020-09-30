@@ -17,6 +17,7 @@ namespace BusinessObjects
 
     public interface IMessagingService
     {
+        public void Init(); 
         public IMessagingServer Server { get; }
         public IMessagingServer LocalServer { get; }
         public void SendMessage(WsMessage wsMessage);

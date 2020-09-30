@@ -67,3 +67,8 @@ Thumbs.db
 /BusinessObjects/bin/Debug/netcoreapp3.1
 /BusinessLogic/bin/Release/netcoreapp3.1
 /BusinessObjects/bin/Release/netcoreapp3.1
+/MTLoader/obj/x64/Debug/netstandard2.0
+/MTLoader/obj
+/MQLConnector/obj
+/MQLConnector/packages/DllExport.1.7.3
+/MTLoader/packages/DllExport.1.7.3
