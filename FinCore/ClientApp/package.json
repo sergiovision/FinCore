@@ -25,7 +25,7 @@
     "@angular/platform-browser-dynamic": "^10.1.6",
     "@angular/router": "^10.1.6",
     "@coreui/angular": "^2.9.4",
-    "@coreui/coreui-pro": "^3.3.0",
+    "@coreui/coreui-pro": "^2.1.16",
     "@coreui/icons": "1.0.1",
     "@ng-select/ng-select": "^3.7.3",
     "@popperjs/core": "^2.5.3",
