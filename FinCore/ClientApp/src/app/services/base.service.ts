@@ -38,9 +38,9 @@ export class BaseService {
   public get authHeaders(): HttpHeaders {
     const user: UserToken = this.currentUserToken;
     return new HttpHeaders()
-    .append('Accept', 'application/json; charset=utf-8')
-    .append('Content-Type', 'application/json; charset=utf-8')
-    .append('Authorization', 'Bearer ' + user.access_token);
+      .append('Accept', 'application/json; charset=utf-8')
+      .append('Content-Type', 'application/json; charset=utf-8')
+      .append('Authorization', 'Bearer ' + user.access_token);
   }
 
   public getAll(apiAction: string) {
@@ -58,36 +58,36 @@ export class BaseService {
   public loadParentData(entity: EntitiesEnum) {
     const entityNum: number = entity;
     const url = `${this.baseURL}/api/wallets/GetObjects/${entityNum}`;
-    return this.http.get<any>( url, { headers: this.authHeaders } );
+    return this.http.get<any>(url, { headers: this.authHeaders });
   }
 
   public loadChildData(parentEntity: EntitiesEnum, childEntity: EntitiesEnum, key: number): CustomStore {
-      const entityParentNum: number = parentEntity;
-      const entityChildNum: number = childEntity;
-      const url = `${this.baseURL}/api/wallets/GetChildObjects/${entityParentNum}/${entityChildNum}/${key}`;
-      const loadResponse = this.http.get<any>( url, { headers: this.authHeaders } );
-      const result = new CustomStore({
+    const entityParentNum: number = parentEntity;
+    const entityChildNum: number = childEntity;
+    const url = `${this.baseURL}/api/wallets/GetChildObjects/${entityParentNum}/${entityChildNum}/${key}`;
+    const loadResponse = this.http.get<any>(url, { headers: this.authHeaders });
+    const result = new CustomStore({
       key: 'Id',
-      load: function (loadOptions: any) {
-          return loadResponse
-              .toPromise()
-              .then((data: any) => {
-                // console.log('data: ' + JSON.stringify( data));
-                return data;
-              })
-              .catch(error => {
-                const message = JSON.stringify( error.error) + '\n' + error.statusText;
-                console.log(message);
-              });
-        }
-      });
-      return result;
+      load: function(loadOptions: any) {
+        return loadResponse
+          .toPromise()
+          .then((data: any) => {
+            // console.log('data: ' + JSON.stringify( data));
+            return data;
+          })
+          .catch(error => {
+            const message = JSON.stringify(error.error) + '\n' + error.statusText;
+            console.log(message);
+          });
+      }
+    });
+    return result;
   }
 
   public pushStore(entity: EntitiesEnum, values: any) {
     const type: number = entity;
     const url = `${this.baseURL}/api/wallets/InsertObject/${type}`;
-    return this.http.post<any>( url, values, { headers: this.authHeaders } );
+    return this.http.post<any>(url, values, { headers: this.authHeaders });
   }
 
   public updateStore(entity: EntitiesEnum, keyId: number, values: any) {
@@ -95,13 +95,13 @@ export class BaseService {
     // console.log('UpdateObject ' + values);
     const url = `${this.baseURL}/api/wallets/UpdateObject/${type}/${keyId}`;
     // console.log('UpdateObject url: ' + values);
-    return this.http.put<any>( url, values, { headers: this.authHeaders } );
+    return this.http.put<any>(url, values, { headers: this.authHeaders });
   }
 
   public deleteStore(entity: EntitiesEnum, keyId: number) {
     const entityNum: number = entity;
     const url = `${this.baseURL}/api/wallets/DeleteObject/${entityNum}/${keyId}`;
-    return this.http.delete<any>( url, { headers: this.authHeaders } );
+    return this.http.delete<any>(url, { headers: this.authHeaders });
   }
 
   public getRunning() {
@@ -122,11 +122,11 @@ export class BaseService {
     return this.postWithParams('/api/jobs/Stop', JSON.stringify(body));
   }
 
-  getVersion()  {
+  getVersion() {
     return this.GetGlobalProp('VERSION');
   }
 
-  externChartURL(sym: string): string  {
+  externChartURL(sym: string): string {
     const url = `https://www.tradingview.com/chart?symbol=${sym}`;
     return url;
   }
@@ -135,6 +135,4 @@ export class BaseService {
     const url = '/api/wallets/GetGlobalProp/' + name;
     return this.getAll(url);
   }
-
-
 }

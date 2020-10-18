@@ -45,7 +45,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   }
 
   public onOpen(evt: MessageEvent) {
-
     this.UpdateDeals();
     this.connectionStarted = true;
     // console.log('connected dashboard\n');
@@ -64,8 +63,8 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     if (typeof data === 'string') {
       // return false;
       // console.log('should be disabled: ' + data);
-      if ((data === 'LongInvestment')  || (data === 'ShortInvestment')) {
-         return false;
+      if (data === 'LongInvestment' || data === 'ShortInvestment') {
+        return false;
       }
     }
     return true;
@@ -75,34 +74,34 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     if (msg) {
       switch (msg.Type) {
         case WsMessageType.GetAllPositions:
-        {
-          // console.log('Insert ' + msg.Message);
-          const data = JSON.parse(msg.Message);
-          this.dataSource = new CustomStore({
-            load: () => data,
-            key: 'Ticket'
-          });
-          this.dgauge.updateData(data);
-          this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
-        }
+          {
+            // console.log('Insert ' + msg.Message);
+            const data = JSON.parse(msg.Message);
+            this.dataSource = new CustomStore({
+              load: () => data,
+              key: 'Ticket'
+            });
+            this.dgauge.updateData(data);
+            this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
+          }
           break;
         case WsMessageType.UpdatePosition:
-        {
-          const data = JSON.parse(msg.Message);
-          // console.log('Update ' + msg.Message);
-          if (this.dataSource) {
-            this.dataSource.push([
-              {
-                type: 'update',
-                key: data.Ticket,
-                data: data
-              }
-            ]);
+          {
+            const data = JSON.parse(msg.Message);
+            // console.log('Update ' + msg.Message);
+            if (this.dataSource) {
+              this.dataSource.push([
+                {
+                  type: 'update',
+                  key: data.Ticket,
+                  data: data
+                }
+              ]);
+            }
           }
-        }
           break;
         case WsMessageType.InsertPosition:
-        {
+          {
             const data = JSON.parse(msg.Message);
             console.log('Insert ' + data);
             if (this.dataSource) {
@@ -116,7 +115,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
           }
           break;
         case WsMessageType.RemovePosition:
-        {
+          {
             const data = JSON.parse(msg.Message);
             console.log('Remove ' + data);
             if (this.dataSource) {
@@ -128,7 +127,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
               ]);
             }
             this.UpdateDeals();
-        }
+          }
           break;
       }
     }
@@ -149,7 +148,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     }
     return 'Properties';
   }
-
 
   ngOnDestroy(): void {
     clearInterval(this.timerId);
@@ -177,7 +175,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       return;
     }
 
-    if (( id === 7)) {
+    if (id === 7) {
       const pos: PositionInfo = e.data;
       if (this.allowClosePositions(pos.Role)) {
         this.subs.sink = this.deals.closePosition(pos.Account, pos.Magic, pos.Ticket).subscribe(
@@ -209,7 +207,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       error => this.logNotifyError(error)
     );
   }
-
 
   onToolbarPreparing(e) {
     e.toolbarOptions.items.unshift(
@@ -258,14 +255,14 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   onSave() {
     const key = this.propsContainer.objId;
     if (key) {
-        const pos = JSON.stringify(this.toDBObj(key));
-        // console.log(pos);
-        this.ws.doSend({ Type: WsMessageType.UpdatePosition, From: this.deals.currentUserToken.userName, Message: pos });
+      const pos = JSON.stringify(this.toDBObj(key));
+      // console.log(pos);
+      this.ws.doSend({ Type: WsMessageType.UpdatePosition, From: this.deals.currentUserToken.userName, Message: pos });
 
-        this.propsContainer.updateProperty(true, true);
-        this.loadData();
+      this.propsContainer.updateProperty(true, true);
+      this.loadData();
 
-        /* this.subs.sink = this.deals.updateStore(this.propsContainer.entityType, key, this.toDBObj(key)).subscribe(
+      /* this.subs.sink = this.deals.updateStore(this.propsContainer.entityType, key, this.toDBObj(key)).subscribe(
           data => {
           }
           , error => this.logConsoleError(error));
@@ -283,7 +280,5 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
         , error => this.logConsoleError(error));
     }
     */
-
   }
-
 }
