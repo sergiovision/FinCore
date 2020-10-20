@@ -126,7 +126,7 @@ FinCore folders structure:
   2. As an usual console application
   3. As a Docker image in a Docker container
 
-  When application started it becomes accessible by this link: http://localhost:2020 <br>
+  When application started it becomes accessible by this link: http://localhost:2020/#/login or http://localhost:2020/#/dashboard <br>
   Websockets port uses port `2021`.
   Make sure ports `2020` and `2021` are opened to make FinCore accesible outside of VPS.
   If you run application in docker on a separate address to connect it to Windows where Metatrader terminals live - you should activate ports forwarding in Windows:<br>
