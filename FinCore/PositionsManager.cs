@@ -1,13 +1,12 @@
-﻿using BusinessObjects;
+﻿using Autofac;
+using BusinessObjects;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Autofac;
 using System.Text;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace FinCore
 {
@@ -45,7 +44,7 @@ namespace FinCore
                     acc.TerminalId = term.Id;
                     todayStat.Accounts.Add(acc);
                 }
-            }            
+            }
         }
 
         protected void loadPositions()
@@ -57,7 +56,8 @@ namespace FinCore
                 if (!String.IsNullOrEmpty(pos))
                     positions = JsonConvert.DeserializeObject<ConcurrentDictionary<long, PositionInfo>>(pos);
 
-            } catch(Exception)
+            }
+            catch (Exception)
             {
                 positions = new ConcurrentDictionary<long, PositionInfo>();
             }

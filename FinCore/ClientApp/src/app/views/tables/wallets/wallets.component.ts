@@ -50,26 +50,6 @@ export class WalletsComponent extends BaseComponent implements OnInit {
             },
             error => this.logConsoleError(error));
 
-
-    /* this.dataSource = new CustomStore({
-          key: 'Id',
-          load: () => this.wallets.loadParentData(EntitiesEnum.Wallet)
-                      .toPromise()
-                      .then((data: any) => {
-                          this.dataSource = data.filter(item => !item.Retired);
-                          if (fullRefresh)  {
-                            this.dataSource.forEach(element => {
-                              this.loadChilds(element.Id);
-                            });
-                          }
-                      })
-                      .catch(error => {
-                        const message = JSON.stringify(error.error);
-                        console.log(message);
-                      })
-        });
-*/
-
     this.subs.sink = this.wallets.assetsDistribution(0)
           .subscribe(
           data => {

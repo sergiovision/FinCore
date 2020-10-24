@@ -1,19 +1,10 @@
 ﻿using BusinessObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
-using System.Net.Http;
-using System.Net;
-using BusinessObjects.BusinessObjects;
-using BusinessLogic.Repo;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using System;
 
 namespace FinCore.Controllers
 {
@@ -44,7 +35,7 @@ namespace FinCore.Controllers
         [HttpGet]
         [AcceptVerbs("GET")]
         [Route("[action]/{Id}")]
-        public IActionResult DeployScript([FromRoute]int Id)
+        public IActionResult DeployScript([FromRoute] int Id)
         {
             try
             {

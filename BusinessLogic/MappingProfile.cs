@@ -1,5 +1,4 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using BusinessLogic.BusinessObjects;
 using BusinessLogic.Repo;
 using BusinessObjects;
@@ -11,9 +10,9 @@ namespace BusinessLogic
         public MappingProfile()
         {
             var types = MainService.thisGlobal.GetTypes();
-            foreach( var t in types)
+            foreach (var t in types)
             {
-                switch(t.Key)
+                switch (t.Key)
                 {
                     case EntitiesEnum.Account:
                         CreateMap<DBAccount, Account>(MemberList.None)
@@ -22,7 +21,7 @@ namespace BusinessLogic
                             .ForMember(dto => dto.PersonId, conf => conf.MapFrom(ol => ol.Person.Id))
                             .ForMember(dto => dto.WalletId, conf => conf.MapFrom(ol => ol.Wallet.Id)).PreserveReferences()
                             .ReverseMap()
-                             // .ForMember(x => x.Person, opt => opt.Ignore())
+                                // .ForMember(x => x.Person, opt => opt.Ignore())
                                 .ForMember(x => x.Terminal, opt => opt.Ignore());
                         break;
                     case EntitiesEnum.Adviser:
@@ -38,7 +37,7 @@ namespace BusinessLogic
                             .ForMember(dto => dto.TerminalId, conf => conf.MapFrom(ol => ol.Terminal.Id))
                             .PreserveReferences()
                             .ReverseMap().ForMember(x => x.Symbol, opt => opt.Ignore())
-                                         .ForMember(x => x.Terminal, opt => opt.Ignore()); 
+                                         .ForMember(x => x.Terminal, opt => opt.Ignore());
                         break;
                     case EntitiesEnum.Deals:
                         CreateMap<DBDeals, DealInfo>(MemberList.None)

@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Autofac;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Autofac;
-using BusinessObjects.BusinessObjects;
 
 namespace BusinessObjects
 {
@@ -10,7 +9,7 @@ namespace BusinessObjects
     {
         ILifetimeScope Container { get; }
 
-        
+
         void Init(ILifetimeScope container);
 
         void Dispose();
@@ -52,7 +51,7 @@ namespace BusinessObjects
         void DeInitExpert(ExpertInfo expert);
 
         void DeInitTerminal(ExpertInfo expert);
-        
+
         int DeleteHistoryOrders(string filePath);
 
         void DeployToTerminals(string sourceFolder);

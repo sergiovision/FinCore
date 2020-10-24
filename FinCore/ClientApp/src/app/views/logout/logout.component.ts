@@ -1,11 +1,9 @@
 
 import { Component, OnInit } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { first } from 'rxjs/operators';
+import { FormBuilder, FormGroup } from '@angular/forms';
 
 import { AuthenticationService } from '../../services/authentication.service';
-import { AlertService } from '../../services/alert.service';
 
 @Component({templateUrl: 'logout.component.html'})
 export class LogoutComponent implements OnInit {
@@ -18,8 +16,7 @@ export class LogoutComponent implements OnInit {
         private formBuilder: FormBuilder,
         private route: ActivatedRoute,
         private router: Router,
-        private authenticationService: AuthenticationService,
-        private alertService: AlertService
+        private authenticationService: AuthenticationService
     ) {
 
       this.authenticationService.logout();
@@ -27,7 +24,6 @@ export class LogoutComponent implements OnInit {
     }
 
     ngOnInit() {
-      console.log('Init LogoutComponent...');
 
     }
 }

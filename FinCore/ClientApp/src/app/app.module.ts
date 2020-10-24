@@ -48,7 +48,6 @@ import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TabsModule } from 'ngx-bootstrap/tabs';
 
 import { AuthenticationService } from './services/authentication.service';
-import { AlertService } from './services/alert.service';
 import { PersonService } from './services/person.service';
 import { JwtInterceptor } from './helpers/JwtInterceptior';
 import { ErrorInterceptor } from './helpers/ErrorInterceptor';
@@ -61,7 +60,6 @@ import { DealsService } from './services/deals.service';
 import { WebsocketService } from './services/websocket.service';
 import { TablesModule } from './views/tables/tables.module';
 import { PropsService } from './services/props.service';
-import { PropertiesComponent } from './views/tables/properties/properties.component';
 import { DocComponent } from './views/doc/doc.component';
 import { DGaugeComponent } from './views/dgauge/dgauge.component';
 // import { PropertiesComponent } from './views/tables/properties/properties.component';
@@ -116,7 +114,6 @@ import { DGaugeComponent } from './views/dgauge/dgauge.component';
       provide: LocationStrategy,
       useClass: HashLocationStrategy
     },
-    AlertService,
     AuthenticationService,
     JwtInterceptor,
     AuthGuard,

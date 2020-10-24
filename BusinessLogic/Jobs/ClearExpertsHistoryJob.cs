@@ -1,14 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Autofac;
-using System.Linq;
+﻿using BusinessLogic.BusinessObjects;
+using BusinessLogic.Scheduler;
 using BusinessObjects;
 using Quartz;
-using System.Diagnostics;
+using System;
 using System.IO;
-using BusinessLogic.BusinessObjects;
-using BusinessLogic.Scheduler;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Jobs
 {

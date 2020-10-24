@@ -1,27 +1,23 @@
-﻿using System;
+﻿using Autofac;
+using BusinessLogic.Repo;
+using BusinessLogic.Scheduler;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NHibernate;
+using Quartz;
+using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 using System.Text;
-using System.Threading;
-using Autofac;
-using BusinessObjects;
-using BusinessLogic.Repo;
-using BusinessLogic.Scheduler;
-using NHibernate;
-using NHibernate.Type;
-using Quartz;
-using System.Collections.Concurrent;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using BusinessObjects.BusinessObjects;
 using System.Threading.Tasks;
 
 namespace BusinessLogic.BusinessObjects
@@ -38,7 +34,7 @@ namespace BusinessLogic.BusinessObjects
         private DataService data;
         private bool Initialized;
         private ConcurrentDictionary<long, ConcurrentQueue<SignalInfo>> signalQue;
-        private Dictionary<EntitiesEnum, Tuple<Type, Type> > dicTypes;
+        private Dictionary<EntitiesEnum, Tuple<Type, Type>> dicTypes;
 
         public MainService()
         {
@@ -51,7 +47,7 @@ namespace BusinessLogic.BusinessObjects
 
         private void InitTypesMapping()
         {
-            dicTypes = new Dictionary<EntitiesEnum, Tuple<Type, Type> >();
+            dicTypes = new Dictionary<EntitiesEnum, Tuple<Type, Type>>();
             TupleMap<DBAccount, Account>(EntitiesEnum.Account);
             TupleMap<DBTerminal, Terminal>(EntitiesEnum.Terminal);
             TupleMap<DBMetasymbol, MetaSymbol>(EntitiesEnum.MetaSymbol);
@@ -66,7 +62,7 @@ namespace BusinessLogic.BusinessObjects
             TupleMap<DBPerson, Person>(EntitiesEnum.Person);
         }
 
-        private void TupleMap<DBT, DTO>(EntitiesEnum t) 
+        private void TupleMap<DBT, DTO>(EntitiesEnum t)
         {
             dicTypes[t] = new Tuple<Type, Type>(typeof(DBT), typeof(DTO));
         }
@@ -163,7 +159,7 @@ namespace BusinessLogic.BusinessObjects
         {
             StringBuilder stringBuilder = new StringBuilder();
             var list = data.GetRates(false);
-            foreach( var rate in list)
+            foreach (var rate in list)
             {
                 stringBuilder.Append(rate.Key);
                 stringBuilder.Append(",");
@@ -274,7 +270,7 @@ namespace BusinessLogic.BusinessObjects
 
             if (_gSchedulerService != null)
                 _gSchedulerService.Shutdown();
-           
+
             // To enable QUIK: uncomment these lines
             //ITerminalConnector connector = thisGlobal.Container.Resolve<ITerminalConnector>();
             //if (connector != null)
@@ -482,7 +478,7 @@ namespace BusinessLogic.BusinessObjects
                 using (ISession Session = ConnectionHelper.CreateNewSession())
                 {
                     var adv = Session.Query<DBAdviser>()
-                        .Where(x => x.Symbol.Metasymbol.Id == (int) masterId);
+                        .Where(x => x.Symbol.Metasymbol.Id == (int)masterId);
                     if (adv == null || advisers.Count() == 0)
                         return advisers; // it is not master expert
                     foreach (var adviser in adv)
@@ -569,7 +565,7 @@ namespace BusinessLogic.BusinessObjects
             {
                 //    Sets the maxsize buffer to 500, if the more
                 //    is required then doubles the size each time.
-                for (int maxsize = CHAR_BUFF_SIZE;; maxsize *= 2)
+                for (int maxsize = CHAR_BUFF_SIZE; ; maxsize *= 2)
                 {
                     //    Obtains the information in bytes and stores
                     //    them in the maxsize buffer (Bytes array)
@@ -596,7 +592,7 @@ namespace BusinessLogic.BusinessObjects
                 log.Error("Failed to get Section Names from file: " + path + ". Error: " + e);
             }
 
-            return new[] {""};
+            return new[] { "" };
         }
 
         public static string GetPrivateProfileString(string fileName, string sectionName, string keyName)
@@ -641,7 +637,7 @@ namespace BusinessLogic.BusinessObjects
                         msg = $"Unknown AccountNumber {expert.Account}. Please Register Account in DB.";
                         log.Log(msg);
                         expert.Magic = 0;
-                        expert.Reason = msg; 
+                        expert.Reason = msg;
                         return expert;
                     }
 
@@ -756,7 +752,7 @@ namespace BusinessLogic.BusinessObjects
         public SignalInfo SendSignal(SignalInfo signal)
         {
             SignalInfo result = null;
-            switch ((EnumSignals) signal.Id)
+            switch ((EnumSignals)signal.Id)
             {
                 case EnumSignals.SIGNAL_POST_LOG:
                     {
@@ -771,7 +767,7 @@ namespace BusinessLogic.BusinessObjects
                     {
                         ExpertInfo ei = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
                         var expertInfo = InitExpert(ei);
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id, signal.ChartId);
+                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
 
                         result.Data = JsonConvert.SerializeObject(expertInfo);
                     }
@@ -969,7 +965,7 @@ namespace BusinessLogic.BusinessObjects
                         string roleString = GetPrivateProfileString(filePath, sectionName, "role");
                         if (!string.IsNullOrEmpty(roleString))
                         {
-                            ENUM_ORDERROLE role = (ENUM_ORDERROLE) int.Parse(roleString);
+                            ENUM_ORDERROLE role = (ENUM_ORDERROLE)int.Parse(roleString);
                             if (role.Equals(ENUM_ORDERROLE.History))
                             {
                                 // Deletes section!!!
@@ -1066,7 +1062,7 @@ namespace BusinessLogic.BusinessObjects
             {
                 using (ISession Session = ConnectionHelper.CreateNewSession())
                 {
-                    int magicNumber = (int) expert.Magic;
+                    int magicNumber = (int)expert.Magic;
                     DBAdviser adviser = data.getAdviserByMagicNumber(Session, magicNumber);
                     if (adviser == null)
                     {
@@ -1247,7 +1243,6 @@ namespace BusinessLogic.BusinessObjects
         public void SubscribeToSignals(long objectId)
         {
             ConcurrentQueue<SignalInfo> que = new ConcurrentQueue<SignalInfo>();
-            //signalQue.AddOrUpdate(objectId, que, (oldkey, oldvalue) => que);
             if (!signalQue.ContainsKey(objectId))
             {
                 if (signalQue.TryAdd(objectId, que))
@@ -1265,16 +1260,14 @@ namespace BusinessLogic.BusinessObjects
 
         protected void PostSignal(SignalInfo signal)
         {
-            if (signalQue.ContainsKey(signal.ObjectId))
-            {
-                ConcurrentQueue<SignalInfo> que = signalQue[signal.ObjectId];
+            ConcurrentQueue<SignalInfo> que;
+            if (signalQue.TryGetValue(signal.ObjectId, out que))
                 que.Enqueue(signal);
-            }
         }
 
         public void PostSignalTo(SignalInfo signal)
         {
-            SignalFlags to = (SignalFlags) signal.Flags;
+            SignalFlags to = (SignalFlags)signal.Flags;
             if (to == SignalFlags.AllTerminals)
             {
                 foreach (var que in signalQue) que.Value.Enqueue(signal);
@@ -1295,7 +1288,7 @@ namespace BusinessLogic.BusinessObjects
                 if (advisers != null && advisers.Count() > 0)
                     foreach (var adv in advisers)
                     {
-                        signal.Flags = (long) SignalFlags.Expert;
+                        signal.Flags = (long)SignalFlags.Expert;
                         signal.ObjectId = adv.Id;
                         PostSignal(signal);
                     }
@@ -1336,8 +1329,8 @@ namespace BusinessLogic.BusinessObjects
         public SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id, long chartId)
         {
             SignalInfo signal = new SignalInfo();
-            signal.Flags = (long) flags;
-            signal.Id = (int) Id;
+            signal.Flags = (long)flags;
+            signal.Id = (int)Id;
             signal.ObjectId = ObjectId;
             signal.Value = 1;
             signal.ChartId = chartId;
@@ -1456,8 +1449,8 @@ namespace BusinessLogic.BusinessObjects
                     if (directory.Exists)
                     {
                         var logFile = (from f in directory.GetFiles()
-                                      orderby f.LastWriteTime descending
-                                      select f).First();
+                                       orderby f.LastWriteTime descending
+                                       select f).First();
                         if (logFile.Exists)
                             itemx.Path = logFile.FullName; //  terminal.CodeBase + "/Logs";
                     }
@@ -1478,10 +1471,10 @@ namespace BusinessLogic.BusinessObjects
                     {
                         directory2 = new DirectoryInfo(directory2.Parent.FullName + "/logs");
                         var logFile2 = (from f in directory2.GetFiles()
-                                       orderby f.LastAccessTime descending
-                                       select f).First();
+                                        orderby f.LastAccessTime descending
+                                        select f).First();
                         if (logFile2.Exists)
-                            itemy.Path = logFile2.FullName; 
+                            itemy.Path = logFile2.FullName;
                     }
                     LogItems.Add(itemy);
                     i++;
@@ -1533,7 +1526,8 @@ namespace BusinessLogic.BusinessObjects
                 }
                 return result;
 
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 return e.ToString();
             }

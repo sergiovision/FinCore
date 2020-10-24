@@ -1,17 +1,11 @@
-﻿using System;
+﻿using Autofac;
+using BusinessObjects;
+using log4net;
+using NetCoreServer;
+using Newtonsoft.Json;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Autofac;
-using BusinessObjects;
-using BusinessObjects.BusinessObjects;
-using log4net;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using NetCoreServer;
-using Newtonsoft.Json;
 
 namespace FinCore
 {
@@ -63,7 +57,8 @@ namespace FinCore
         public SMessagingServer(SslContext ctx, IPAddress address, int port)
             : base(ctx, address, port) { }
 
-        protected override SslSession CreateSession() {
+        protected override SslSession CreateSession()
+        {
             if (Program.Container == null)
                 return null;
             ISignalHandler handler = Program.Container.Resolve<ISignalHandler>();

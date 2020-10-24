@@ -1,14 +1,12 @@
-﻿using System;
-using System.Configuration;
-using System.IO;
-using System.Net;
-using Autofac;
+﻿using Autofac;
 using BusinessLogic.BusinessObjects;
 using BusinessLogic.Repo;
 using BusinessObjects;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
+using System.IO;
+using System.Net;
 
 namespace BusinessLogic
 {
@@ -29,8 +27,8 @@ namespace BusinessLogic
             if (_sessionFactory == null)
             {
                 InitConfig();
-                string connection =  config.ConnectionString();
-                
+                string connection = config.ConnectionString();
+
                 if (config.ConnectionStringName().Contains("SQLite"))
                 {
                     // http://qaru.site/questions/754091/getting-fluent-nhibernate-to-work-with-sqlite
@@ -71,7 +69,7 @@ namespace BusinessLogic
             string ipAddress = html.Replace(
                     "<html><head><title>Current IP Check</title></head><body>Current IP Address: ", string.Empty)
                 .Replace("</body></html>", string.Empty);
-            char[] trim = {'\r', '\n'};
+            char[] trim = { '\r', '\n' };
             ipAddress = ipAddress.TrimEnd(trim);
             return ipAddress;
         }

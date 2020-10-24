@@ -1,9 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace BusinessLogic.Repo
 {
-    public interface IRepository<TEntity> 
+    public interface IRepository<TEntity>
     {
         List<TEntity> GetAll();
 

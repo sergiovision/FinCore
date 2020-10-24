@@ -10,7 +10,6 @@ import { LoginComponent } from './views/login/login.component';
 import { LogoutComponent } from './views/logout/logout.component';
 import { RegisterComponent } from './views/register/register.component';
 import { AuthGuard } from './guards/AuthGuard';
-import { ChartComponent } from './views/chart/chart.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { DocComponent } from './views/doc/doc.component';
 
@@ -88,13 +87,6 @@ export const routes: Routes = [
         canActivate: [AuthGuard],
         component: DocComponent
       }
-
-       /* ,
-      {
-        path: 'chart',
-        canActivate: [AuthGuard],
-        component: ChartComponent
-      }*/
     ]
   }
 ];

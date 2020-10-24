@@ -27,16 +27,6 @@ export class DealsComponent extends BaseComponent implements OnInit {
                 const message = JSON.stringify( error.error) + '\n' + error.statusText;
                 console.log(message);
             });
-
-/*    this.dataSource = new CustomStore({
-        key: 'Id',
-        load: () => this.deals.loadParentData(EntitiesEnum.Deals)
-            .toPromise()
-            .then((data: any) => {
-                this.dataSource = data;
-            })
-            .catch(error => this.logNotifyError(error)),
-    }); */
   }
 
   ngOnInit() {

@@ -10,7 +10,7 @@ namespace BusinessObjects
         public string Symbol { get; set; }
         public string EAName { get; set; }
         public string Data { get; set; }
-        public bool   IsMaster { get; set; }
+        public bool IsMaster { get; set; }
         public string Orders { get; set; }
         public string Reason { get; set; }
     }

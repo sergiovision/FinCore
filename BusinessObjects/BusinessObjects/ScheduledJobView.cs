@@ -1,12 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using BusinessObjects;
 
 namespace BusinessObjects
 {
-    public class ScheduledJobView: Idable
+    public class ScheduledJobView : Idable
     {
         public int Id { get; set; }
         public DateTime PrevDate { get; set; }

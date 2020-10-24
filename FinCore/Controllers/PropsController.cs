@@ -1,17 +1,12 @@
-﻿using BusinessObjects;
+﻿using Autofac;
+using BusinessLogic.Repo;
+using BusinessObjects;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
-using System.Net.Http;
-using System.Net;
-using BusinessLogic.Repo;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Http;
 
 namespace FinCore.Controllers
 {
@@ -41,7 +36,7 @@ namespace FinCore.Controllers
         [HttpGet]
         [AcceptVerbs("GET")]
         [Route("[action]")]
-        public DynamicProperties GetInstance([FromQuery]short entityType, [FromQuery]int objId)
+        public DynamicProperties GetInstance([FromQuery] short entityType, [FromQuery] int objId)
         {
             try
             {

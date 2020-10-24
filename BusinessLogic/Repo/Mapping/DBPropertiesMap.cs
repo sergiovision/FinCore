@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using System.Text;
 using FluentNHibernate.Mapping;
-using BusinessLogic.Repo;
 
 namespace BusinessLogic.Repo
 {

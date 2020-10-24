@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Autofac;
-using System.Linq;
-using Quartz;
-using System.Diagnostics;
-using BusinessLogic;
-using System.IO;
+﻿using Autofac;
 using BusinessLogic.BusinessObjects;
 using BusinessLogic.Repo;
 using BusinessObjects;
+using Quartz;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Jobs
 {
@@ -42,7 +41,7 @@ namespace BusinessLogic.Jobs
 
                 IEnumerable<object> results = (IEnumerable<object>)dataService.GetObjects(EntitiesEnum.Terminal);
 
-                results = results.Where(x  => ((x as Terminal).Retired == false) &&
+                results = results.Where(x => ((x as Terminal).Retired == false) &&
                                 ((x as Terminal).Stopped == false));
                 foreach (var resRow in results)
                 {

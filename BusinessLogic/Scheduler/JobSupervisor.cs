@@ -1,13 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Autofac;
-using System.Linq;
-using BusinessObjects;
+﻿using Autofac;
 using BusinessLogic.BusinessObjects;
-using Quartz;
 using BusinessLogic.Repo;
-using BusinessLogic.Jobs;
+using BusinessObjects;
+using Quartz;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Scheduler
 {
@@ -147,7 +146,7 @@ namespace BusinessLogic.Scheduler
                 return false;
             string triggerName = name + "Trigger";
             SchedulerService.SetJobDataMap(job.Key, job.JobDataMap);
-            var trigger = (ICronTrigger) TriggerBuilder.Create()
+            var trigger = (ICronTrigger)TriggerBuilder.Create()
                 .WithIdentity(triggerName, group)
                 .WithCronSchedule(cron)
                 //.WithPriority(1)
@@ -175,7 +174,7 @@ namespace BusinessLogic.Scheduler
             if (exists.Result) return;
             string triggerName = name + "Trigger";
             SchedulerService.SetJobDataMap(job.Key, job.JobDataMap);
-            var trigger = (ICronTrigger) TriggerBuilder.Create()
+            var trigger = (ICronTrigger)TriggerBuilder.Create()
                 .WithIdentity(triggerName, group)
                 .WithCronSchedule(cron)
                 //.WithPriority(1)

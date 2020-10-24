@@ -1,11 +1,8 @@
-using System;
-using System.Threading;
-using System.Threading.Tasks;
 using Autofac;
-using Autofac.Extensions.DependencyInjection;
 using BusinessObjects;
 using log4net;
 using Microsoft.Extensions.Hosting;
+using System;
 using Topshelf;
 
 namespace FinCore
@@ -24,8 +21,10 @@ namespace FinCore
         {
         }
 
-        public static QuartzServer Server {
-            get {
+        public static QuartzServer Server
+        {
+            get
+            {
                 if (server == null)
                 {
                     server = new QuartzServer();
@@ -115,7 +114,7 @@ namespace FinCore
         {
             try
             {
-                XTradeConfig config = Program.Container.Resolve<XTradeConfig>();
+                // XTradeConfig config = Program.Container.Resolve<XTradeConfig>();
                 xtradeServer = Program.Container.Resolve<IMainService>();
                 xtradeServer.Init(Program.Container);
 
@@ -132,7 +131,7 @@ namespace FinCore
         /// <summary>
         ///     Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public virtual void  Dispose()
+        public virtual void Dispose()
         {
             //base.Dispose();
             xtradeServer.Dispose(); // no-op for now

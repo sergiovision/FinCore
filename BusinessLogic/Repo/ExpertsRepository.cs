@@ -1,13 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
-//using BusinessLogic.BusinessObjects;
+﻿//using BusinessLogic.BusinessObjects;
 using BusinessObjects;
 //using Newtonsoft.Json;
 using NHibernate;
+using System.Collections.Generic;
 
 namespace BusinessLogic.Repo
 {
@@ -128,7 +123,8 @@ namespace BusinessLogic.Repo
                 result.Timeframe = adv.Timeframe;
                 // result.State = adv.State;
                 return true;
-            } catch
+            }
+            catch
             {
                 return false;
             }

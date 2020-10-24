@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Configuration;
-using System.Threading.Tasks;
-using System.Threading;
-using Autofac;
+﻿using Autofac;
+using BusinessLogic.BusinessObjects;
 using BusinessObjects;
 using Quartz;
 using Quartz.Impl;
 using Quartz.Impl.Matchers;
-using BusinessLogic.BusinessObjects;
+using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Scheduler
 {
@@ -224,7 +223,7 @@ namespace BusinessLogic.Scheduler
                     //int Priority = trigger.Priority;
 
                     //removeJobTriggers(detail);
-                    var newtrigger = (ICronTrigger) TriggerBuilder.Create()
+                    var newtrigger = (ICronTrigger)TriggerBuilder.Create()
                         .WithIdentity(triggerName, triggerGroup)
                         .WithCronSchedule(cron)
                         //.WithPriority(Priority)

@@ -4,12 +4,9 @@ using BusinessLogic;
 using BusinessObjects;
 using log4net;
 using log4net.Config;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Threading.Tasks;
 
 
 namespace FinCore

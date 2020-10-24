@@ -1,23 +1,17 @@
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.ExceptionServices;
-using System.Security;
-using System.Threading;
-using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using BusinessLogic;
 using BusinessObjects;
 using log4net;
-using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System;
+using System.Diagnostics;
+using System.Runtime.ExceptionServices;
+using System.Security;
+using System.Threading;
+using System.Threading.Tasks;
 using Topshelf;
-using static System.Net.Mime.MediaTypeNames;
 using Host = Microsoft.Extensions.Hosting.Host;
 
 namespace FinCore
@@ -76,7 +70,7 @@ namespace FinCore
                 x.SetDisplayName(Configuration.ServiceDisplayName);
                 x.SetServiceName(Configuration.ServiceName);
                 x.RunAsLocalSystem();
-         
+
                 x.Service(factory =>
                 {
                     return QuartzServer.Server;
@@ -85,7 +79,7 @@ namespace FinCore
             var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
             string msg = string.Format("------------------------------- FinCore Exited with code: (%d) --------------------------------", exitCode);
             Log.Info(msg);
-            Environment.ExitCode = exitCode;            
+            Environment.ExitCode = exitCode;
         }
 
         public static IHostBuilder CreateHostBuilder(string[] args)

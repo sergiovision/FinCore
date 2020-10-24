@@ -1,16 +1,12 @@
-﻿using BusinessObjects;
+﻿using Autofac;
+using BusinessLogic.Repo;
+using BusinessObjects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Text;
-using Autofac;
 using System.Net.Http;
-using BusinessLogic.Repo;
 using System.Threading.Tasks;
-using BusinessObjects.BusinessObjects;
-using System.Globalization;
-using System.Linq;
 
 namespace BusinessLogic.BusinessObjects
 {
@@ -22,7 +18,7 @@ namespace BusinessLogic.BusinessObjects
 
         public ServerSignalsHandler()
         {
-            xtrade = MainService.thisGlobal; 
+            xtrade = MainService.thisGlobal;
             //terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
             log = MainService.thisGlobal.Container.Resolve<IWebLog>();
         }
@@ -34,13 +30,13 @@ namespace BusinessLogic.BusinessObjects
 
         public void PostSignal(SignalInfo signal, IMessagingServer server)
         {
-            if ((SignalFlags) signal.Flags == SignalFlags.Cluster)
+            if ((SignalFlags)signal.Flags == SignalFlags.Cluster)
             {
                 xtrade.PostSignalTo(signal);
                 return;
             }
 
-            switch ((EnumSignals) signal.Id)
+            switch ((EnumSignals)signal.Id)
             {
                 case EnumSignals.SIGNAL_POST_LOG:
                     {
@@ -54,31 +50,32 @@ namespace BusinessLogic.BusinessObjects
                         log.Info("CheckHealth: " + signal.Flags);
                     break;
                 case EnumSignals.SIGNAL_DEALS_HISTORY:
-                {
-                    List<DealInfo> deals = null;
-                    if (signal.Data != null)
-                        deals = JsonConvert.DeserializeObject<List<DealInfo>>(signal.Data.ToString());
-                    else
-                        deals = new List<DealInfo>();
-                    xtrade.SaveDeals(deals);
-                }
+                    {
+                        List<DealInfo> deals = null;
+                        if (signal.Data != null)
+                            deals = JsonConvert.DeserializeObject<List<DealInfo>>(signal.Data.ToString());
+                        else
+                            deals = new List<DealInfo>();
+                        xtrade.SaveDeals(deals);
+                    }
                     break;
                 case EnumSignals.SIGNAL_CHECK_BALANCE:
-                {
-                    if (signal.Data == null)
-                        break;
-                    JArray jarray = (JArray) signal.Data;
-                    if (jarray == null || jarray.Count == 0)
-                        break;
-                    decimal balance = jarray.First.Value<decimal?>("Balance") ?? 0;
-                    decimal equity = jarray.First.Value<decimal?>("Equity") ?? 0;
-                    int Account = jarray.First.Value<int?>("Account") ?? 0;
-                    xtrade.UpdateBalance(Account, balance, equity);
-                }
+                    {
+                        if (signal.Data == null)
+                            break;
+                        JArray jarray = (JArray)signal.Data;
+                        if (jarray == null || jarray.Count == 0)
+                            break;
+                        decimal balance = jarray.First.Value<decimal?>("Balance") ?? 0;
+                        decimal equity = jarray.First.Value<decimal?>("Equity") ?? 0;
+                        int Account = jarray.First.Value<int?>("Account") ?? 0;
+                        xtrade.UpdateBalance(Account, balance, equity);
+                    }
                     break;
                 case EnumSignals.SIGNAL_UPDATE_RATES:
                     {
-                        try { 
+                        try
+                        {
                             List<RatesInfo> rates = null;
                             if (signal.Data != null)
                                 rates = JsonConvert.DeserializeObject<List<RatesInfo>>(signal.Data.ToString());
@@ -104,15 +101,15 @@ namespace BusinessLogic.BusinessObjects
                     }
                     break;
                 case EnumSignals.SIGNAL_ACTIVE_ORDERS:
-                {
-                    List<PositionInfo> positions = null;
-                    if (signal.Data != null)
-                        positions = JsonConvert.DeserializeObject<List<PositionInfo>>(signal.Data.ToString());
-                    else
-                        positions = new List<PositionInfo>();
-                    var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-                    terminals.UpdatePositions(signal.ObjectId, signal.Value, positions);
-                }
+                    {
+                        List<PositionInfo> positions = null;
+                        if (signal.Data != null)
+                            positions = JsonConvert.DeserializeObject<List<PositionInfo>>(signal.Data.ToString());
+                        else
+                            positions = new List<PositionInfo>();
+                        var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
+                        terminals.UpdatePositions(signal.ObjectId, signal.Value, positions);
+                    }
                     break;
                 /*
                 case EnumSignals.SIGNAL_UPDATE_SLTP:
@@ -141,17 +138,17 @@ namespace BusinessLogic.BusinessObjects
                     }
                     break;
                 case EnumSignals.SIGNAL_LEVELS4SYMBOL:
-                {
-                    string symbol = signal.Sym;
-                    string levelsString = xtrade.Levels4Symbol(symbol);
-                    var result = xtrade.CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
-                    result.Sym = symbol;
-                    result.Data = levelsString;
-                    var send = JsonConvert.SerializeObject(result);
-                    if (server != null)
-                       server.MulticastText(send);
-                }
-                break;
+                    {
+                        string symbol = signal.Sym;
+                        string levelsString = xtrade.Levels4Symbol(symbol);
+                        var result = xtrade.CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
+                        result.Sym = symbol;
+                        result.Data = levelsString;
+                        var send = JsonConvert.SerializeObject(result);
+                        if (server != null)
+                            server.MulticastText(send);
+                    }
+                    break;
                 default:
                     if (server != null)
                     {
@@ -205,7 +202,7 @@ namespace BusinessLogic.BusinessObjects
                         WsMessage message = new WsMessage();
                         message.From = wsMessage.From;
                         message.Type = WsMessageType.GetAllPerformance;
-                        message.Message = "[]"; 
+                        message.Message = "[]";
                         var ds = MainService.thisGlobal.Container.Resolve<DataService>();
                         int month = int.Parse(wsMessage.Message);
                         ds.StartPerf(month);
@@ -261,33 +258,33 @@ namespace BusinessLogic.BusinessObjects
 
         public async Task<double> GetBYNRates()
         {
-                const string url = "https://www.nbrb.by/api/exrates/rates?periodicity=0";
-                var client = new HttpClient();
-                var stringTask = client.GetStringAsync(url);
-                // double result = 0;
-                await stringTask;
-                if (stringTask.Result != null)
+            const string url = "https://www.nbrb.by/api/exrates/rates?periodicity=0";
+            var client = new HttpClient();
+            var stringTask = client.GetStringAsync(url);
+            // double result = 0;
+            await stringTask;
+            if (stringTask.Result != null)
+            {
+                string stringData = stringTask.Result;
+                List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(stringData);
+                if (data != null)
                 {
-                    string stringData = stringTask.Result;
-                    List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(stringData);
-                    if (data != null)
+                    foreach (var item in data)
                     {
-                        foreach (var item in data)
+                        if (item.ContainsKey("Cur_ID"))
                         {
-                            if (item.ContainsKey("Cur_ID"))
+                            Int64 value = (Int64)item["Cur_ID"];
+                            if (value == 145)
                             {
-                                Int64 value = (Int64)item["Cur_ID"];
-                                if (value == 145)
-                                {
-                                    return (double)item["Cur_OfficialRate"];
-                                }
+                                return (double)item["Cur_OfficialRate"];
                             }
-
                         }
 
                     }
+
                 }
-                return 0;
+            }
+            return 0;
         }
 
 

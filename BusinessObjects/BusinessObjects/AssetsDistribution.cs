@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace BusinessObjects
+﻿namespace BusinessObjects
 {
     public class Asset
     {

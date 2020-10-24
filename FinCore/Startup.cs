@@ -1,24 +1,19 @@
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using AutoMapper;
 using BusinessObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
-using Microsoft.Extensions.Hosting;
-using System.IO;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
-using Autofac;
-using System;
-using System.Diagnostics;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Http;
-using Autofac.Extensions.DependencyInjection;
-using System.Text.RegularExpressions;
-using AutoMapper;
-using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System.IO;
 
 namespace FinCore
 {
@@ -39,7 +34,7 @@ namespace FinCore
             // Add Cors
             services.AddCors(o => o.AddPolicy(MyAllowSpecificOrigins, builder =>
             {
-                builder.WithOrigins("http://localhost:" + Configuration["WebPort"], 
+                builder.WithOrigins("http://localhost:" + Configuration["WebPort"],
                                     Configuration["DebugClientURL"],
                                     Configuration["ExternalClientURL"],
                                     "http://localhost:2020",
@@ -128,8 +123,8 @@ namespace FinCore
             QuartzServer.Server.Initialize(angularFolder, env.EnvironmentName);
 
             app.UseCors(MyAllowSpecificOrigins);
-            
-            
+
+
             app.Use(async (context, next) =>
             {
                 // Add Header
@@ -138,7 +133,7 @@ namespace FinCore
                 // Call next middleware
                 await next.Invoke();
             });
-            
+
             app.UseRouting();
 
             app.UseAuthentication();
@@ -150,8 +145,8 @@ namespace FinCore
             app.UseSpaStaticFiles();
             SetupStaticAngular(app, angularFolder);
             app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-                app.UseHsts();
+            // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+            app.UseHsts();
 #endif
 
             // app.UseHttpsRedirection();

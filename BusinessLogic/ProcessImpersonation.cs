@@ -1,17 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Autofac;
-using System.Linq;
-using BusinessObjects;
-using System.Diagnostics;
-using BusinessLogic;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Security.Principal;
-using System.Security;
+﻿using Autofac;
 using BusinessLogic.BusinessObjects;
+using BusinessObjects;
 using Quartz;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Security;
+using System.Security.Principal;
 using System.Threading;
 
 namespace BusinessLogic
@@ -112,7 +110,7 @@ namespace BusinessLogic
                     try
                     {
                         int tokenRights =
-                            MAXIMUM_ALLOWED; 
+                            MAXIMUM_ALLOWED;
                         if (!OpenProcessToken(ShellProcess.Handle, tokenRights, ref ShellProcessToken))
                         {
                             WriteToLog("Unable to OpenProcessToken " + Marshal.GetLastWin32Error());
@@ -145,7 +143,7 @@ namespace BusinessLogic
                         SECURITY_ATTRIBUTES threadAttributes = new SECURITY_ATTRIBUTES();
                         PROCESS_INFORMATION pi;
                         STARTUPINFO si = new STARTUPINFO();
-                        si.cb = (uint) Marshal.SizeOf(si);
+                        si.cb = (uint)Marshal.SizeOf(si);
 
                         IntPtr UserEnvironment = IntPtr.Zero;
                         uint dwCreationFlags = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE;

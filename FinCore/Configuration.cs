@@ -1,4 +1,3 @@
-using System;
 using log4net;
 
 namespace FinCore

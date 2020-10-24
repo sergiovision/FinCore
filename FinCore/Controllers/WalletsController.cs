@@ -1,18 +1,13 @@
-﻿using BusinessObjects;
+﻿using Autofac;
+using BusinessLogic.Repo;
+using BusinessObjects;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Autofac;
-using System.Text;
-using System.Threading.Tasks;
-using System.Net.Http;
-using System.Net;
-using Newtonsoft.Json;
-using BusinessLogic.Repo;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
 
 namespace FinCore.Controllers
 {
@@ -58,7 +53,7 @@ namespace FinCore.Controllers
         [HttpGet]
         [Route("[action]")]
         [AcceptVerbs("GET")]
-        public List<Wallet> GetRange([FromQuery]int id, [FromQuery]DateTime fromDate, [FromQuery]DateTime toDate)
+        public List<Wallet> GetRange([FromQuery] int id, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
         {
             try
             {
@@ -77,14 +72,14 @@ namespace FinCore.Controllers
         [HttpGet]
         [AcceptVerbs("GET")]
         [Route("[action]")]
-        public List<TimeStat> Performance([FromQuery]int month, [FromQuery]int period)
+        public List<TimeStat> Performance([FromQuery] int month, [FromQuery] int period)
         {
             try
             {
                 var ds = MainService.Container.Resolve<DataService>();
                 if (ds == null)
                     return null;
-                return ds.Performance(month, (TimePeriod) period);
+                return ds.Performance(month, (TimePeriod)period);
             }
             catch (Exception e)
             {
@@ -97,7 +92,7 @@ namespace FinCore.Controllers
         [HttpGet]
         [AcceptVerbs("GET")]
         [Route("[action]")]
-        public List<Asset> AssetsDistribution([FromQuery]int type)
+        public List<Asset> AssetsDistribution([FromQuery] int type)
         {
             try
             {
@@ -118,7 +113,7 @@ namespace FinCore.Controllers
         [HttpPut]
         [AcceptVerbs("PUT")]
         [Route("[action]")]
-        public ActionResult Put([FromBody]AccountState state)
+        public ActionResult Put([FromBody] AccountState state)
         {
             try
             {

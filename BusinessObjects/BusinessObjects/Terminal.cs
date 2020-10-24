@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BusinessObjects
+﻿namespace BusinessObjects
 {
-    public class Terminal: Idable
+    public class Terminal : Idable
     {
         public int Id { get; set; }
         public long AccountNumber { get; set; }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using Autofac;
+﻿using Autofac;
 using BusinessObjects;
 using log4net;
 using NetCoreServer;
 using Newtonsoft.Json;
+using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace FinCore
 {
@@ -41,7 +41,7 @@ namespace FinCore
                 log.Debug("Incoming: " + message);
 #endif
                 string[] strings = message.Split(new char[] { (char)0x1A });
-                foreach(var str in strings)
+                foreach (var str in strings)
                 {
                     if (string.IsNullOrEmpty(str))
                         continue;
@@ -51,7 +51,8 @@ namespace FinCore
                         handler.PostSignal(signal, mServer);
                     }
                 }
-            } catch(Exception e)
+            }
+            catch (Exception e)
             {
                 log.Error($"OnReceived: {message } e={e.ToString()}");
             }
@@ -69,7 +70,8 @@ namespace FinCore
 
         public TMessagingServer(IPAddress address, int port) : base(address, port) { }
 
-        protected override TcpSession CreateSession() {
+        protected override TcpSession CreateSession()
+        {
             if (Program.Container == null)
                 return null;
             ISignalHandler handler = Program.Container.Resolve<ISignalHandler>();

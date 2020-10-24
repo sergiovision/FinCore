@@ -2,7 +2,7 @@
 
 namespace BusinessObjects
 {
-    public class Rates: Idable
+    public class Rates : Idable
     {
         public virtual int Id { get; set; }
         public string MetaSymbol { get; set; }

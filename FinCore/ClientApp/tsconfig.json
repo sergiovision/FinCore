@@ -8,14 +8,15 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "moduleResolution": "node",
-    "module": "es2020",
-    "target": "es2018",
+    "module": "esnext",
+    "target": "es5",
     "typeRoots": [
       "node_modules/@types"
     ],
     "lib": [
       "esnext",
       "es2017.object",
+      "ES2015.Promise",
       "dom"
     ],
     "types": [

@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BusinessObjects.BusinessObjects;
-
-namespace BusinessObjects
+﻿namespace BusinessObjects
 {
     public interface ISignalHandler
     {

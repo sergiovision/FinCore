@@ -1,12 +1,11 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using Autofac;
+﻿using Autofac;
 using BusinessObjects;
 using log4net;
 using NetCoreServer;
 using Newtonsoft.Json;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 
 namespace FinCore
 {
@@ -62,7 +61,7 @@ namespace FinCore
             if (Program.Container == null)
                 return null;
             ISignalHandler handler = Program.Container.Resolve<ISignalHandler>();
-            if (handler != null) 
+            if (handler != null)
                 return new MessageSession(this, log, handler);
             return null;
         }

@@ -1,8 +1,3 @@
-using System;
-using System.Text;
-using System.Collections.Generic;
-
-
 namespace BusinessLogic.Repo
 {
     public class DBWallet : BaseEntity<DBWallet>

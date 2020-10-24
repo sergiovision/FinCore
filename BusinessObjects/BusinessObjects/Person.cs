@@ -2,7 +2,7 @@
 
 namespace BusinessObjects
 {
-    public class Person: Idable
+    public class Person : Idable
     {
         public int Id { get; set; }
         public int CountryId { get; set; }

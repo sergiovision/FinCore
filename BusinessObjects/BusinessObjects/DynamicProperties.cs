@@ -1,11 +1,7 @@
 
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Text;
-using System.IO;
-using System.Runtime.Serialization;
 using System.Drawing;
 
 namespace BusinessObjects
@@ -54,7 +50,8 @@ namespace BusinessObjects
         public T value;
     }
 
-    public class DefaultProperties {
+    public class DefaultProperties
+    {
         public static Dictionary<string, DynamicProperty> fillProperties(ref Dictionary<string, DynamicProperty> result, EntitiesEnum etype, int id, int objid, string value)
         {
             DynamicProperty p1 = new DynamicProperty()
@@ -90,24 +87,24 @@ namespace BusinessObjects
         public static Dictionary<string, object> transformProperties(Dictionary<string, DynamicProperty> dbProps)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
-            if ((dbProps == null)||(dbProps.Count == 0))
+            if ((dbProps == null) || (dbProps.Count == 0))
                 return result;
-            foreach( var prop in dbProps)
+            foreach (var prop in dbProps)
             {
-                switch(prop.Value.type)
+                switch (prop.Value.type)
                 {
                     case "integer":
                         result.Add(prop.Key, int.Parse(prop.Value.value));
                         break;
                     case "hexinteger":
                         {
-                           string hexValue = prop.Value.value;
-                           if (hexValue.StartsWith("#"))
+                            string hexValue = prop.Value.value;
+                            if (hexValue.StartsWith("#"))
                                 hexValue = hexValue.Substring(1);
-                           int value = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
-                           Color c = Color.FromArgb(value);
-                           value = RGBtoInt(c.R, c.G, c.B);
-                           result.Add(prop.Key, value);
+                            int value = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
+                            Color c = Color.FromArgb(value);
+                            value = RGBtoInt(c.R, c.G, c.B);
+                            result.Add(prop.Key, value);
                         }
                         break;
                     case "double":

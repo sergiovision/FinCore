@@ -1,15 +1,11 @@
 ﻿using Autofac;
 using BusinessObjects;
-using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.SignalR;
-using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 
 namespace FinCore
 {
@@ -80,7 +76,7 @@ namespace FinCore
             else if (r >= 0.5 && r <= 0.65)
             {
                 position = new PositionInfo
-                    {Symbol = "AUDUSD", Ticket = (long) (r * 1000), Lots = 0.02, Profit = 0.0};
+                { Symbol = "AUDUSD", Ticket = (long)(r * 1000), Lots = 0.02, Profit = 0.0 };
                 InsertPosition(position);
                 return false;
             }

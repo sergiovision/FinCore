@@ -1,9 +1,9 @@
-using System;
-using System.Threading.Tasks;
+using Autofac;
 using BusinessLogic.BusinessObjects;
 using BusinessObjects;
 using Quartz;
-using Autofac;
+using System;
+using System.Threading.Tasks;
 
 namespace BusinessLogic.Scheduler
 {
@@ -40,7 +40,7 @@ namespace BusinessLogic.Scheduler
         {
             DateTimeOffset now = SystemTime.UtcNow();
             TimeSpan duration = now - runTime;
-            strMessage += ". For " + (long) duration.TotalMilliseconds + " ms. At " +
+            strMessage += ". For " + (long)duration.TotalMilliseconds + " ms. At " +
                           now.ToString(xtradeConstants.MTDATETIMEFORMAT) + " GMT";
             SchedulerService.LogJob(context, strMessage);
             if (log != null && !string.IsNullOrEmpty(strMessage))

@@ -1,14 +1,6 @@
 ﻿using BusinessObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Autofac;
-using System.Net.Http;
-using System.Net;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 namespace FinCore.Controllers
 {
@@ -22,7 +14,7 @@ namespace FinCore.Controllers
     {
         [HttpPost]
         [Route("[action]")]
-        public ActionResult  Register(Person userModel)
+        public ActionResult Register(Person userModel)
         {
             if (!ModelState.IsValid) return BadRequest(ModelState);
 

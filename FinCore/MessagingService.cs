@@ -1,19 +1,15 @@
-﻿using System;
-using System.Net;
-using System.Net.Sockets;
-using System.Security.Authentication;
-using System.Security.Cryptography.X509Certificates;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Autofac;
-using BusinessObjects;
-using BusinessObjects.BusinessObjects;
+﻿using BusinessObjects;
 using log4net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using NetCoreServer;
 using Newtonsoft.Json;
+using System;
+using System.Net;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace FinCore
 {
@@ -124,7 +120,7 @@ namespace FinCore
         private static readonly ILog log = LogManager.GetLogger(typeof(MessagingBackgroundService));
         private IMessagingService service;
 
-        public MessagingBackgroundService(IServiceProvider services) 
+        public MessagingBackgroundService(IServiceProvider services)
         {
             Services = services;
         }

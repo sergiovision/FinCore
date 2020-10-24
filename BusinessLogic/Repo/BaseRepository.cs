@@ -1,21 +1,16 @@
-﻿using BusinessLogic.BusinessObjects;
+﻿using Autofac;
+using BusinessLogic.BusinessObjects;
 using BusinessObjects;
 using NHibernate;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Autofac;
 
 namespace BusinessLogic.Repo
 {
-    public class BaseRepository<T> : IRepository<T> //where T : Object
+    public class BaseRepository<T> : IRepository<T> 
     {
-        protected IWebLog log;
-
         public BaseRepository()
         {
-            log = MainService.thisGlobal.Container.Resolve<IWebLog>();
         }
 
         public List<T> GetAll()

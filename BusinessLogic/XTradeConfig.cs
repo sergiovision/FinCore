@@ -1,11 +1,6 @@
 ﻿using Microsoft.Extensions.Configuration;
 using System;
-using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessObjects
 {
@@ -32,7 +27,7 @@ namespace BusinessObjects
         public NameValueCollection Quartz()
         {
             var properties = new NameValueCollection();
-            foreach ( var pair in Configuration.GetSection("quartz").GetChildren())
+            foreach (var pair in Configuration.GetSection("quartz").GetChildren())
             {
                 properties.Add(pair.Key, pair.Value);
             }
@@ -45,13 +40,14 @@ namespace BusinessObjects
             {
                 string result = Configuration["AngularDir"];
                 return result;
-            } catch
+            }
+            catch
             {
                 return xtradeConstants.ANGULAR_DIR;
             }
         }
 
-        public  short WebPort()
+        public short WebPort()
         {
             try
             {

@@ -1,4 +1,6 @@
-﻿using BusinessLogic.BusinessObjects;
+﻿using Autofac;
+using AutoMapper;
+using BusinessLogic.BusinessObjects;
 using BusinessObjects;
 using Newtonsoft.Json;
 using NHibernate;
@@ -7,10 +9,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Autofac;
-using AutoMapper;
 
 namespace BusinessLogic.Repo
 {
@@ -62,7 +61,7 @@ namespace BusinessLogic.Repo
                 currencies.GetAll().ForEach(currency =>
                 {
                     var curr = new CurrencyInfo();
-                    curr.Id = (short) currency.Id;
+                    curr.Id = (short)currency.Id;
                     curr.Name = currency.Name;
                     curr.Retired = currency.Enabled.Value > 0 ? false : true;
                     result.Add(curr);
@@ -123,7 +122,8 @@ namespace BusinessLogic.Repo
             {
                 Rates finalRate = crates[c1sym];
                 result = result * finalRate.Ratebid;
-            } else
+            }
+            else
             {
                 string c2sym = "USD" + valueCurrency;
                 if (crates.ContainsKey(c2sym))
@@ -142,10 +142,10 @@ namespace BusinessLogic.Repo
                 using (ISession Session = ConnectionHelper.CreateNewSession())
                 {
                     var dbrates = Session.Query<DBRates>();
-                    foreach( var rate in dbrates)
+                    foreach (var rate in dbrates)
                     {
                         string symbolName = rate.Metasymbol.Name;
-                        var currentRate = rInfo.FirstOrDefault(d => d.Symbol.CompareTo(symbolName)==0);
+                        var currentRate = rInfo.FirstOrDefault(d => d.Symbol.CompareTo(symbolName) == 0);
                         if (currentRate == null)
                             continue;
                         using (ITransaction Transaction = Session.BeginTransaction())
@@ -186,7 +186,7 @@ namespace BusinessLogic.Repo
                         {
                             result.Add(toDTO(dbd));
                         }
-                        
+
                 }
             }
             catch (Exception e)
@@ -304,7 +304,7 @@ namespace BusinessLogic.Repo
                             var sym = getSymbolByName(deal.Symbol);
                             if (sym == null)
                                 continue;
-                            DBDeals dbDeal = Session.Get<DBDeals>((int) deal.Ticket);
+                            DBDeals dbDeal = Session.Get<DBDeals>((int)deal.Ticket);
                             if (dbDeal == null)
                             {
                                 if (getDealById(Session, deal.Ticket) != null)
@@ -314,25 +314,25 @@ namespace BusinessLogic.Repo
                                     using (ITransaction Transaction = Session.BeginTransaction())
                                     {
                                         dbDeal = new DBDeals();
-                                        dbDeal.Dealid = (int) deal.Ticket;
+                                        dbDeal.Dealid = (int)deal.Ticket;
                                         dbDeal.Symbol = getSymbolByName(deal.Symbol);
                                         dbDeal.Terminal = getBDTerminalByNumber(Session, deal.Account);
                                         dbDeal.Adviser = getAdviserByMagicNumber(Session, deal.Magic);
-                                        dbDeal.Id = (int) deal.Ticket;
+                                        dbDeal.Id = (int)deal.Ticket;
                                         DateTime closeTime;
                                         if (DateTime.TryParse(deal.CloseTime, out closeTime))
                                             dbDeal.Closetime = DateTime.Parse(deal.CloseTime);
                                         dbDeal.Comment = deal.Comment;
-                                        dbDeal.Commission = (decimal) deal.Commission;
+                                        dbDeal.Commission = (decimal)deal.Commission;
                                         DateTime openTime;
                                         if (DateTime.TryParse(deal.OpenTime, out openTime))
                                             dbDeal.Opentime = DateTime.Parse(deal.OpenTime);
-                                        dbDeal.Orderid = (int) deal.OrderId;
-                                        dbDeal.Profit = (decimal) deal.Profit;
-                                        dbDeal.Price = (decimal) deal.ClosePrice;
-                                        dbDeal.Swap = (decimal) deal.SwapValue;
+                                        dbDeal.Orderid = (int)deal.OrderId;
+                                        dbDeal.Profit = (decimal)deal.Profit;
+                                        dbDeal.Price = (decimal)deal.ClosePrice;
+                                        dbDeal.Swap = (decimal)deal.SwapValue;
                                         dbDeal.Typ = deal.Type;
-                                        dbDeal.Volume = (decimal) deal.Lots;
+                                        dbDeal.Volume = (decimal)deal.Lots;
                                         Session.Save(dbDeal);
                                         Transaction.Commit();
                                         i++;
@@ -533,9 +533,9 @@ namespace BusinessLogic.Repo
                                 if (acc.Terminal.Demo)
                                     continue;
                             var accStateAll = Session.Query<DBAccountstate>().Where(x => x.Account.Id == acc.Id);
-                            var accResultsStart = accStateAll.Where(x => x.Date <= forDate) 
+                            var accResultsStart = accStateAll.Where(x => x.Date <= forDate)
                                 .OrderByDescending(x => x.Date);
-                            var accResultsEnd = accStateAll.Where(x => x.Date <= forDateEnd) 
+                            var accResultsEnd = accStateAll.Where(x => x.Date <= forDateEnd)
                                 .OrderByDescending(x => x.Date);
 
                             if (accResultsEnd == null || accResultsEnd.Count() == 0)
@@ -700,25 +700,25 @@ namespace BusinessLogic.Repo
             if (deal.Closetime.HasValue)
                 result.CloseTime = deal.Closetime.Value.ToString(xtradeConstants.MTDATETIMEFORMAT);
             result.Comment = deal.Comment;
-            result.Commission = (double) deal.Commission;
-            result.Lots = (double) deal.Volume;
+            result.Commission = (double)deal.Commission;
+            result.Lots = (double)deal.Volume;
             if (deal.Adviser != null) result.Magic = deal.Adviser.Id;
 
-            result.OpenPrice = (double) deal.Price;
+            result.OpenPrice = (double)deal.Price;
             result.OpenTime = deal.Opentime.ToString(xtradeConstants.MTDATETIMEFORMAT);
-            result.Profit = (double) deal.Profit;
+            result.Profit = (double)deal.Profit;
             if (deal.Terminal != null)
             {
                 result.Account = deal.Terminal.Accountnumber.Value;
                 result.AccountName = deal.Terminal.Broker;
             }
 
-            result.SwapValue = (double) deal.Swap;
+            result.SwapValue = (double)deal.Swap;
             if (deal.Symbol != null)
                 result.Symbol = deal.Symbol.Name;
             if (deal.Orderid.HasValue)
                 result.Ticket = deal.Orderid.Value;
-            result.Type = (sbyte) deal.Typ;
+            result.Type = (sbyte)deal.Typ;
             return result;
         }
 
@@ -831,7 +831,8 @@ namespace BusinessLogic.Repo
                             result.Vals = newdP.Vals;
                             result.updated = DateTime.UtcNow;
                             Session.Update(result);
-                        } else
+                        }
+                        else
                         {
                             var gvar = new DBProperties();
                             // gvar.ID = newdP.ID; // ID should be Autogenerated by DB
@@ -872,7 +873,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                DBAdviser adviser = Session.Get<DBAdviser>((int) magicNumber);
+                DBAdviser adviser = Session.Get<DBAdviser>((int)magicNumber);
                 return adviser;
             }
             catch (Exception e)
@@ -903,7 +904,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int) AccountNumber);
+                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int)AccountNumber);
                 if (result.Any())
                 {
                     var term = result.FirstOrDefault();
@@ -923,7 +924,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int) AccountNumber);
+                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int)AccountNumber);
                 if (result.Any()) return result.FirstOrDefault();
             }
             catch (Exception e)
@@ -938,7 +939,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                var result = Session.Query<DBDeals>().Where(x => x.Dealid == (int) DealId);
+                var result = Session.Query<DBDeals>().Where(x => x.Dealid == (int)DealId);
                 if (result.Any()) return result.FirstOrDefault();
             }
             catch (Exception e)
@@ -1060,7 +1061,7 @@ namespace BusinessLogic.Repo
                     {
                         var dtObj = mapper.Map(item, t.Item1, t.Item2);
                         result.Add(dtObj);
-                    }); 
+                    });
                 return result;
             }
         }
@@ -1069,7 +1070,7 @@ namespace BusinessLogic.Repo
         {
             var parentTuple = MainService.thisGlobal.EnumToType(parentType);
             if (parentTuple == null)
-                return ""; 
+                return "";
             var childTuple = MainService.thisGlobal.EnumToType(childType);
             if (childTuple == null)
                 return "";

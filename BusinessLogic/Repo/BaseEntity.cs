@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BusinessLogic.Repo
+﻿namespace BusinessLogic.Repo
 {
     public abstract class BaseEntity<T> where T : BaseEntity<T>
     {

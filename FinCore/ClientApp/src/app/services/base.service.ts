@@ -27,10 +27,6 @@ export class BaseService {
     return this.datePipe.transform(date, environment.shortDateFormat);
   }
 
-  // transformMTDate(date): Date {
-  //   return this.datePipe.transform(date, 'yyyy.MM.dd HH:mm');
-  // }
-
   public get currentUserToken(): UserToken {
     return JSON.parse(localStorage.getItem('currentUser'));
   }
@@ -61,6 +57,11 @@ export class BaseService {
     return this.http.get<any>(url, { headers: this.authHeaders });
   }
 
+  logConsoleError(error: any) {
+    const message = error;
+    console.log(message);
+  }
+
   public loadChildData(parentEntity: EntitiesEnum, childEntity: EntitiesEnum, key: number): CustomStore {
     const entityParentNum: number = parentEntity;
     const entityChildNum: number = childEntity;
@@ -72,13 +73,9 @@ export class BaseService {
         return loadResponse
           .toPromise()
           .then((data: any) => {
-            // console.log('data: ' + JSON.stringify( data));
             return data;
           })
-          .catch(error => {
-            const message = JSON.stringify(error.error) + '\n' + error.statusText;
-            console.log(message);
-          });
+          .catch(error => this.logConsoleError(error));
       }
     });
     return result;

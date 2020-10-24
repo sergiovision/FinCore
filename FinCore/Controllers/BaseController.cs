@@ -1,16 +1,11 @@
-﻿using BusinessObjects;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Autofac;
+﻿using Autofac;
+using BusinessObjects;
 using log4net;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Http;
-using Newtonsoft.Json;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using System;
 
 namespace FinCore.Controllers
 {
@@ -31,7 +26,7 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{type}")]
-        public object GetObjects([FromRoute]int type)
+        public object GetObjects([FromRoute] int type)
         {
             try
             {
@@ -52,7 +47,7 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{parentType}/{childType}/{parentKey}")]
-        public object GetChildObjects([FromRoute]int parentType, [FromRoute]int childType, [FromRoute]int parentKey)
+        public object GetChildObjects([FromRoute] int parentType, [FromRoute] int childType, [FromRoute] int parentKey)
         {
             try
             {
@@ -74,7 +69,7 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{type}")]
-        public object GetObject([FromRoute]int type, [FromQuery] int id)
+        public object GetObject([FromRoute] int type, [FromQuery] int id)
         {
             try
             {
@@ -95,7 +90,7 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{type}")]
-        public IActionResult InsertObject([FromRoute]int type, [FromBody]object value)
+        public IActionResult InsertObject([FromRoute] int type, [FromBody] object value)
         {
             try
             {
@@ -119,7 +114,7 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{type}/{keyId}")]
-        public IActionResult UpdateObject([FromRoute]int type, [FromRoute]int keyId, [FromBody]object value)
+        public IActionResult UpdateObject([FromRoute] int type, [FromRoute] int keyId, [FromBody] object value)
         {
             try
             {
@@ -143,7 +138,7 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{type}")]
-        public IActionResult DeleteObject([FromRoute]int type, [FromQuery]int key)
+        public IActionResult DeleteObject([FromRoute] int type, [FromQuery] int key)
         {
             try
             {
@@ -210,7 +205,7 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]")]
-        public string GetLogContent([FromQuery]string logName, [FromQuery]int size)
+        public string GetLogContent([FromQuery] string logName, [FromQuery] int size)
         {
             try
             {

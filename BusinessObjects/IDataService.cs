@@ -1,8 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessObjects
 {
@@ -11,9 +8,9 @@ namespace BusinessObjects
         object GetObjects(EntitiesEnum type);
         object GetChildObjects(EntitiesEnum parentType, EntitiesEnum childType, int parentKey);
         object GetObject(EntitiesEnum type, int id);
-        int    InsertObject(EntitiesEnum type, string values);
-        int    UpdateObject(EntitiesEnum type, int id, string values);
-        int    DeleteObject(EntitiesEnum type, int id);
+        int InsertObject(EntitiesEnum type, string values);
+        int UpdateObject(EntitiesEnum type, int id, string values);
+        int DeleteObject(EntitiesEnum type, int id);
 
         List<CurrencyInfo> GetCurrencies();
         List<Wallet> GetWalletsState(DateTime forDate);
