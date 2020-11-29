@@ -16,7 +16,7 @@ FROM node:13.13.0-alpine AS client
 ARG skip_client_build=false
 WORKDIR /app
 COPY FinCore/ClientApp .
-RUN [[ ${skip_client_build} = true ]] && echo "Skipping npm install" || npm install
+RUN [[ ${skip_client_build} = true ]] && echo "Skipping npm install" || npm i -f
 RUN [[ ${skip_client_build} = true ]] && mkdir dist || npm run docker
 
 
