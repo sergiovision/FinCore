@@ -352,7 +352,8 @@ namespace FinCore
         protected void CheckRiskForAccount(ref Account acc)
         {
             DayOfWeek dow = DateTime.Now.DayOfWeek;
-            if ((dow == DayOfWeek.Sunday) || (dow == DayOfWeek.Saturday) || (dow == DayOfWeek.Wednesday))
+            // || (dow == DayOfWeek.Wednesday)
+            if ((dow == DayOfWeek.Sunday) || (dow == DayOfWeek.Saturday)) 
             {
                 acc.StopReason = "Today is non trading day of the week: " + dow.ToString() + "!!! RELAX!";
                 acc.StopTrading = true;

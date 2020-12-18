@@ -259,13 +259,6 @@
         ],
         "Renko": [
           { "type": "boolean",
-            "name": "EnableRenko",
-            "group": "Renko",
-            "control": "GeneralCheckbox",
-            "defaultValue": false,
-            "description": "EnableRenko"
-          },
-          { "type": "boolean",
             "name": "EnableRenkoMA",
             "group": "Renko",
             "control": "GeneralCheckbox",

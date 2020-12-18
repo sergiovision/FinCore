@@ -3,7 +3,7 @@
 # About FinCore
 <p id="doc_about">
 </p>
-  FinCore is a cool and free cross-platform personal finances manager written in .NET Core 3.1 with Angular 10 frontend. <br>
+  FinCore is a cool and free cross-platform personal finances manager written in .NET 5 with Angular 10 frontend. <br>
 
   <p>   This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.</p>
   
