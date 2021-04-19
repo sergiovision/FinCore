@@ -175,7 +175,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       return;
     }
 
-    if (id === 7) {
+    if (id === 5) {
       const pos: PositionInfo = e.data;
       if (this.allowClosePositions(pos.Role)) {
         this.subs.sink = this.deals.closePosition(pos.Account, pos.Magic, pos.Ticket).subscribe(
@@ -218,7 +218,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
         location: 'after',
         widget: 'dxButton',
         options: {
-          width: 120,
+          width: 100,
           icon: 'refresh',
           onClick: this.syncAll.bind(this)
         }
@@ -227,8 +227,8 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
         location: 'after',
         widget: 'dxButton',
         options: {
-          width: 120,
-          text: 'Refresh All',
+          width: 100,
+          text: 'Refresh',
           onClick: this.refreshAll.bind(this)
         }
       }
@@ -261,24 +261,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
 
       this.propsContainer.updateProperty(true, true);
       this.loadData();
-
-      /* this.subs.sink = this.deals.updateStore(this.propsContainer.entityType, key, this.toDBObj(key)).subscribe(
-          data => {
-          }
-          , error => this.logConsoleError(error));
-          */
     }
-    /*
-    else {
-        console.log(this.propsContainer.dataSource);
-        this.subs.sink = this.deals.pushStore(this.propsContainer.entityType, this.toDBObj(key)).subscribe(
-        data => {
-          console.log('Added successfully: ' + this.propsContainer.entityType.toString() + ', Id=' + data);
-          this.currentObject.Id = data;
-          this.propsContainer.parentVisibleChange.emit(false);
-        }
-        , error => this.logConsoleError(error));
-    }
-    */
   }
 }

@@ -27,7 +27,6 @@ namespace BusinessLogic.BusinessObjects
         public const int CHAR_BUFF_SIZE = 512;
         public static MainService thisGlobal;
         private static int isDebug = -1;
-        public static char[] ParamsSeparator = xtradeConstants.PARAMS_SEPARATOR.ToCharArray();
         protected static IWebLog log;
         private SchedulerService _gSchedulerService;
         protected TimeZoneInfo BrokerTimeZoneInfo;
@@ -195,6 +194,9 @@ namespace BusinessLogic.BusinessObjects
             BrokerTimeZoneInfo = GetBrokerTimeZone();
 
             InitScheduler(true);
+            
+            data.GetRates(true);
+
             SetVersion();
 
             SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STARTSERVER, 0);
@@ -866,6 +868,51 @@ namespace BusinessLogic.BusinessObjects
             }
             return result;
         }
+
+        public string SaveLevels4Symbol(string strSymbol, string levels)
+        {
+            string result = "";
+            try
+            {
+                using (ISession Session = ConnectionHelper.CreateNewSession())
+                {
+                    DBSymbol dbSymbol = data.getSymbolByName(strSymbol);
+                    if (dbSymbol == null)
+                    {
+                        log.Error("ERROR. Unknown Symbol: " + strSymbol + " .");
+                        return "";
+                    }
+                    DBMetasymbol metaSymbol = dbSymbol.Metasymbol;
+                    if (metaSymbol == null)
+                    {
+                        log.Error("ERROR. Metasymbol is null for symbol " + strSymbol + " .");
+                        return "";
+                    }
+                    DynamicProperties props = data.GetPropertiesInstance((short)EntitiesEnum.MetaSymbol, metaSymbol.Id);
+                    Dictionary<string, DynamicProperty> propsList = JsonConvert.DeserializeObject<Dictionary<string, DynamicProperty>>(props.Vals);
+                    if (propsList.Any())
+                    {
+                        if (propsList.ContainsKey("Levels"))
+                            propsList["Levels"].value = levels;
+                        else
+                        {
+                            DynamicProperty newProp = new DynamicProperty();
+                            newProp.type = "string";
+                            newProp.value = levels;
+                            propsList.Add("Levels", newProp);
+                        }
+                        props.Vals = JsonConvert.SerializeObject(propsList);
+                        data.SavePropertiesInstance(props);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                log.Error(e);
+            }
+            return result;
+        }
+
 
         private bool GetOrdersListToLoad(DBAdviser adviser, ref ExpertInfo expert)
         {

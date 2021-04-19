@@ -41,12 +41,16 @@ namespace FinCore
         [SecurityCritical]
         static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
-            Debug.Fail("Error " + (e.ExceptionObject as Exception).Message);
-            try
+            if (e != null)
             {
-                Log.Error(e.ToString());
+                Log.Error("CurrentDomain_UnhandledException: " + e.ToString());
+                if (e.ExceptionObject is Exception o)
+                {
+                    string errMsg = o.ToString();
+                    Console.Write(errMsg);
+                    Log.Error(errMsg);
+                }
             }
-            catch { }
         }
 
         static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)

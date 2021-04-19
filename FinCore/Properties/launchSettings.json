@@ -28,11 +28,21 @@
     },
     "FinCore": {
       "commandName": "Project",
+      "workingDirectory": "C:\\dev\\FinCore\\bin",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
       "applicationUrl": "http://localhost:2020"
     },
+    "FinCoreRider": {
+      "commandName": "Project",
+      "workingDirectory": "$(HOME)/Documents/Projects/Git/FinCore/bin",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "http://localhost:2020"
+    },
+
     "Azure Dev Spaces": {
       "commandName": "AzureDevSpaces",
       "launchBrowser": true

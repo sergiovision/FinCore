@@ -86,6 +86,8 @@ namespace BusinessObjects
 
         string Levels4Symbol(string strSymbol);
 
+        string SaveLevels4Symbol(string strSymbol, string levels);
+
         string GetLogContent(string logName, long size);
 
         object LogList();

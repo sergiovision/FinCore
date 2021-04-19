@@ -12,7 +12,7 @@ namespace FinCore.Controllers
 {
     [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
     [ApiController]
-    [Route("/api/[controller]")]
+    [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
     public class PropsController : BaseController
     {
         [HttpGet]

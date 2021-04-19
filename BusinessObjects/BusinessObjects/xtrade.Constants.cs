@@ -2,17 +2,20 @@ namespace BusinessObjects
 {
     public static class xtradeConstants
     {
-        public const string FINCORE_VERSION = "0.9.6";
+        public const string FINCORE_VERSION = "0.9.7";
         public const double GAP_VALUE = -125;
         public const string MTDATETIMEFORMAT = "yyyy.MM.dd HH:mm";
         public const string MYSQLDATETIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
         public const string SOLRDATETIMEFORMAT = "yyyy-MM-dd'T'HH:mm:ss'Z'";
         public const int SENTIMENTS_FETCH_PERIOD = 100;
         public const string ANGULAR_DIR = @"..\\FinCore\\ClientApp\\dist";
+        public const string API_ROUTE = @"/api";
+        public const string API_ROUTE_CONTROLLER = @"/api/[controller]";
 
         public const short WebBackend_PORT = 2020;
         public const int FAKE_MAGIC_NUMBER = 1000000;
         public const int TOKEN_LIFETIME_HOURS = 18;
+        public const int SERVICE_DELAY_MS = 3000;
 
         public const string JOBGROUP_TECHDETAIL = "Technical Details";
         public const string JOBGROUP_OPENPOSRATIO = "Positions Ratio";

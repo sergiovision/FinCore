@@ -35,6 +35,7 @@ namespace BusinessLogic.Repo
         {
             symbols = new BaseRepository<DBSymbol>();
             currencies = new BaseRepository<DBCurrency>();
+            crates = new ConcurrentDictionary<string, Rates>();
             settings = new BaseRepository<DBSettings>();
             jobs = new BaseRepository<DBJobs>();
             accstates = new BaseRepository<DBAccountstate>();
@@ -45,8 +46,6 @@ namespace BusinessLogic.Repo
             props = new BaseRepository<DBProperties>();
             metaSymbols = new BaseRepository<DBMetasymbol>();
             log = l;
-            crates = new ConcurrentDictionary<string, Rates>();
-            GetRates(true);
             mapper = MainService.thisGlobal.Container.Resolve<IMapper>();
 #if DEBUG
             mapper.ConfigurationProvider.AssertConfigurationIsValid();

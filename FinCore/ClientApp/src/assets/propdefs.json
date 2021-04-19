@@ -666,7 +666,7 @@
           "defaultValue": 1,
           "items": [ {"ID":1, "name": "USD"}, {"ID": 2,"name": "EUR" }, {"ID":3, "name": "GBP"},
             {"ID":4, "name": "AUD"}, {"ID":5, "name": "CHF"},{"ID":6, "name": "CAD"},
-            {"ID":11, "name": "MXN"},{"ID":18, "name": "BTC"},{"ID":19, "name": "ETH"},
+            {"ID":11, "name": "MXN"},{"ID":18, "name": "BTC"},{"ID":19, "name": "ETH"},{"ID":20, "name": "XMR.jt"},
             {"ID":21, "name": "RUB"},{"ID":22, "name": "BYN"},
             {"ID":23, "name": "XAU"} ],
           "description": "Currency"

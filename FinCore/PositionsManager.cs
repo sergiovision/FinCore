@@ -367,7 +367,7 @@ namespace FinCore
                 //acc.StopTrading = true;
                 return;
             }
-            if (acc.DailyProfit < 0)
+            /* if (acc.DailyProfit < 0)
             {
                 decimal currentDailyRisk = Math.Abs(acc.DailyProfit) / startBalance;
                 if (currentDailyRisk > todayStat.RISK_PER_DAY)  // GAME OVER FOR TODAY
@@ -390,7 +390,7 @@ namespace FinCore
                     acc.StopTrading = true;
                     return;
                 }
-            }
+            } */ 
             acc.StopTrading = false;
         }
 

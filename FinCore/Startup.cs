@@ -13,6 +13,8 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
+using System.Collections;
+using System.Collections.Generic;
 using System.IO;
 
 namespace FinCore
@@ -34,14 +36,40 @@ namespace FinCore
             // Add Cors
             services.AddCors(o => o.AddPolicy(MyAllowSpecificOrigins, builder =>
             {
-                builder.WithOrigins("http://localhost:" + Configuration["WebPort"],
+
+                string[] hosts = { "localhost", "127.0.0.1", "www.sergego.com" };
+
+                string[] protocols = { "http", "https", Configuration["WSProtocol"] };
+                List<string> urls = new List<string>();
+                foreach(var host in hosts)
+                {
+                    foreach (var protocol in protocols)
+                    {
+                        urls.Add(protocol + "://" + host);
+                        urls.Add(protocol + "://" + host + ":" + Configuration["WebPort"]);
+                        urls.Add(protocol + "://" + host + ":" + Configuration["MessagingPort"]);
+                    }
+                }
+                urls.Add(Configuration["DebugClientURL"]);
+                urls.Add(Configuration["ExternalClientURL"]);
+                HashSet<string> withoutDuplicates = new HashSet<string>();
+                foreach (var url in urls)
+                {
+                    withoutDuplicates.Add(url);
+                }
+
+                string[] array = new string[withoutDuplicates.Count];
+                withoutDuplicates.CopyTo(array);
+                builder.WithOrigins(array)
+               /*  builder.WithOrigins("http://localhost:" + Configuration["WebPort"],
+                                    "http://www.sergego.com:" + Configuration["WebPort"],
                                     Configuration["DebugClientURL"],
                                     Configuration["ExternalClientURL"],
                                     "http://localhost:2020",
                                     "http://localhost:4200",
                                     "wss://localhost:" + Configuration["MessagingPort"],
                                     "wss://www.sergego.com:" + Configuration["MessagingPort"],
-                                    "http://www.sergego.com", "http://www.sergego.com/fincore")
+                                    "http://www.sergego.com", "http://www.sergego.com/fincore") */
                 // builder.AllowAnyOrigin()
                 .AllowAnyMethod()
                 .AllowAnyHeader()
@@ -122,6 +150,8 @@ namespace FinCore
             string angularFolder = AngularPath(Configuration["AngularDir"]);
             QuartzServer.Server.Initialize(angularFolder, env.EnvironmentName);
 
+            app.UseRouting();
+
             app.UseCors(MyAllowSpecificOrigins);
 
 
@@ -134,7 +164,6 @@ namespace FinCore
                 await next.Invoke();
             });
 
-            app.UseRouting();
 
             app.UseAuthentication();
             app.UseAuthorization();

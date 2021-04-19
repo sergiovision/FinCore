@@ -16,9 +16,8 @@ import { DocComponent } from './views/doc/doc.component';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: 'dashboard',
     canActivate: [AuthGuard],
-    pathMatch: 'full'
+    component: DashboardComponent
   },
   {
     path: '404',
@@ -92,7 +91,7 @@ export const routes: Routes = [
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { relativeLinkResolution: 'legacy' })],
   exports: [RouterModule]
 })
 export class AppRoutingModule {}

@@ -12,7 +12,7 @@ RUN  apt-get update \
   && apt-get install -y nano
 
 
-FROM node:15.4.0-alpine3.10 AS client
+FROM node:15.14.0-alpine3.10 AS client
 ARG skip_client_build=false
 WORKDIR /app
 COPY FinCore/ClientApp .

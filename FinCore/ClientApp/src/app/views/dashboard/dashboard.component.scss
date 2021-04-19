@@ -1,4 +1,8 @@
 
+.pos-edit-item {
+  padding: 0;
+  font-size: 7px;
+}
 
 ::ng-deep #positionsContainer span.current-value {
   display: inline-block;
@@ -103,8 +107,13 @@
 
 ::ng-deep #dealsContainer span.current-value {
   display: inline-block;
-  //margin-right: 5px;
 }
+
+.lots-value {
+  color: black;
+  font-weight: bold;
+}
+
 
 ::ng-deep #dealsContainer span.diff {
   width: 50px;

@@ -149,6 +149,15 @@ namespace BusinessLogic.BusinessObjects
                             server.MulticastText(send);
                     }
                     break;
+                case EnumSignals.SIGNAL_SAVELEVELS4SYMBOL:
+                    {
+                        if (signal.Data == null)
+                            break;
+                        string levels = signal.Data.ToString();
+                        xtrade.SaveLevels4Symbol(signal.Sym, levels);
+                        log.Info($"Levels Saved For Symbol {signal.Sym}: {levels}");
+                    }
+                    break;
                 default:
                     if (server != null)
                     {
@@ -263,7 +272,6 @@ namespace BusinessLogic.BusinessObjects
             var stringTask = client.GetStringAsync(url);
             // double result = 0;
             await stringTask;
-            if (stringTask.Result != null)
             {
                 string stringData = stringTask.Result;
                 List<Dictionary<string, object>> data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(stringData);

@@ -81,7 +81,6 @@ BusinessLogic/obj/BusinessLogic.csproj.nuget.g.props
 BusinessLogic/obj/BusinessLogic.csproj.nuget.g.props
 BusinessLogic/obj/BusinessLogic.csproj.nuget.dgspec.json
 BusinessLogic/obj/project.assets.json
-BusinessObjects/BusinessObjects.csproj
 BusinessObjects/bin/Debug/net5.0/BusinessObjects.deps.json
 BusinessObjects/bin/Debug/net5.0/BusinessObjects.pdb
 BusinessObjects/bin/Debug/net5.0/BusinessObjects.dll
@@ -89,6 +88,16 @@ BusinessObjects/bin/Debug/net5.0/ref/BusinessObjects.dll
 BusinessLogic/bin/Debug/net5.0/BusinessLogic.dll
 BusinessLogic/bin/Debug/net5.0/BusinessObjects.dll
 BusinessObjects/mono_crash.11a6748113.0.json
-/BusinessLogic/bin/Release/net5.0
-/BusinessLogic/obj
-/BusinessObjects/bin/Release/net5.0
+BusinessLogic/bin/Release/net5.0/BusinessLogic.deps.json
+BusinessLogic/bin/Release/net5.0/BusinessLogic.dll
+BusinessLogic/bin/Release/net5.0/BusinessLogic.pdb
+BusinessLogic/bin/Release/net5.0/BusinessObjects.dll
+BusinessLogic/bin/Release/net5.0/BusinessObjects.pdb
+BusinessLogic/bin/Release/net5.0/ref/BusinessLogic.dll
+BusinessLogic/obj/BusinessLogic.csproj.nuget.g.targets
+BusinessLogic/obj/project.nuget.cache
+BusinessObjects/bin/Release/net5.0/BusinessObjects.deps.json
+BusinessObjects/bin/Release/net5.0/BusinessObjects.dll
+BusinessObjects/bin/Release/net5.0/BusinessObjects.pdb
+BusinessObjects/bin/Release/net5.0/ref/BusinessObjects.dll
+BusinessLogic/obj/project.packagespec.json

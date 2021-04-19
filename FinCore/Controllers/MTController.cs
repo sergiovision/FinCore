@@ -10,7 +10,7 @@ namespace FinCore.Controllers
 {
     [AllowAnonymous]
     [ApiController]
-    [Route("/api/[controller]")]
+    [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
     public class MTController : BaseController
     {
         [HttpGet]

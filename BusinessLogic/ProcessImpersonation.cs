@@ -72,26 +72,13 @@ namespace BusinessLogic
 
             List<Process> explorerProcessList = new List<Process>();
             string
-                trayProcessName =
-                    Path.GetFileNameWithoutExtension(
-                        AppName); // AppName.Substring(AppName.LastIndexOf(@"\") + 1, AppName.Length - AppName.LastIndexOf(@"\") - 5);
+                trayProcessName = Path.GetFileNameWithoutExtension(AppName); 
             string userName = "";
             foreach (Process explorerProcess in Process.GetProcessesByName("explorer"))
             {
                 userName = GetProcessUser(explorerProcess);
                 bool IsProcessRunningForUser = userName.Equals(MainService.MTTerminalUserName,
                     StringComparison.InvariantCultureIgnoreCase);
-                //foreach (Process PHTrayProcess in Process.GetProcessesByName(trayProcessName))
-                //{
-                //    if (explorerProcess.SessionId == PHTrayProcess.SessionId )
-                //    {
-                //        if (log.IsDebugEnabled)
-                //            log.Debug(trayProcessName + " is already running for user SessionId " + explorerProcess.SessionId);
-                //        IsProcessRunningForUser = true;
-                //        break;
-                //    }
-                //}
-
                 if ((Environment.OSVersion.Version.Major > 5 && explorerProcess.SessionId > 0
                      || Environment.OSVersion.Version.Major == 5)
                     && IsProcessRunningForUser)
@@ -168,24 +155,17 @@ namespace BusinessLogic
                         log.Info(string.Format("Process {0} started under user {1} successfully", AppName, userName));
                         Thread.Sleep(300);
                         Process trayApp = Process.GetProcessById(Convert.ToInt32(pi.dwProcessId));
-                        //trayApp.StartInfo.LoadUserProfile = true;
                         return trayApp;
-                        //break;
                     }
-                    //catch (Exception e)
-                    //{
-                    //    log.Error(e.ToString());
-                    //}
                     finally
                     {
-                        if (ShellProcessToken != null) CloseHandle(ShellProcessToken);
-                        if (DuplicateToken != null) CloseHandle(DuplicateToken);
+                        CloseHandle(ShellProcessToken);
+                        CloseHandle(DuplicateToken);
                     }
                 }
             else
                 WriteToLog("No user has been identified to have logged into the system.");
 
-            //WriteToLog("Finished ExecuteAppAsLoggedOnUser for all users.");
             return null;
         }
 

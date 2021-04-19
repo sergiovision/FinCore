@@ -12,7 +12,7 @@ using System.Security.Claims;
 namespace FinCore.Controllers
 {
     [ApiController]
-    [Route("/api")]
+    [Route(xtradeConstants.API_ROUTE)]
     [AllowAnonymous]
     public class AuthController : ControllerBase
     {

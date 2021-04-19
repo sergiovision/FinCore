@@ -119,6 +119,7 @@ namespace FinCore
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(MessagingBackgroundService));
         private IMessagingService service;
+        private Thread thread;
 
         public MessagingBackgroundService(IServiceProvider services)
         {
@@ -127,13 +128,27 @@ namespace FinCore
 
         public IServiceProvider Services { get; }
 
+        private void RunThread()
+        {
+            Thread.Sleep(xtradeConstants.SERVICE_DELAY_MS);
+            service = (IMessagingService)Services.GetService(typeof(IMessagingService));
+            if (service != null)
+            {
+                service.Init();
+                service.Server.Start();
+                service.LocalServer.Start();
+                log.Info("MessagingService started after delay of " + xtradeConstants.SERVICE_DELAY_MS + " ms...");
+            }
+            else
+            {
+                log.Info("MessagingService Failed to start!");
+            }
+        }
+
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            service = (IMessagingService)Services.GetService(typeof(IMessagingService));
-            service.Init();
-            service.Server.Start();
-            service.LocalServer.Start();
-            log.Info("MessagingBackgroundService ExecuteAsync done.");
+            thread = new Thread(RunThread);
+            thread.Start();
             await Task.CompletedTask;
         }
 
@@ -141,7 +156,7 @@ namespace FinCore
         {
             service.LocalServer.Stop();
             service.Server.Stop();
-            log.Info("MessagingBackgroundService is stopped.");
+            log.Info("MessagingService is stopped.");
             await Task.CompletedTask;
         }
     }

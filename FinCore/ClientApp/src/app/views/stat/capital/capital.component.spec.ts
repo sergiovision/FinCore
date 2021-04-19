@@ -1,4 +1,4 @@
-import {async, ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, inject} from '@angular/core/testing';
+import { ComponentFixture, fakeAsync, flush, flushMicrotasks, TestBed, tick, inject, waitForAsync } from '@angular/core/testing';
 import {DebugElement} from '@angular/core';
 import { CapitalComponent } from './capital.component';
 import { WalletsService } from '../../../services/wallets.service';
