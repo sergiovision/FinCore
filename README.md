@@ -3,7 +3,7 @@
 # About FinCore
 <p id="doc_about">
 </p>
-  FinCore is a cool and free cross-platform personal finances manager written in .NET 5 with Angular 11 frontend. <br>
+  FinCore is a cool and free cross-platform personal finances manager written in .NET 5 with Angular 11.2 frontend. <br>
 
   <p>   This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.</p>
   
@@ -37,6 +37,7 @@ Program fits for anybody. <br>
 App. 
   Go to FinCore/ClientApp folder 
   Run: `npm install`
+  For UI Debug run: : `npm run start` and use URL http://127.0.0.1:4200 for running debug version of UI
 
 3. Build Whole application 
   To build as a Windows Service or Console app:
