@@ -1,4 +1,5 @@
 ﻿using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

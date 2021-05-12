@@ -1,21 +1,23 @@
-﻿using Autofac;
-using BusinessLogic.BusinessObjects;
-using BusinessLogic.Repo;
-using BusinessObjects;
-using Quartz;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac;
+using BusinessLogic.BusinessObjects;
+using BusinessLogic.Repo;
+using BusinessLogic.Repo.Domain;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using Quartz;
 
 namespace BusinessLogic.Scheduler
 {
     // JobSupervisor responsible for sheduling and manage all jobs in quartz
     internal class JobSupervisor : IJob
     {
-        protected IWebLog log;
-        protected IScheduler sched;
-        protected IJobDetail thisJobDetail;
+        private readonly IWebLog log;
+        private IScheduler sched;
+        private IJobDetail thisJobDetail;
 
         public JobSupervisor()
         {
@@ -37,7 +39,7 @@ namespace BusinessLogic.Scheduler
                 // CronExpression decoder
                 // https://www.freeformatter.com/cron-expression-generator-quartz.html
 
-                IEnumerable<DBJobs> jobs2Check =
+                var jobs2Check =
                     MainService.thisGlobal.Container.Resolve<DataService>().GetDBActiveJobsList();
                 UnscheduleObsoleteJobs(jobs2Check);
                 addOrModifyJobs(jobs2Check);
@@ -75,9 +77,9 @@ namespace BusinessLogic.Scheduler
         }
 
         /**
-         * From jobs2Check (a fresh list of JobDescription objects), addOrModifyJobs checks if jobs must be added or modified.<p>
-         * 
-         * @param jobs2Check list of JobDescription objects
+         * From jobs2Check (a fresh list of JobDescription objects), addOrModifyJobs checks if jobs must be added or modified.
+         * <p>
+         *     @param jobs2Check list of JobDescription objects
          */
         protected void addOrModifyJobs(IEnumerable<DBJobs> jobs2Check)
         {
@@ -100,7 +102,7 @@ namespace BusinessLogic.Scheduler
             return new JobKey(aJobDescription.Name, aJobDescription.Group);
         }
 
-        public JobKey getJobKeyForJobDescription(DBJobs aJobDescription)
+        private JobKey getJobKeyForJobDescription(DBJobs aJobDescription)
         {
             return new JobKey(aJobDescription.Name, aJobDescription.Grp);
         }
@@ -124,7 +126,7 @@ namespace BusinessLogic.Scheduler
                 var xtrade = container.Resolve<IMainService>();
                 if (xtrade != null)
                 {
-                    TimeZoneInfo tz = xtrade.GetBrokerTimeZone();
+                    var tz = xtrade.GetBrokerTimeZone();
                     trigger.TimeZone = tz;
                 }
             }
@@ -133,20 +135,20 @@ namespace BusinessLogic.Scheduler
         public bool ScheduleJob(string typeClassName, string group, string name,
             string cron) // where TJobType : GenericJob, new()
         {
-            Type type = Type.GetType(typeClassName);
+            var type = Type.GetType(typeClassName);
             if (type == null)
                 return false;
-            IJobDetail job = JobBuilder.Create(type)
+            var job = JobBuilder.Create(type)
                 .WithIdentity(name, group)
                 .UsingJobData("Lock", "false")
-                .StoreDurably(true)
+                .StoreDurably()
                 .Build();
             var exists = sched.CheckExists(job.Key);
             if (exists.Result)
                 return false;
-            string triggerName = name + "Trigger";
+            var triggerName = name + "Trigger";
             SchedulerService.SetJobDataMap(job.Key, job.JobDataMap);
-            var trigger = (ICronTrigger)TriggerBuilder.Create()
+            var trigger = (ICronTrigger) TriggerBuilder.Create()
                 .WithIdentity(triggerName, group)
                 .WithCronSchedule(cron)
                 //.WithPriority(1)
@@ -154,7 +156,7 @@ namespace BusinessLogic.Scheduler
             SetTimeZoneForTrigger(trigger);
 
             var result = sched.ScheduleJob(job, trigger);
-            DateTimeOffset ft = result.Result;
+            var ft = result.Result;
 
             log.Info(job.Key + " scheduled at: " + ft.ToUniversalTime() + " and repeat on cron: " +
                      trigger.CronExpressionString);
@@ -164,17 +166,17 @@ namespace BusinessLogic.Scheduler
         public void ScheduleJobWithParam<TJobType>(string group, string name, string cron, string param, string value)
             where TJobType : IJob, new()
         {
-            IJobDetail job = JobBuilder.Create<TJobType>()
+            var job = JobBuilder.Create<TJobType>()
                 .WithIdentity(name, group)
                 .UsingJobData("Lock", "false")
                 .UsingJobData(param, value)
-                .StoreDurably(true)
+                .StoreDurably()
                 .Build();
             var exists = sched.CheckExists(job.Key);
             if (exists.Result) return;
-            string triggerName = name + "Trigger";
+            var triggerName = name + "Trigger";
             SchedulerService.SetJobDataMap(job.Key, job.JobDataMap);
-            var trigger = (ICronTrigger)TriggerBuilder.Create()
+            var trigger = (ICronTrigger) TriggerBuilder.Create()
                 .WithIdentity(triggerName, group)
                 .WithCronSchedule(cron)
                 //.WithPriority(1)
@@ -183,7 +185,7 @@ namespace BusinessLogic.Scheduler
             SetTimeZoneForTrigger(trigger);
 
             var result = sched.ScheduleJob(job, trigger);
-            DateTimeOffset ft = result.Result;
+            var ft = result.Result;
 
             log.Info(job.Key + " scheduled at: " + ft.ToUniversalTime() + " and repeat on cron: " +
                      trigger.CronExpressionString);
@@ -192,24 +194,23 @@ namespace BusinessLogic.Scheduler
         public void ScheduleThriftJob<TJobType>(string group, string name, short port, int timeoutsec)
             where TJobType : GenericJob, new()
         {
-            IJobDetail job = JobBuilder.Create<TJobType>()
+            var job = JobBuilder.Create<TJobType>()
                 .WithIdentity(name, group)
                 .UsingJobData("port", port.ToString())
-                .StoreDurably(true)
+                .StoreDurably()
                 .Build();
             var exists = sched.CheckExists(job.Key);
             if (exists.Result)
                 sched.DeleteJob(job.Key);
-            string triggerName = name + "Trigger";
+            var triggerName = name + "Trigger";
             SchedulerService.SetJobDataMap(job.Key, job.JobDataMap);
-            ITrigger trigger = TriggerBuilder.Create()
+            var trigger = TriggerBuilder.Create()
                 .WithIdentity(triggerName, group)
-                //.WithPriority(10)
                 .StartAt(DateTime.Now.AddSeconds(timeoutsec))
                 .Build();
 
             var result = sched.ScheduleJob(job, trigger);
-            DateTimeOffset ft = result.Result;
+            var ft = result.Result;
 
             log.Info(job.Key + " scheduled to start at " + ft);
         }

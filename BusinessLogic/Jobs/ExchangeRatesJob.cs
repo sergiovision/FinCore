@@ -1,9 +1,10 @@
-﻿using BusinessLogic.BusinessObjects;
+﻿using System;
+using System.Threading.Tasks;
+using BusinessLogic.BusinessObjects;
 using BusinessLogic.Scheduler;
 using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Quartz;
-using System;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.Jobs
 {
@@ -13,10 +14,6 @@ namespace BusinessLogic.Jobs
         protected IScheduler sched;
         protected IJobDetail thisJobDetail;
 
-        public ExchangeRatesJob()
-        {
-        }
-
         public override async Task Execute(IJobExecutionContext context)
         {
             if (Begin(context))
@@ -25,28 +22,28 @@ namespace BusinessLogic.Jobs
                 Exit(context);
                 return;
             }
+
             try
             {
                 thisJobDetail = context.JobDetail;
                 sched = context.Scheduler;
 
-                SignalInfo signal_UpdateRates =
-                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_UPDATE_RATES, 0);
-                signal_UpdateRates.Data = MainService.thisGlobal.GetRatesList();
+                var signal_UpdateRates =
+                    MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_UPDATE_RATES,
+                        0);
+                
+                signal_UpdateRates.SetData(MainService.thisGlobal.GetRatesList());
                 MainService.thisGlobal.PostSignalTo(signal_UpdateRates);
 
                 SetMessage("ExcahngeRatesJob Finished.");
             }
             catch (Exception ex)
             {
-                SetMessage($"ERROR: {ex.ToString()}");
+                SetMessage($"ERROR: {ex}");
             }
 
             Exit(context);
             await Task.CompletedTask;
         }
-
-
-
     }
 }

@@ -1,47 +1,47 @@
-﻿using BusinessObjects;
-using log4net;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using NetCoreServer;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading;
 using System.Threading.Tasks;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using log4net;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using NetCoreServer;
+using Newtonsoft.Json;
 
 namespace FinCore
 {
-    class MessagingService : IMessagingService
+    internal class MessagingService : IMessagingService
     {
         private static readonly ILog log = LogManager.GetLogger(typeof(MessagingService));
         private static IMessagingServer _serv;
         private static IMessagingServer _localserv;
         private static IConfiguration configuration;
 
-        public IMessagingServer Server
+        public MessagingService(IConfiguration config)
         {
-            get { return _serv; }
+            configuration = config;
+            //Init();
         }
 
-        public IMessagingServer LocalServer
-        {
-            get { return _localserv; }
-        }
+        public IMessagingServer Server => _serv;
+
+        public IMessagingServer LocalServer => _localserv;
 
         public void Init()
         {
             if (Server == null)
-            {
                 try
                 {
-                    short Port = Int16.Parse(configuration["MessagingPort"]);
+                    var Port = short.Parse(configuration["MessagingPort"]);
                     if (Port <= 0)
                         Port = 2021;
                     if (configuration["WSProtocol"] == "wss")
                     {
-                        string pass = configuration["CertificatePassword"];
+                        var pass = configuration["CertificatePassword"];
                         var context = new SslContext(SslProtocols.Tls12, new X509Certificate2("server.pfx", pass));
                         _serv = new SMessagingServer(context, IPAddress.Any, Port);
                     }
@@ -54,13 +54,11 @@ namespace FinCore
                 {
                     log.Info(e.ToString());
                 }
-            }
 
             if (LocalServer == null)
-            {
                 try
                 {
-                    short Port = Int16.Parse(configuration["TcpPort"]);
+                    var Port = short.Parse(configuration["TcpPort"]);
                     if (Port <= 0)
                         Port = 2022;
                     Thread.Sleep(100);
@@ -70,13 +68,6 @@ namespace FinCore
                 {
                     log.Info(e.ToString());
                 }
-            }
-        }
-
-        public MessagingService(IConfiguration config)
-        {
-            configuration = config;
-            //Init();
         }
 
         public void SendMessage(WsMessage wsMessage)
@@ -88,7 +79,7 @@ namespace FinCore
 
         public void SendMessage<T>(WsMessageType type, T obj)
         {
-            WsMessage wsMessage = new WsMessage();
+            var wsMessage = new WsMessage();
             wsMessage.Type = type;
             wsMessage.From = "Server";
             wsMessage.Message = JsonConvert.SerializeObject(obj);
@@ -105,14 +96,13 @@ namespace FinCore
 
         public void SendTcpMessage<T>(WsMessageType type, T obj)
         {
-            WsMessage wsMessage = new WsMessage();
+            var wsMessage = new WsMessage();
             wsMessage.Type = type;
             wsMessage.From = "TcpServer";
             wsMessage.Message = JsonConvert.SerializeObject(obj);
             var send = JsonConvert.SerializeObject(wsMessage);
             LocalServer.MulticastText(send);
         }
-
     }
 
     public class MessagingBackgroundService : BackgroundService
@@ -131,7 +121,7 @@ namespace FinCore
         private void RunThread()
         {
             Thread.Sleep(xtradeConstants.SERVICE_DELAY_MS);
-            service = (IMessagingService)Services.GetService(typeof(IMessagingService));
+            service = (IMessagingService) Services.GetService(typeof(IMessagingService));
             if (service != null)
             {
                 service.Init();

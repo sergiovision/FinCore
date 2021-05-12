@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public class ScheduledJobView : Idable
     {
-        public int Id { get; set; }
         public DateTime PrevDate { get; set; }
         public DateTime NextDate { get; set; }
 
@@ -17,5 +16,6 @@ namespace BusinessObjects
         public bool IsRunning { get; set; }
 
         public string Log { get; set; }
+        public int Id { get; set; }
     }
 }

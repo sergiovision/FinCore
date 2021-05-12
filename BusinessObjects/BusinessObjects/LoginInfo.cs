@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public class UserToken
     {
@@ -12,10 +12,8 @@ namespace BusinessObjects
 
     public class LoginInfo
     {
-        [Required]
-        public string UserName { get; set; }
+        [Required] public string UserName { get; set; }
 
-        [Required]
-        public string Password { get; set; }
+        [Required] public string Password { get; set; }
     }
 }

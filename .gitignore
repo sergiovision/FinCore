@@ -101,3 +101,4 @@ BusinessObjects/bin/Release/net5.0/BusinessObjects.dll
 BusinessObjects/bin/Release/net5.0/BusinessObjects.pdb
 BusinessObjects/bin/Release/net5.0/ref/BusinessObjects.dll
 BusinessLogic/obj/project.packagespec.json
+BusinessLogic/obj/rider.project.restore.info

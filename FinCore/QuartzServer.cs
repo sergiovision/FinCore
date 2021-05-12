@@ -1,8 +1,8 @@
+using System;
 using Autofac;
 using BusinessObjects;
 using log4net;
 using Microsoft.Extensions.Hosting;
-using System;
 using Topshelf;
 
 namespace FinCore
@@ -13,9 +13,9 @@ namespace FinCore
     public class QuartzServer : ServiceControl, IQuartzServer
     {
         private static readonly ILog Log = LogManager.GetLogger(typeof(QuartzServer));
+        private static QuartzServer server;
         private IHost webapi;
         private IMainService xtradeServer;
-        private static QuartzServer server;
 
         private QuartzServer()
         {
@@ -30,6 +30,7 @@ namespace FinCore
                     server = new QuartzServer();
                     return server;
                 }
+
                 return server;
             }
         }
@@ -41,7 +42,7 @@ namespace FinCore
         {
             try
             {
-                string[] args = { "" };
+                string[] args = {""};
                 webapi = Program.CreateHostBuilder(args).Build();
                 webapi.StartAsync();
             }
@@ -118,7 +119,7 @@ namespace FinCore
                 xtradeServer = Program.Container.Resolve<IMainService>();
                 xtradeServer.Init(Program.Container);
 
-                Log.Info(String.Format("Inited with AngularFolder: {0},  Env: {1}", angularFolder, envName));
+                Log.Info(string.Format("Inited with AngularFolder: {0},  Env: {1}", angularFolder, envName));
             }
             catch (Exception e)
             {

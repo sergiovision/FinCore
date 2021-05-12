@@ -25,9 +25,9 @@ namespace BusinessLogic
             var httpClient = new HttpClient();
             var httpRequestMessage = new HttpRequestMessage(HttpMethod.Get, url);
             if (useAgent) httpRequestMessage.Headers.Add("User-Agent", UserAgent);
-            HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
+            var response = await httpClient.SendAsync(httpRequestMessage);
             response.EnsureSuccessStatusCode();
-            string responseBody = await response.Content.ReadAsStringAsync();
+            var responseBody = await response.Content.ReadAsStringAsync();
             return responseBody;
         }
     }

@@ -1,15 +1,17 @@
-﻿using Autofac;
-using AutoMapper;
-using BusinessLogic.BusinessObjects;
-using BusinessObjects;
-using Newtonsoft.Json;
-using NHibernate;
-using NHibernate.Type;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac;
+using AutoMapper;
+using BusinessLogic.BusinessObjects;
+using BusinessLogic.Repo.Domain;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using Newtonsoft.Json;
+using NHibernate;
+using NHibernate.Type;
 
 namespace BusinessLogic.Repo
 {
@@ -19,17 +21,17 @@ namespace BusinessLogic.Repo
         private static readonly object lockDeals = new object();
         private readonly IRepository<DBAccountstate> accstates;
         private readonly IRepository<DBCurrency> currencies;
-        private IRepository<DBDeals> deals;
         private readonly ExpertsRepository experts;
         private readonly IRepository<DBJobs> jobs;
+        private readonly IRepository<DBMetasymbol> metaSymbols;
         private readonly AuthRepository persons;
+        private readonly IRepository<DBProperties> props;
         private readonly IRepository<DBSettings> settings;
         private readonly IRepository<DBSymbol> symbols;
-        private readonly IRepository<DBMetasymbol> metaSymbols;
         private readonly WalletsRepository wallets;
-        private readonly IRepository<DBProperties> props;
-        private ConcurrentDictionary<string, Rates> crates;
-        private IMapper mapper;
+        private readonly ConcurrentDictionary<string, Rates> crates;
+        private IRepository<DBDeals> deals;
+        private readonly IMapper mapper;
 
         public DataService(IWebLog l)
         {
@@ -54,13 +56,13 @@ namespace BusinessLogic.Repo
 
         public List<CurrencyInfo> GetCurrencies()
         {
-            List<CurrencyInfo> result = new List<CurrencyInfo>();
+            var result = new List<CurrencyInfo>();
             try
             {
                 currencies.GetAll().ForEach(currency =>
                 {
                     var curr = new CurrencyInfo();
-                    curr.Id = (short)currency.Id;
+                    curr.Id = (short) currency.Id;
                     curr.Name = currency.Name;
                     curr.Retired = currency.Enabled.Value > 0 ? false : true;
                     result.Add(curr);
@@ -81,7 +83,7 @@ namespace BusinessLogic.Repo
                 var gvars = settings.GetAll().Where(x => x.Propertyname.Equals(name));
                 if (gvars.Count() > 0)
                 {
-                    DBSettings gvar = gvars.First();
+                    var gvar = gvars.First();
                     return gvar.Value;
                 }
             }
@@ -98,7 +100,7 @@ namespace BusinessLogic.Repo
             var gvars = settings.GetAll().Where(x => x.Propertyname == name);
             if (gvars.Count() > 0)
             {
-                DBSettings gvar = gvars.First();
+                var gvar = gvars.First();
                 gvar.Value = value;
                 settings.Update(gvar);
             }
@@ -113,101 +115,63 @@ namespace BusinessLogic.Repo
 
         public decimal ConvertToUSD(decimal value, string valueCurrency)
         {
-            decimal result = value;
-            if (valueCurrency.Equals("USD") || (value == 0))
+            var result = value;
+            if (valueCurrency.Equals("USD") || value == 0)
                 return result;
-            string c1sym = valueCurrency + "USD";
+            var c1sym = valueCurrency + "USD";
             if (crates.ContainsKey(c1sym))
             {
-                Rates finalRate = crates[c1sym];
+                var finalRate = crates[c1sym];
                 result = result * finalRate.Ratebid;
             }
             else
             {
-                string c2sym = "USD" + valueCurrency;
+                var c2sym = "USD" + valueCurrency;
                 if (crates.ContainsKey(c2sym))
                 {
-                    Rates finalRate = crates[c2sym];
+                    var finalRate = crates[c2sym];
                     result = result / finalRate.Rateask;
                 }
             }
+
             return result;
-        }
-
-        public void UpdateRates(List<RatesInfo> rInfo)
-        {
-            try
-            {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
-                {
-                    var dbrates = Session.Query<DBRates>();
-                    foreach (var rate in dbrates)
-                    {
-                        string symbolName = rate.Metasymbol.Name;
-                        var currentRate = rInfo.FirstOrDefault(d => d.Symbol.CompareTo(symbolName) == 0);
-                        if (currentRate == null)
-                            continue;
-                        using (ITransaction Transaction = Session.BeginTransaction())
-                        {
-                            rate.Rateask = new decimal(currentRate.Ask);
-                            rate.Ratebid = new decimal(currentRate.Bid);
-                            rate.Lastupdate = DateTime.UtcNow;
-                            Session.Update(rate);
-                            Transaction.Commit();
-                        }
-                    }
-                }
-                GetRates(true);
-            }
-            catch (Exception e)
-            {
-                log.Error("Error: UpdateRates: " + e);
-            }
-
-        }
-
-        public bool isSameDay(DateTime d1, DateTime d2)
-        {
-            return (d1.DayOfYear == d2.DayOfYear) && (d2.Year == d1.Year);
         }
 
         public List<DealInfo> TodayDeals()
         {
-            List<DealInfo> result = new List<DealInfo>();
+            var result = new List<DealInfo>();
             try
             {
-                DateTime now = DateTime.Now;
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                var now = DateTime.Now;
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     var deals = Session.Query<DBDeals>().OrderByDescending(x => x.Closetime);
                     foreach (var dbd in deals)
                         if (isSameDay(dbd.Closetime.Value, now))
-                        {
                             result.Add(toDTO(dbd));
-                        }
-
                 }
             }
             catch (Exception e)
             {
                 log.Error("Error: TodayDeals: " + e);
             }
+
             return result;
         }
 
         public void UpdateBalance(int AccountNumber, decimal Balance, decimal Equity)
         {
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
                 var terms = Session.Query<DBTerminal>().Where(x => x.Accountnumber == AccountNumber);
                 if (terms == null || terms.Count() <= 0)
                     return;
-                DBTerminal terminal = terms.FirstOrDefault();
+                var terminal = terms.FirstOrDefault();
                 if (terminal == null)
                     return;
                 if (terminal.Account == null)
                     return;
-                using (ITransaction Transaction = Session.BeginTransaction())
+                using (var Transaction = Session.BeginTransaction())
                 {
                     terminal.Account.Balance = Balance;
                     terminal.Account.Equity = Equity;
@@ -218,7 +182,7 @@ namespace BusinessLogic.Repo
 
                 var acc = Session.Query<DBAccountstate>().Where(x => x.Account.Id == terminal.Account.Id)
                     .OrderByDescending(x => x.Date);
-                using (ITransaction Transaction = Session.BeginTransaction())
+                using (var Transaction = Session.BeginTransaction())
                 {
                     if (acc.Any())
                     {
@@ -267,7 +231,7 @@ namespace BusinessLogic.Repo
 
         public List<Wallet> GetWalletsState(DateTime date)
         {
-            List<Wallet> result = new List<Wallet>();
+            var result = new List<Wallet>();
             try
             {
                 return wallets.GetWalletsState(date);
@@ -280,11 +244,6 @@ namespace BusinessLogic.Repo
             return result;
         }
 
-        public List<Asset> AssetsDistribution(int type)
-        {
-            return wallets.AssetsDistribution(type);
-        }
-
         public void SaveDeals(List<DealInfo> deals)
         {
             if (deals == null)
@@ -295,43 +254,43 @@ namespace BusinessLogic.Repo
             {
                 lock (lockDeals)
                 {
-                    int i = 0;
-                    using (ISession Session = ConnectionHelper.CreateNewSession())
+                    var i = 0;
+                    using (var Session = ConnectionHelper.CreateNewSession())
                     {
                         foreach (var deal in deals.OrderBy(x => x.CloseTime))
                         {
                             var sym = getSymbolByName(deal.Symbol);
                             if (sym == null)
                                 continue;
-                            DBDeals dbDeal = Session.Get<DBDeals>((int)deal.Ticket);
+                            var dbDeal = Session.Get<DBDeals>((int) deal.Ticket);
                             if (dbDeal == null)
                             {
                                 if (getDealById(Session, deal.Ticket) != null)
                                     continue;
                                 try
                                 {
-                                    using (ITransaction Transaction = Session.BeginTransaction())
+                                    using (var Transaction = Session.BeginTransaction())
                                     {
                                         dbDeal = new DBDeals();
-                                        dbDeal.Dealid = (int)deal.Ticket;
+                                        dbDeal.Dealid = (int) deal.Ticket;
                                         dbDeal.Symbol = getSymbolByName(deal.Symbol);
                                         dbDeal.Terminal = getBDTerminalByNumber(Session, deal.Account);
                                         dbDeal.Adviser = getAdviserByMagicNumber(Session, deal.Magic);
-                                        dbDeal.Id = (int)deal.Ticket;
+                                        dbDeal.Id = (int) deal.Ticket;
                                         DateTime closeTime;
                                         if (DateTime.TryParse(deal.CloseTime, out closeTime))
                                             dbDeal.Closetime = DateTime.Parse(deal.CloseTime);
                                         dbDeal.Comment = deal.Comment;
-                                        dbDeal.Commission = (decimal)deal.Commission;
+                                        dbDeal.Commission = (decimal) deal.Commission;
                                         DateTime openTime;
                                         if (DateTime.TryParse(deal.OpenTime, out openTime))
                                             dbDeal.Opentime = DateTime.Parse(deal.OpenTime);
-                                        dbDeal.Orderid = (int)deal.OrderId;
-                                        dbDeal.Profit = (decimal)deal.Profit;
-                                        dbDeal.Price = (decimal)deal.ClosePrice;
-                                        dbDeal.Swap = (decimal)deal.SwapValue;
+                                        dbDeal.Orderid = (int) deal.OrderId;
+                                        dbDeal.Profit = (decimal) deal.Profit;
+                                        dbDeal.Price = (decimal) deal.ClosePrice;
+                                        dbDeal.Swap = (decimal) deal.SwapValue;
                                         dbDeal.Typ = deal.Type;
-                                        dbDeal.Volume = (decimal)deal.Lots;
+                                        dbDeal.Volume = (decimal) deal.Lots;
                                         Session.Save(dbDeal);
                                         Transaction.Commit();
                                         i++;
@@ -351,19 +310,61 @@ namespace BusinessLogic.Repo
             }
             catch (Exception e)
             {
-                string message = "Error: DataService.SaveDeals: " + e;
+                var message = "Error: DataService.SaveDeals: " + e;
                 log.Error(message);
                 log.Log(message);
             }
         }
 
-        public IEnumerable<MetaSymbolStat> MetaSymbolStatistics(int AccountType)
+        public void UpdateRates(List<RatesInfo> rInfo)
         {
-            List<MetaSymbolStat> result = new List<MetaSymbolStat>();
             try
             {
-                bool IsDemoAccount = AccountType > 0 ? true : false;
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
+                {
+                    var dbrates = Session.Query<DBRates>();
+                    foreach (var rate in dbrates)
+                    {
+                        var symbolName = rate.Metasymbol.Name;
+                        var currentRate = rInfo.FirstOrDefault(d => d.Symbol.CompareTo(symbolName) == 0);
+                        if (currentRate == null)
+                            continue;
+                        using (var Transaction = Session.BeginTransaction())
+                        {
+                            rate.Rateask = new decimal(currentRate.Ask);
+                            rate.Ratebid = new decimal(currentRate.Bid);
+                            rate.Lastupdate = DateTime.UtcNow;
+                            Session.Update(rate);
+                            Transaction.Commit();
+                        }
+                    }
+                }
+
+                GetRates(true);
+            }
+            catch (Exception e)
+            {
+                log.Error("Error: UpdateRates: " + e);
+            }
+        }
+
+        public bool isSameDay(DateTime d1, DateTime d2)
+        {
+            return d1.DayOfYear == d2.DayOfYear && d2.Year == d1.Year;
+        }
+
+        public List<Asset> AssetsDistribution(int type)
+        {
+            return wallets.AssetsDistribution(type);
+        }
+
+        public IEnumerable<MetaSymbolStat> MetaSymbolStatistics(int AccountType)
+        {
+            var result = new List<MetaSymbolStat>();
+            try
+            {
+                var IsDemoAccount = AccountType > 0 ? true : false;
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     var symbols = Session.Query<DBMetasymbol>().Where(x => x.Retired == false).ToList();
                     foreach (var sym in symbols)
@@ -371,7 +372,7 @@ namespace BusinessLogic.Repo
                         var deals = Session.Query<DBDeals>().Where(x =>
                             x.Symbol.Metasymbol.Id == sym.Id && x.Terminal.Demo == IsDemoAccount);
                         decimal sumProfit = 0;
-                        int countTrades = 0;
+                        var countTrades = 0;
                         foreach (var deal in deals)
                         {
                             sumProfit += ConvertToUSD(deal.Profit, deal.Terminal.Account.Currency.Name);
@@ -380,7 +381,7 @@ namespace BusinessLogic.Repo
 
                         if (countTrades <= 10)
                             continue;
-                        MetaSymbolStat mss = new MetaSymbolStat();
+                        var mss = new MetaSymbolStat();
                         mss.MetaId = sym.Id;
                         mss.Name = sym.Name;
                         mss.Description = sym.Description;
@@ -411,24 +412,24 @@ namespace BusinessLogic.Repo
             var service = MainService.thisGlobal.Container.Resolve<IMessagingService>();
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     var rateList = Session.Query<DBRates>().Where(x => x.Retired == false).ToList();
-                    DateTime now = DateTime.Now;
-                    int dayFrom = 1;
-                    int year = now.Year;
+                    var now = DateTime.Now;
+                    var dayFrom = 1;
+                    var year = now.Year;
                     if (now.Month < month + 1) year--;
 
-                    DateTime from = new DateTime(year, month + 1, dayFrom);
-                    int dayTo = now.Month == month + 1 ? now.Day : DateTime.DaysInMonth(year, month + 1);
-                    DateTime to = new DateTime(year, month + 1, dayTo);
+                    var from = new DateTime(year, month + 1, dayFrom);
+                    var dayTo = now.Month == month + 1 ? now.Day : DateTime.DaysInMonth(year, month + 1);
+                    var to = new DateTime(year, month + 1, dayTo);
                     var Accounts = Session.Query<DBAccount>(); // .Where(x => (x.Retired == false));
                     //var Deals = Session.Query<DBDeals>().Where(x => x.Terminal.Demo == false);
-                    for (int i = dayFrom; i <= dayTo; i++)
+                    for (var i = dayFrom; i <= dayTo; i++)
                     {
-                        DateTime forDate = new DateTime(year, month + 1, i);
-                        DateTime forDateEnd = new DateTime(year, month + 1, i, 23, 50, 0);
-                        TimeStat ts = new TimeStat();
+                        var forDate = new DateTime(year, month + 1, i);
+                        var forDateEnd = new DateTime(year, month + 1, i, 23, 50, 0);
+                        var ts = new TimeStat();
                         ts.X = i;
                         ts.Date = forDate;
                         ts.Period = TimePeriod.Daily;
@@ -451,8 +452,8 @@ namespace BusinessLogic.Repo
                                 continue;
 
                             var accStateEnd = accResultsEnd.FirstOrDefault();
-                            decimal balanceStart = new decimal(0);
-                            decimal balanceEnd = new decimal(0);
+                            var balanceStart = new decimal(0);
+                            var balanceEnd = new decimal(0);
                             if (accStateEnd != null)
                             {
                                 balanceEnd = ConvertToUSD(accStateEnd.Balance, acc.Currency.Name);
@@ -495,32 +496,33 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error in Performance : " + e);
             }
+
             service.SendMessage(WsMessageType.ChartDone, "");
         }
 
         public List<TimeStat> Performance(int month, TimePeriod period)
         {
-            List<TimeStat> result = new List<TimeStat>();
+            var result = new List<TimeStat>();
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     var rateList = Session.Query<DBRates>().Where(x => x.Retired == false).ToList();
-                    DateTime now = DateTime.Now;
-                    int dayFrom = 1;
-                    int year = now.Year;
+                    var now = DateTime.Now;
+                    var dayFrom = 1;
+                    var year = now.Year;
                     if (now.Month < month + 1) year--;
 
-                    DateTime from = new DateTime(year, month + 1, dayFrom);
-                    int dayTo = now.Month == month + 1 ? now.Day : DateTime.DaysInMonth(year, month + 1);
-                    DateTime to = new DateTime(year, month + 1, dayTo);
+                    var from = new DateTime(year, month + 1, dayFrom);
+                    var dayTo = now.Month == month + 1 ? now.Day : DateTime.DaysInMonth(year, month + 1);
+                    var to = new DateTime(year, month + 1, dayTo);
                     var Accounts = Session.Query<DBAccount>(); // .Where(x => (x.Retired == false));
                     //var Deals = Session.Query<DBDeals>().Where(x => x.Terminal.Demo == false);
-                    for (int i = dayFrom; i <= dayTo; i++)
+                    for (var i = dayFrom; i <= dayTo; i++)
                     {
-                        DateTime forDate = new DateTime(year, month + 1, i);
-                        DateTime forDateEnd = new DateTime(year, month + 1, i, 23, 50, 0);
-                        TimeStat ts = new TimeStat();
+                        var forDate = new DateTime(year, month + 1, i);
+                        var forDateEnd = new DateTime(year, month + 1, i, 23, 50, 0);
+                        var ts = new TimeStat();
                         ts.X = i;
                         ts.Date = forDate;
                         ts.Period = period;
@@ -543,8 +545,8 @@ namespace BusinessLogic.Repo
                                 continue;
 
                             var accStateEnd = accResultsEnd.FirstOrDefault();
-                            decimal balanceStart = new decimal(0);
-                            decimal balanceEnd = new decimal(0);
+                            var balanceStart = new decimal(0);
+                            var balanceEnd = new decimal(0);
                             if (accStateEnd != null)
                             {
                                 balanceEnd = ConvertToUSD(accStateEnd.Balance, acc.Currency.Name);
@@ -602,10 +604,10 @@ namespace BusinessLogic.Repo
 
         public List<DealInfo> GetDeals()
         {
-            List<DealInfo> result = new List<DealInfo>();
+            var result = new List<DealInfo>();
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     var deals = Session.Query<DBDeals>().OrderByDescending(x => x.Closetime);
                     foreach (var dbd in deals)
@@ -616,6 +618,7 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: GetDeals: " + e);
             }
+
             return result;
         }
 
@@ -625,7 +628,7 @@ namespace BusinessLogic.Repo
             {
                 if (crates.Count() > 0 && !IsReread)
                     return crates;
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     var dbrates = Session.Query<DBRates>();
                     foreach (var dbr in dbrates)
@@ -639,6 +642,7 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: GetRates: " + e);
             }
+
             return crates;
         }
 
@@ -661,7 +665,7 @@ namespace BusinessLogic.Repo
                 result.Retired = a.Retired;
                 if (a.Wallet != null)
                     result.WalletId = a.Wallet.Id;
-                result.Typ = (AccountType)a.Typ;
+                result.Typ = (AccountType) a.Typ;
                 return true;
             }
             catch
@@ -694,36 +698,36 @@ namespace BusinessLogic.Repo
 
         public DealInfo toDTO(DBDeals deal)
         {
-            DealInfo result = new DealInfo();
+            var result = new DealInfo();
             // result.ClosePrice = deal;
             if (deal.Closetime.HasValue)
                 result.CloseTime = deal.Closetime.Value.ToString(xtradeConstants.MTDATETIMEFORMAT);
             result.Comment = deal.Comment;
-            result.Commission = (double)deal.Commission;
-            result.Lots = (double)deal.Volume;
+            result.Commission = (double) deal.Commission;
+            result.Lots = (double) deal.Volume;
             if (deal.Adviser != null) result.Magic = deal.Adviser.Id;
 
-            result.OpenPrice = (double)deal.Price;
+            result.OpenPrice = (double) deal.Price;
             result.OpenTime = deal.Opentime.ToString(xtradeConstants.MTDATETIMEFORMAT);
-            result.Profit = (double)deal.Profit;
+            result.Profit = (double) deal.Profit;
             if (deal.Terminal != null)
             {
                 result.Account = deal.Terminal.Accountnumber.Value;
                 result.AccountName = deal.Terminal.Broker;
             }
 
-            result.SwapValue = (double)deal.Swap;
+            result.SwapValue = (double) deal.Swap;
             if (deal.Symbol != null)
                 result.Symbol = deal.Symbol.Name;
             if (deal.Orderid.HasValue)
                 result.Ticket = deal.Orderid.Value;
-            result.Type = (sbyte)deal.Typ;
+            result.Type = (sbyte) deal.Typ;
             return result;
         }
 
         public Rates toDTO(DBRates rates)
         {
-            Rates result = new Rates();
+            var result = new Rates();
             result.MetaSymbol = rates.Metasymbol.Name;
             result.C1 = rates.Metasymbol.C1;
             result.C2 = rates.Metasymbol.C2;
@@ -760,13 +764,13 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                List<DynamicProperties> results = new List<DynamicProperties>();
+                var results = new List<DynamicProperties>();
                 var result = props.GetAll();
                 if (!result.Any())
                     return results;
                 result.ForEach(x =>
                 {
-                    DynamicProperties dynProps = new DynamicProperties();
+                    var dynProps = new DynamicProperties();
                     if (toPropsDTO(x, ref dynProps))
                         results.Add(dynProps);
                 });
@@ -776,6 +780,7 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: GetAllProperties: " + e);
             }
+
             return null;
         }
 
@@ -783,21 +788,22 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                DynamicProperties newdP = new DynamicProperties();
-                var result = props.GetAll().Where(x => (x.entityType == entityType) && (x.objId == objId));
+                var newdP = new DynamicProperties();
+                var result = props.GetAll().Where(x => x.entityType == entityType && x.objId == objId);
                 if (result.Any())
                     if (toPropsDTO(result.FirstOrDefault(), ref newdP))
                         return newdP;
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    using (ITransaction Transaction = Session.BeginTransaction())
+                    using (var Transaction = Session.BeginTransaction())
                     {
                         var gvar = new DBProperties();
                         // gvar.ID = newdP.ID; // ID should be Autogenerated by DB
-                        gvar.entityType = (short)entityType;
+                        gvar.entityType = entityType;
                         gvar.objId = objId;
-                        Dictionary<string, DynamicProperty> defProps = new Dictionary<string, DynamicProperty>();
-                        defProps = DefaultProperties.fillProperties(ref defProps, (EntitiesEnum)entityType, -1, objId, "");
+                        var defProps = new Dictionary<string, DynamicProperty>();
+                        defProps = DefaultProperties.fillProperties(ref defProps, (EntitiesEnum) entityType, -1, objId,
+                            "");
                         gvar.Vals = JsonConvert.SerializeObject(defProps);
                         gvar.updated = DateTime.UtcNow;
                         Session.Save(gvar);
@@ -811,6 +817,7 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: GetPropertiesInstance: " + e);
             }
+
             return null;
         }
 
@@ -818,9 +825,9 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    using (ITransaction Transaction = Session.BeginTransaction())
+                    using (var Transaction = Session.BeginTransaction())
                     {
                         var result = Session.Get<DBProperties>(newdP.ID);
                         if (result != null)
@@ -835,12 +842,13 @@ namespace BusinessLogic.Repo
                         {
                             var gvar = new DBProperties();
                             // gvar.ID = newdP.ID; // ID should be Autogenerated by DB
-                            gvar.entityType = (short)newdP.entityType;
+                            gvar.entityType = newdP.entityType;
                             gvar.objId = newdP.objId;
                             gvar.Vals = newdP.Vals;
                             gvar.updated = DateTime.UtcNow;
                             Session.Save(gvar);
                         }
+
                         Transaction.Commit();
                         return true;
                     }
@@ -850,6 +858,7 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: UpdateProperties: " + e);
             }
+
             return false;
         }
 
@@ -872,7 +881,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                DBAdviser adviser = Session.Get<DBAdviser>((int)magicNumber);
+                var adviser = Session.Get<DBAdviser>((int) magicNumber);
                 return adviser;
             }
             catch (Exception e)
@@ -903,12 +912,12 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int)AccountNumber);
+                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int) AccountNumber);
                 if (result.Any())
                 {
                     var term = result.FirstOrDefault();
-                    Terminal terminal = new Terminal();
-                    if ((term != null) && toDTO(term, ref terminal))
+                    var terminal = new Terminal();
+                    if (term != null && toDTO(term, ref terminal))
                         return terminal;
                 }
             }
@@ -916,6 +925,7 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: getTerminalByNumber: " + e);
             }
+
             return null;
         }
 
@@ -923,7 +933,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int)AccountNumber);
+                var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int) AccountNumber);
                 if (result.Any()) return result.FirstOrDefault();
             }
             catch (Exception e)
@@ -938,7 +948,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                var result = Session.Query<DBDeals>().Where(x => x.Dealid == (int)DealId);
+                var result = Session.Query<DBDeals>().Where(x => x.Dealid == (int) DealId);
                 if (result.Any()) return result.FirstOrDefault();
             }
             catch (Exception e)
@@ -948,7 +958,6 @@ namespace BusinessLogic.Repo
 
             return null;
         }
-
 
 
         public DBSymbol getSymbolByName(string SymbolStr)
@@ -980,12 +989,13 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: getSymbolByName: " + e);
             }
+
             return null;
         }
 
         public void SaveInsertAdviser(ISession Session, DBAdviser toAdd)
         {
-            using (ITransaction Transaction = Session.BeginTransaction())
+            using (var Transaction = Session.BeginTransaction())
             {
                 if (toAdd.Id == 0)
                     Session.Save(toAdd);
@@ -1004,9 +1014,9 @@ namespace BusinessLogic.Repo
                 var accState = accstates.Insert(toAdd);
                 if (accState == null)
                     return;
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    using (ITransaction Transaction = Session.BeginTransaction())
+                    using (var Transaction = Session.BeginTransaction())
                     {
                         if (accState.Account != null)
                         {
@@ -1038,9 +1048,9 @@ namespace BusinessLogic.Repo
         public IList<T> ExecuteNativeQuery<T>(ISession session, string queryString, string entityParamName,
             Tuple<string, object, IType>[] parameters = null)
         {
-            ISQLQuery query = session.CreateSQLQuery(queryString).AddEntity(entityParamName, typeof(T));
+            var query = session.CreateSQLQuery(queryString).AddEntity(entityParamName, typeof(T));
             if (parameters != null)
-                for (int i = 0; i < parameters.Length; i++)
+                for (var i = 0; i < parameters.Length; i++)
                     query.SetParameter(parameters[i].Item1, parameters[i].Item2, parameters[i].Item3);
 
             return query.List<T>();
@@ -1051,8 +1061,8 @@ namespace BusinessLogic.Repo
             var t = MainService.thisGlobal.EnumToType(type);
             if (t == null)
                 return "";
-            List<object> result = new List<object>();
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            var result = new List<object>();
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
                 Session.Query<object>(t.Item1.FullName)
                     .ToList()
@@ -1074,13 +1084,13 @@ namespace BusinessLogic.Repo
             if (childTuple == null)
                 return "";
 
-            List<object> result = new List<object>();
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            var result = new List<object>();
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
-                if ((parentType == EntitiesEnum.MetaSymbol) && (childType == EntitiesEnum.Symbol))
+                if (parentType == EntitiesEnum.MetaSymbol && childType == EntitiesEnum.Symbol)
                 {
                     var list = Session.QueryOver<DBSymbol>()
-                        .JoinQueryOver<DBMetasymbol>(master => master.Metasymbol)
+                        .JoinQueryOver(master => master.Metasymbol)
                         .Where(parent => parent.Id == parentKey)
                         .List();
                     if (list.Any())
@@ -1090,15 +1100,16 @@ namespace BusinessLogic.Repo
                             var dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj);
                         }
-                        return result;
 
+                        return result;
                     }
                 }
-                if ((parentType == EntitiesEnum.MetaSymbol) && (childType == EntitiesEnum.Adviser))
+
+                if (parentType == EntitiesEnum.MetaSymbol && childType == EntitiesEnum.Adviser)
                 {
                     var list = Session.QueryOver<DBAdviser>()
-                        .JoinQueryOver<DBSymbol>(master => master.Symbol)
-                        .JoinQueryOver<DBMetasymbol>(master => master.Metasymbol)
+                        .JoinQueryOver(master => master.Symbol)
+                        .JoinQueryOver(master => master.Metasymbol)
                         .Where(parent => parent.Id == parentKey)
                         .List();
                     if (list.Any())
@@ -1108,14 +1119,15 @@ namespace BusinessLogic.Repo
                             var dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj);
                         }
+
                         return result;
                     }
                 }
 
-                if ((parentType == EntitiesEnum.Wallet) && (childType == EntitiesEnum.Account))
+                if (parentType == EntitiesEnum.Wallet && childType == EntitiesEnum.Account)
                 {
                     var list = Session.QueryOver<DBAccount>()
-                        .JoinQueryOver<DBWallet>(master => master.Wallet)
+                        .JoinQueryOver(master => master.Wallet)
                         .Where(parent => parent.Id == parentKey)
                         .List();
                     if (list.Any())
@@ -1125,15 +1137,16 @@ namespace BusinessLogic.Repo
                             var dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj);
                         }
+
                         return result;
                     }
                 }
 
-                if ((parentType == EntitiesEnum.Wallet) && (childType == EntitiesEnum.Terminal))
+                if (parentType == EntitiesEnum.Wallet && childType == EntitiesEnum.Terminal)
                 {
                     var list = Session.QueryOver<DBTerminal>()
-                        .JoinQueryOver<DBAccount>(master => master.Account)
-                        .JoinQueryOver<DBWallet>(master => master.Wallet)
+                        .JoinQueryOver(master => master.Account)
+                        .JoinQueryOver(master => master.Wallet)
                         .Where(parent => parent.Id == parentKey)
                         .List();
                     if (list.Any())
@@ -1143,9 +1156,11 @@ namespace BusinessLogic.Repo
                             var dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj);
                         }
+
                         return result;
                     }
                 }
+
                 return result;
             }
         }
@@ -1155,10 +1170,10 @@ namespace BusinessLogic.Repo
             var t = MainService.thisGlobal.EnumToType(type);
             if (t == null)
                 return "";
-            List<object> result = new List<object>();
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            var result = new List<object>();
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
-                object dbObj = Session.Get(t.Item1, id);
+                var dbObj = Session.Get(t.Item1, id);
                 if (dbObj == null)
                     return "";
                 var obj = mapper.Map(dbObj, t.Item1, t.Item2);
@@ -1171,35 +1186,35 @@ namespace BusinessLogic.Repo
             var tuple = MainService.thisGlobal.EnumToType(type);
             if (tuple == null)
                 return -1;
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
-                object obj = JsonConvert.DeserializeObject(values, tuple.Item2);
+                var obj = JsonConvert.DeserializeObject(values, tuple.Item2);
                 if (obj == null)
                     return -1;
-                using (ITransaction Transaction = Session.BeginTransaction())
+                using (var Transaction = Session.BeginTransaction())
                 {
                     var dbNew = mapper.Map(obj, tuple.Item2, tuple.Item1);
-                    object id = Session.Save(dbNew);
+                    var id = Session.Save(dbNew);
                     Transaction.Commit();
-                    return (int)id;
+                    return (int) id;
                 }
             }
         }
 
         public int UpdateObject(EntitiesEnum type, int id, string values)
         {
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
                 var tuple = MainService.thisGlobal.EnumToType(type);
                 if (tuple == null)
                     return -1;
-                object obj = JsonConvert.DeserializeObject(values, tuple.Item2);
+                var obj = JsonConvert.DeserializeObject(values, tuple.Item2);
                 if (obj == null)
                     return -1;
-                object dbObj = Session.Get(tuple.Item1, id);
+                var dbObj = Session.Get(tuple.Item1, id);
                 if (dbObj == null)
                     return -1;
-                using (ITransaction Transaction = Session.BeginTransaction())
+                using (var Transaction = Session.BeginTransaction())
                 {
                     var dbNew = mapper.Map(obj, dbObj, tuple.Item2, tuple.Item1);
                     Session.Update(dbNew);
@@ -1214,14 +1229,15 @@ namespace BusinessLogic.Repo
             var tuple = MainService.thisGlobal.EnumToType(type);
             if (tuple == null)
                 return -1;
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
-                using (ITransaction Transaction = Session.BeginTransaction())
+                using (var Transaction = Session.BeginTransaction())
                 {
                     Session.Delete(Session.Load(tuple.Item1, id));
                     Transaction.Commit();
                 }
             }
+
             return 1;
         }
 

@@ -5,7 +5,7 @@
  *  @generated
  */
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     /// <summary>
     ///     You can define enums, which are just 32 bit integers. Values are optional

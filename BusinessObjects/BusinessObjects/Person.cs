@@ -1,10 +1,9 @@
 ﻿using System;
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public class Person : Idable
     {
-        public int Id { get; set; }
         public int CountryId { get; set; }
         public DateTime Created { get; set; }
         public int Languageid { get; set; }
@@ -15,5 +14,6 @@ namespace BusinessObjects
         public string Uuid { get; set; }
         public int Activated { get; set; }
         public bool Retired { get; set; }
+        public int Id { get; set; }
     }
 }

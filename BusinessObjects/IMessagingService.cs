@@ -1,6 +1,7 @@
-﻿namespace BusinessObjects
-{
+﻿using BusinessObjects.BusinessObjects;
 
+namespace BusinessObjects
+{
     public interface IMessagingServer
     {
         public bool MulticastText(string text);
@@ -10,9 +11,9 @@
 
     public interface IMessagingService
     {
-        public void Init();
         public IMessagingServer Server { get; }
         public IMessagingServer LocalServer { get; }
+        public void Init();
         public void SendMessage(WsMessage wsMessage);
         public void SendMessage<T>(WsMessageType type, T obj);
 

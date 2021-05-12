@@ -1,6 +1,7 @@
-using Autofac;
+using System.Collections.Generic;
+using System.IO;
+using System.Reflection;
 using Autofac.Extensions.DependencyInjection;
-using AutoMapper;
 using BusinessObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -13,14 +14,13 @@ using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
 
 namespace FinCore
 {
     public class Startup
     {
+        private readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
+
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -28,52 +28,48 @@ namespace FinCore
 
         public IConfiguration Configuration { get; }
 
-        readonly string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
-
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             // Add Cors
             services.AddCors(o => o.AddPolicy(MyAllowSpecificOrigins, builder =>
             {
+                string[] hosts = {"localhost", "127.0.0.1", "www.sergego.com"};
 
-                string[] hosts = { "localhost", "127.0.0.1", "www.sergego.com" };
-
-                string[] protocols = { "http", "https", Configuration["WSProtocol"] };
-                List<string> urls = new List<string>();
-                foreach(var host in hosts)
+                string[] protocols = {"http", "https", Configuration["WSProtocol"]};
+                var urls = new List<string>();
+                foreach (var host in hosts)
+                foreach (var protocol in protocols)
                 {
-                    foreach (var protocol in protocols)
-                    {
-                        urls.Add(protocol + "://" + host);
-                        urls.Add(protocol + "://" + host + ":" + Configuration["WebPort"]);
-                        urls.Add(protocol + "://" + host + ":" + Configuration["MessagingPort"]);
-                    }
+                    urls.Add(protocol + "://" + host);
+                    urls.Add(protocol + "://" + host + ":" + Configuration["WebPort"]);
+                    urls.Add(protocol + "://" + host + ":" + Configuration["MessagingPort"]);
                 }
+
                 urls.Add(Configuration["DebugClientURL"]);
+#if DEBUG
+                urls.Add("http://localhost:4200");
+#endif
                 urls.Add(Configuration["ExternalClientURL"]);
-                HashSet<string> withoutDuplicates = new HashSet<string>();
-                foreach (var url in urls)
-                {
-                    withoutDuplicates.Add(url);
-                }
+                var withoutDuplicates = new HashSet<string>();
+                foreach (var url in urls) withoutDuplicates.Add(url);
 
-                string[] array = new string[withoutDuplicates.Count];
+                var array = new string[withoutDuplicates.Count];
                 withoutDuplicates.CopyTo(array);
                 builder.WithOrigins(array)
-               /*  builder.WithOrigins("http://localhost:" + Configuration["WebPort"],
-                                    "http://www.sergego.com:" + Configuration["WebPort"],
-                                    Configuration["DebugClientURL"],
-                                    Configuration["ExternalClientURL"],
-                                    "http://localhost:2020",
-                                    "http://localhost:4200",
-                                    "wss://localhost:" + Configuration["MessagingPort"],
-                                    "wss://www.sergego.com:" + Configuration["MessagingPort"],
-                                    "http://www.sergego.com", "http://www.sergego.com/fincore") */
-                // builder.AllowAnyOrigin()
-                .AllowAnyMethod()
-                .AllowAnyHeader()
-                .AllowCredentials();
+                    /*  builder.WithOrigins("http://localhost:" + Configuration["WebPort"],
+                                         "http://www.sergego.com:" + Configuration["WebPort"],
+                                         Configuration["DebugClientURL"],
+                                         Configuration["ExternalClientURL"],
+                                         "http://localhost:2020",
+                                         "http://localhost:4200",
+                                         "wss://localhost:" + Configuration["MessagingPort"],
+                                         "wss://www.sergego.com:" + Configuration["MessagingPort"],
+                                         "http://www.sergego.com", "http://www.sergego.com/fincore") */
+                    // builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowCredentials();
             }));
 
             var jwtSettings = JwtSettings.FromConfiguration(Configuration);
@@ -103,21 +99,18 @@ namespace FinCore
                 .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options => options.TokenValidationParameters = jwtSettings.TokenValidationParameters);
 
-            services.AddControllersWithViews().AddNewtonsoftJson((options =>
+            services.AddControllersWithViews().AddNewtonsoftJson(options =>
             {
                 // Return JSON responses in LowerCase?
                 options.SerializerSettings.ContractResolver = new DefaultContractResolver();
                 // Resolve Looping navigation properties
                 options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-            }));
+            });
 
-            string angularFolder = AngularPath(Configuration["AngularDir"]);
+            var angularFolder = AngularPath(Configuration["AngularDir"]);
 
             // In production, the Angular files will be served from this directory
-            services.AddSpaStaticFiles(configuration =>
-            {
-                configuration.RootPath = angularFolder;
-            });
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = angularFolder; });
 
             services.AddHostedService<MessagingBackgroundService>();
             services.AddSingleton<IMessagingService, MessagingService>();
@@ -126,7 +119,7 @@ namespace FinCore
 
         public string GetApplicationRoot()
         {
-            var exePath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var exePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             return exePath;
         }
 
@@ -137,7 +130,7 @@ namespace FinCore
             //     pathToExe = Process.GetCurrentProcess().MainModule.FileName;
             // else
             //    pathToExe = GetApplicationRoot();
-            string currentDir = GetApplicationRoot(); //  Path.GetDirectoryName(pathToExe);
+            var currentDir = GetApplicationRoot(); //  Path.GetDirectoryName(pathToExe);
             return Path.Combine(currentDir, restPath);
         }
 
@@ -147,7 +140,7 @@ namespace FinCore
             Program.Container = app.ApplicationServices.GetAutofacRoot();
             loggerFactory.AddLog4Net();
 
-            string angularFolder = AngularPath(Configuration["AngularDir"]);
+            var angularFolder = AngularPath(Configuration["AngularDir"]);
             QuartzServer.Server.Initialize(angularFolder, env.EnvironmentName);
 
             app.UseRouting();
@@ -183,10 +176,7 @@ namespace FinCore
 
             app.UseStaticFiles();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => { endpoints.MapControllers(); });
 
             app.UseSpa(spa =>
             {
@@ -198,9 +188,9 @@ namespace FinCore
 #if DEBUG
                 //if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows))
                 //{ 
-                    //spa.UseAngularCliServer(npmScript: "start");
+                //spa.UseAngularCliServer(npmScript: "start");
                 spa.UseProxyToSpaDevelopmentServer(Configuration["DebugClientURL"]);
-                    //spa.UseProxyToSpaDevelopmentServer(Configuration["ExternalClientURL"]);
+                //spa.UseProxyToSpaDevelopmentServer(Configuration["ExternalClientURL"]);
                 //}
                 //else
                 //{
@@ -208,7 +198,6 @@ namespace FinCore
                 //}
 #endif
             });
-
         }
 
         public void SetupStaticAngular(IApplicationBuilder app, string angularFolder)
@@ -217,10 +206,9 @@ namespace FinCore
             options.EnableDefaultFiles = true;
             options.StaticFileOptions.FileProvider = new PhysicalFileProvider(angularFolder);
             options.StaticFileOptions.ServeUnknownFileTypes = true;
-            options.DefaultFilesOptions.DefaultFileNames = new[] { "index.html" };
+            options.DefaultFilesOptions.DefaultFileNames = new[] {"index.html"};
 
             app.UseFileServer(options);
         }
-
     }
 }

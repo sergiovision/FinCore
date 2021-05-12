@@ -1,8 +1,4 @@
-﻿using Autofac;
-using BusinessLogic.BusinessObjects;
-using BusinessObjects;
-using Quartz;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -11,6 +7,9 @@ using System.Runtime.InteropServices;
 using System.Security;
 using System.Security.Principal;
 using System.Threading;
+using BusinessLogic.BusinessObjects;
+using BusinessObjects;
+using Quartz;
 
 namespace BusinessLogic
 {
@@ -38,12 +37,12 @@ namespace BusinessLogic
         public Process ExecuteAppAsLoggedOnUser(string AppName, string CmdLineArgs)
         {
             //WriteToLog("In ExecuteAppAsLoggedOnUser for all users.");
-            IntPtr LoggedInUserToken = IntPtr.Zero;
-            IntPtr DuplicateToken = IntPtr.Zero;
-            IntPtr ShellProcessToken = IntPtr.Zero;
+            var LoggedInUserToken = IntPtr.Zero;
+            var DuplicateToken = IntPtr.Zero;
+            var ShellProcessToken = IntPtr.Zero;
 
-            Process currProc = Process.GetCurrentProcess();
-            bool result = OpenProcessToken(currProc.Handle, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
+            var currProc = Process.GetCurrentProcess();
+            var result = OpenProcessToken(currProc.Handle, TOKEN_QUERY | TOKEN_ADJUST_PRIVILEGES,
                 ref LoggedInUserToken);
             if (!result)
             {
@@ -52,7 +51,7 @@ namespace BusinessLogic
             }
 
             //Below part for increasing the UAC previleges to the token.
-            TokPriv1Luid tp = new TokPriv1Luid();
+            var tp = new TokPriv1Luid();
             tp.Count = 1;
             tp.Luid = 0;
             if (!LookupPrivilegeValue(null, SE_INCREASE_QUOTA_NAME, ref tp.Luid))
@@ -70,20 +69,20 @@ namespace BusinessLogic
 
             CloseHandle(LoggedInUserToken);
 
-            List<Process> explorerProcessList = new List<Process>();
-            string
-                trayProcessName = Path.GetFileNameWithoutExtension(AppName); 
-            string userName = "";
-            foreach (Process explorerProcess in Process.GetProcessesByName("explorer"))
+            var explorerProcessList = new List<Process>();
+            var
+                trayProcessName = Path.GetFileNameWithoutExtension(AppName);
+            var userName = "";
+            foreach (var explorerProcess in Process.GetProcessesByName("explorer"))
             {
                 userName = GetProcessUser(explorerProcess);
-                bool IsProcessRunningForUser = userName.Equals(MainService.MTTerminalUserName,
+                var IsProcessRunningForUser = userName.Equals(MainService.MTTerminalUserName,
                     StringComparison.InvariantCultureIgnoreCase);
                 if ((Environment.OSVersion.Version.Major > 5 && explorerProcess.SessionId > 0
                      || Environment.OSVersion.Version.Major == 5)
                     && IsProcessRunningForUser)
                 {
-                    if (MainService.thisGlobal.IsDebug())
+                    if (Utils.IsDebug())
                         log.Info($"Desktop is running for user {userName} and SessionId " + explorerProcess.SessionId);
                     explorerProcessList.Add(explorerProcess);
                     break;
@@ -91,12 +90,12 @@ namespace BusinessLogic
             }
 
             if (null != explorerProcessList && explorerProcessList.Count > 0)
-                foreach (Process explorerProcess in explorerProcessList)
+                foreach (var explorerProcess in explorerProcessList)
                 {
-                    Process ShellProcess = explorerProcess;
+                    var ShellProcess = explorerProcess;
                     try
                     {
-                        int tokenRights =
+                        var tokenRights =
                             MAXIMUM_ALLOWED;
                         if (!OpenProcessToken(ShellProcess.Handle, tokenRights, ref ShellProcessToken))
                         {
@@ -104,13 +103,13 @@ namespace BusinessLogic
                             return null;
                         }
 
-                        SECURITY_ATTRIBUTES sa = new SECURITY_ATTRIBUTES();
+                        var sa = new SECURITY_ATTRIBUTES();
                         sa.nLength = Marshal.SizeOf(sa);
 
                         if (Environment.UserInteractive && Debugger.IsAttached)
                         {
                             // In debug mode tokens obtained differently
-                            IntPtr hToken = WindowsIdentity.GetCurrent().Token;
+                            var hToken = WindowsIdentity.GetCurrent().Token;
                             if (!DuplicateTokenEx(hToken, GENERIC_ALL_ACCESS, ref sa, 1, 1, ref DuplicateToken))
                             {
                                 WriteToLog("Unable to duplicate token " + Marshal.GetLastWin32Error());
@@ -126,20 +125,20 @@ namespace BusinessLogic
                             }
                         }
 
-                        SECURITY_ATTRIBUTES processAttributes = new SECURITY_ATTRIBUTES();
-                        SECURITY_ATTRIBUTES threadAttributes = new SECURITY_ATTRIBUTES();
+                        var processAttributes = new SECURITY_ATTRIBUTES();
+                        var threadAttributes = new SECURITY_ATTRIBUTES();
                         PROCESS_INFORMATION pi;
-                        STARTUPINFO si = new STARTUPINFO();
-                        si.cb = (uint)Marshal.SizeOf(si);
+                        var si = new STARTUPINFO();
+                        si.cb = (uint) Marshal.SizeOf(si);
 
-                        IntPtr UserEnvironment = IntPtr.Zero;
+                        var UserEnvironment = IntPtr.Zero;
                         uint dwCreationFlags = NORMAL_PRIORITY_CLASS | CREATE_NEW_CONSOLE;
                         if (!CreateEnvironmentBlock(out UserEnvironment, ShellProcessToken, true))
                             WriteToLog("Unable to create user's enviroment block " + Marshal.GetLastWin32Error());
                         else
                             dwCreationFlags |= CREATE_UNICODE_ENVIRONMENT;
 
-                        string WorkingDir = Path.GetDirectoryName(AppName);
+                        var WorkingDir = Path.GetDirectoryName(AppName);
 
                         if (!CreateProcessAsUser(DuplicateToken, AppName, CmdLineArgs, ref processAttributes,
                             ref threadAttributes, true, dwCreationFlags, UserEnvironment, WorkingDir, ref si, out pi))
@@ -154,7 +153,7 @@ namespace BusinessLogic
 
                         log.Info(string.Format("Process {0} started under user {1} successfully", AppName, userName));
                         Thread.Sleep(300);
-                        Process trayApp = Process.GetProcessById(Convert.ToInt32(pi.dwProcessId));
+                        var trayApp = Process.GetProcessById(Convert.ToInt32(pi.dwProcessId));
                         return trayApp;
                     }
                     finally
@@ -179,7 +178,7 @@ namespace BusinessLogic
                 out AnswerBytes,
                 out AnswerCount))
             {
-                string userName = Marshal.PtrToStringAnsi(AnswerBytes);
+                var userName = Marshal.PtrToStringAnsi(AnswerBytes);
                 return userName;
             }
 
@@ -194,8 +193,8 @@ namespace BusinessLogic
         /// <returns>Returns duplicated token</returns>
         public static IntPtr DupeToken(IntPtr token, int Level)
         {
-            IntPtr dupeTokenHandle = IntPtr.Zero;
-            bool retVal = DuplicateToken(token, Level, ref dupeTokenHandle);
+            var dupeTokenHandle = IntPtr.Zero;
+            var retVal = DuplicateToken(token, Level, ref dupeTokenHandle);
             return dupeTokenHandle;
         }
 
@@ -208,11 +207,11 @@ namespace BusinessLogic
         /// <returns>Returns back the process</returns>
         public static Process GetaProcess(string processname)
         {
-            Process[] aProc = Process.GetProcessesByName(processname);
+            var aProc = Process.GetProcessesByName(processname);
             if (aProc.Length > 0) return aProc[0];
 
             //if (log.IsDebugEnabled) log.Debug("Explorer is not running");
-            Process currentProcess = Process.GetCurrentProcess();
+            var currentProcess = Process.GetCurrentProcess();
             return currentProcess;
         }
 
@@ -221,19 +220,19 @@ namespace BusinessLogic
         {
             log.Info($"Starting deploy script {fileName}");
             var runTime = SystemTime.UtcNow();
-            Thread newThread = new Thread(Func =>
+            var newThread = new Thread(Func =>
             {
                 try
                 {
                     //CloseTerminal(appname);
-                    string CmdLineArgs = $" > {logFile}";
+                    var CmdLineArgs = $" > {logFile}";
 
                     var p = ExecuteAppAsLoggedOnUser(fileName, "");
                     if (p != null)
                     {
                         p.WaitForExit();
-                        DateTimeOffset now = SystemTime.UtcNow();
-                        TimeSpan duration = now - runTime;
+                        var now = SystemTime.UtcNow();
+                        var duration = now - runTime;
                         log.Info($"Deploying finished for script {fileName} for {duration.Seconds} seconds.");
                     }
 
@@ -254,7 +253,7 @@ namespace BusinessLogic
                 }
                 catch (Exception e)
                 {
-                    log.Error("Thread run Process Error: " + e.ToString());
+                    log.Error("Thread run Process Error: " + e);
                 }
             });
             newThread.Start();
@@ -265,7 +264,7 @@ namespace BusinessLogic
             Process[] processlist = null;
             try
             {
-                string trayProcessName = Path.GetFileNameWithoutExtension(AppName);
+                var trayProcessName = Path.GetFileNameWithoutExtension(AppName);
                 processlist = Process.GetProcessesByName(trayProcessName);
                 var processL = processlist.Where(d =>
                     d.MainModule.FileName.Equals(AppName, StringComparison.InvariantCultureIgnoreCase));
@@ -286,7 +285,7 @@ namespace BusinessLogic
             finally
             {
                 if (processlist != null)
-                    foreach (Process p in processlist)
+                    foreach (var p in processlist)
                         p.Dispose();
             }
         }

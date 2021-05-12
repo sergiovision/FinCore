@@ -1,4 +1,4 @@
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public enum EnumSignals
     {
@@ -27,6 +27,9 @@ namespace BusinessObjects
         SIGNAL_STOPSERVER = 1025,
         SIGNAL_GETMAINLOGPATH = 1026,
         SIGNAL_SAVELEVELS4SYMBOL = 1027,
+        SIGNAL_ADD_ORDERS = 1028,
+        SIGNAL_DELETE_ORDERS = 1029,
+        SIGNAL_UPDATE_ORDERS = 1030,
         SIGNAL_LAST = 2000
     }
 }

@@ -1,13 +1,14 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Autofac;
 using BusinessLogic.Repo;
 using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FinCore.Controllers
 {
@@ -79,7 +80,7 @@ namespace FinCore.Controllers
                 var ds = MainService.Container.Resolve<DataService>();
                 if (ds == null)
                     return null;
-                return ds.Performance(month, (TimePeriod)period);
+                return ds.Performance(month, (TimePeriod) period);
             }
             catch (Exception e)
             {
@@ -107,6 +108,7 @@ namespace FinCore.Controllers
             {
                 log.Error(e.ToString());
             }
+
             return null;
         }
 
@@ -118,9 +120,10 @@ namespace FinCore.Controllers
             try
             {
                 if (state == null)
-                    return Problem("Empty state passed to Put method!", "Error", StatusCodes.Status500InternalServerError);
+                    return Problem("Empty state passed to Put method!", "Error",
+                        StatusCodes.Status500InternalServerError);
 
-                bool bres = MainService.UpdateAccountState(state);
+                var bres = MainService.UpdateAccountState(state);
                 if (bres)
                     return Ok();
                 return Problem("Failed to Update Account State", "Error", StatusCodes.Status417ExpectationFailed);
@@ -131,6 +134,5 @@ namespace FinCore.Controllers
                 return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
             }
         }
-
     }
 }

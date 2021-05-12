@@ -1,4 +1,6 @@
-﻿namespace BusinessObjects
+﻿using BusinessObjects.BusinessObjects;
+
+namespace BusinessObjects
 {
     public interface ISignalHandler
     {

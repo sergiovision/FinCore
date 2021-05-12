@@ -5,7 +5,7 @@
  *  @generated
  */
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public enum SignalFlags
     {

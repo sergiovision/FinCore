@@ -1,11 +1,12 @@
-﻿using Autofac;
-using BusinessObjects;
-using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Autofac;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 
 namespace FinCore
 {
@@ -20,7 +21,7 @@ namespace FinCore
         private readonly Random _updateOrNotRandom = new Random();
 
         private readonly object _updateStockPricesLock = new object();
-        private IMessagingServer server;
+        private readonly IMessagingServer server;
 
         public PositionsTester()
         {
@@ -34,6 +35,11 @@ namespace FinCore
         public List<PositionInfo> GetAllPositions()
         {
             return _positions;
+        }
+
+        public List<PositionInfo> GetPositions4Adviser(long adviserId)
+        {
+            throw new NotImplementedException();
         }
 
         private static List<PositionInfo> GeneratePositions()
@@ -52,10 +58,10 @@ namespace FinCore
             lock (_updateStockPricesLock)
             {
                 IEnumerator<PositionInfo> enumerator = _positions.GetEnumerator();
-                bool hasNext = enumerator.MoveNext();
+                var hasNext = enumerator.MoveNext();
                 while (hasNext)
                 {
-                    PositionInfo position = enumerator.Current;
+                    var position = enumerator.Current;
                     if (!ChangePositions(position))
                         break;
                     hasNext = enumerator.MoveNext();
@@ -76,7 +82,7 @@ namespace FinCore
             else if (r >= 0.5 && r <= 0.65)
             {
                 position = new PositionInfo
-                { Symbol = "AUDUSD", Ticket = (long)(r * 1000), Lots = 0.02, Profit = 0.0 };
+                    {Symbol = "AUDUSD", Ticket = (long) (r * 1000), Lots = 0.02, Profit = 0.0};
                 InsertPosition(position);
                 return false;
             }
@@ -95,7 +101,7 @@ namespace FinCore
         {
             _positions.Add(pos);
 
-            WsMessage message = new WsMessage();
+            var message = new WsMessage();
             message.From = "Server";
             message.Type = WsMessageType.InsertPosition;
             message.Message = JsonConvert.SerializeObject(pos);
@@ -105,7 +111,7 @@ namespace FinCore
 
         public void UpdatePosition(PositionInfo pos)
         {
-            WsMessage message = new WsMessage();
+            var message = new WsMessage();
             message.From = "Server";
             message.Type = WsMessageType.UpdatePosition;
             message.Message = JsonConvert.SerializeObject(pos);
@@ -123,13 +129,28 @@ namespace FinCore
             if (pos != null)
             {
                 _positions.Remove(pos);
-                WsMessage message = new WsMessage();
+                var message = new WsMessage();
                 message.From = "Server";
                 message.Type = WsMessageType.RemovePosition;
                 message.Message = Ticket.ToString();
                 var send = JsonConvert.SerializeObject(message);
                 server.MulticastText(send);
             }
+        }
+
+        public void AddOrders(long magicId, long AccountNumber, IEnumerable<PositionInfo> pos)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void UpdateOrders(long magicId, long AccountNumber, IEnumerable<PositionInfo> pos)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void DeleteOrders(long magicId, long AccountNumber, IEnumerable<PositionInfo> pos)
+        {
+            throw new NotImplementedException();
         }
 
         public void UpdatePositions(long magicId, long AccountNumber, IEnumerable<PositionInfo> pos)
@@ -161,15 +182,12 @@ namespace FinCore
         public void UpdateBalance(int TerminalId, decimal Balance, decimal Equity)
         {
             throw new NotImplementedException();
-
         }
 
         public bool CheckTradeAllowed(SignalInfo signal)
         {
             return true;
         }
-
-
 
         #endregion
     }

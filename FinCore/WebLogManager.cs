@@ -1,7 +1,8 @@
-﻿using BusinessObjects;
-using log4net;
-using System;
+﻿using System;
 using System.Text;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using log4net;
 
 namespace FinCore
 {
@@ -10,8 +11,8 @@ namespace FinCore
         private static readonly ILog log = LogManager.GetLogger(typeof(WebLogManager));
 
         private static readonly object lockObject = new object();
+        private readonly IMessagingService service;
         protected StringBuilder text;
-        IMessagingService service;
 
         public WebLogManager(IMessagingService serv)
         {
@@ -31,7 +32,7 @@ namespace FinCore
             lock (lockObject)
             {
                 text.Clear();
-                string initMessage = $"***Logging started at {DateTime.Now.ToString()}***{Environment.NewLine}";
+                var initMessage = $"***Logging started at {DateTime.Now.ToString()}***{Environment.NewLine}";
                 text.Append(initMessage);
                 service.SendMessage(WsMessageType.WriteLog, initMessage);
             }
@@ -41,7 +42,7 @@ namespace FinCore
         {
             if (string.IsNullOrEmpty(message))
                 return;
-            string msg = DateTime.Now + " " + message + Environment.NewLine;
+            var msg = DateTime.Now + " " + message + Environment.NewLine;
             text.Append(msg);
             service.SendMessage(WsMessageType.WriteLog, msg);
         }

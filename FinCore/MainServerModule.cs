@@ -1,31 +1,31 @@
-﻿using Autofac;
+﻿using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using Autofac;
 using AutoMapper;
 using BusinessLogic;
 using BusinessObjects;
 using log4net;
 using log4net.Config;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
-
+using Module = Autofac.Module;
 
 namespace FinCore
 {
-    public class MainServerModule : Autofac.Module
+    public class MainServerModule : Module
     {
         protected void InitLogging()
         {
             var logRepo = LogManager.GetRepository(Assembly.GetAssembly(typeof(MainServerModule)));
             var pathToExe = Process.GetCurrentProcess().MainModule.FileName;
-            string currentDir = Path.GetDirectoryName(pathToExe);
-            string logFile = Path.Combine(currentDir, "log4net.config");
+            var currentDir = Path.GetDirectoryName(pathToExe);
+            var logFile = Path.Combine(currentDir, "log4net.config");
             XmlConfigurator.Configure(logRepo, new FileInfo(logFile));
         }
 
         protected override void Load(ContainerBuilder builder)
         {
             InitLogging();
-            builder.RegisterInstance<QuartzServer>(QuartzServer.Server);
+            builder.RegisterInstance(QuartzServer.Server);
             builder.RegisterType<PositionsManager>().As<ITerminalEvents>().SingleInstance();
             builder.RegisterType<WebLogManager>().As<IWebLog>().SingleInstance();
             RegisterMaps(builder);
@@ -38,7 +38,8 @@ namespace FinCore
                 var profile = new MappingProfile();
                 cfg.AddProfile(profile);
             }));
-            builder.Register(ctx => ctx.Resolve<MapperConfiguration>().CreateMapper()).As<IMapper>().InstancePerLifetimeScope();
+            builder.Register(ctx => ctx.Resolve<MapperConfiguration>().CreateMapper()).As<IMapper>()
+                .InstancePerLifetimeScope();
         }
     }
 }

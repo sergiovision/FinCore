@@ -165,7 +165,11 @@ export class Terminal {
     contractSize: number;
     cur: string;
     Value: number;
-    // calcValue(): number {
+    Vsl: number;
+    Realsl: number;
+    Vtp: number;
+    Realtp: number;
+// calcValue(): number {
     //   return this.Lots * this.contractSize * this.Openprice + this.Profit;
     // }
   }

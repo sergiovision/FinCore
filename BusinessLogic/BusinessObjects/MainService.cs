@@ -1,39 +1,34 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Security.Principal;
+using System.Text;
+using System.Threading.Tasks;
+using Autofac;
 using BusinessLogic.Repo;
+using BusinessLogic.Repo.Domain;
 using BusinessLogic.Scheduler;
 using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using NHibernate;
 using Quartz;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.BusinessObjects
 {
     public class MainService : IMainService
     {
-        public const int CHAR_BUFF_SIZE = 512;
         public static MainService thisGlobal;
-        private static int isDebug = -1;
-        protected static IWebLog log;
+        private static IWebLog log;
         private SchedulerService _gSchedulerService;
-        protected TimeZoneInfo BrokerTimeZoneInfo;
+        private TimeZoneInfo BrokerTimeZoneInfo;
         private DataService data;
+        private Dictionary<EntitiesEnum, Tuple<Type, Type>> dicTypes;
         private bool Initialized;
         private ConcurrentDictionary<long, ConcurrentQueue<SignalInfo>> signalQue;
-        private Dictionary<EntitiesEnum, Tuple<Type, Type>> dicTypes;
 
         public MainService()
         {
@@ -44,35 +39,13 @@ namespace BusinessLogic.BusinessObjects
             InitTypesMapping();
         }
 
-        private void InitTypesMapping()
-        {
-            dicTypes = new Dictionary<EntitiesEnum, Tuple<Type, Type>>();
-            TupleMap<DBAccount, Account>(EntitiesEnum.Account);
-            TupleMap<DBTerminal, Terminal>(EntitiesEnum.Terminal);
-            TupleMap<DBMetasymbol, MetaSymbol>(EntitiesEnum.MetaSymbol);
-            TupleMap<DBWallet, Wallet>(EntitiesEnum.Wallet);
-            TupleMap<DBJobs, ScheduledJobView>(EntitiesEnum.Jobs);
-            TupleMap<DBDeals, DealInfo>(EntitiesEnum.Deals);
-            TupleMap<DBRates, Rates>(EntitiesEnum.Rates);
-            TupleMap<DBSymbol, Symbol>(EntitiesEnum.Symbol);
-            TupleMap<DBAccountstate, AccountState>(EntitiesEnum.AccountState);
-            TupleMap<DBAdviser, Adviser>(EntitiesEnum.Adviser);
-            TupleMap<DBSettings, Settings>(EntitiesEnum.Settings);
-            TupleMap<DBPerson, Person>(EntitiesEnum.Person);
-        }
-
-        private void TupleMap<DBT, DTO>(EntitiesEnum t)
-        {
-            dicTypes[t] = new Tuple<Type, Type>(typeof(DBT), typeof(DTO));
-        }
-
         public static string AssemblyDirectory
         {
             get
             {
-                string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                UriBuilder uri = new UriBuilder(codeBase);
-                string path = Uri.UnescapeDataString(uri.Path);
+                var codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                var uri = new UriBuilder(codeBase);
+                var path = Uri.UnescapeDataString(uri.Path);
                 return Path.GetDirectoryName(path);
             }
         }
@@ -81,16 +54,16 @@ namespace BusinessLogic.BusinessObjects
         {
             get
             {
-                string logfile = "FinCore.MainServer.log";
+                var logfile = "FinCore.MainServer.log";
                 return Path.Combine(AssemblyDirectory, logfile);
             }
         }
 
-        public static string RegistryInstallDir
+        private static string RegistryInstallDir
         {
             get
             {
-                string result = AssemblyDirectory;
+                var result = AssemblyDirectory;
                 try
                 {
                     result = thisGlobal.GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_INSTALLDIR);
@@ -99,7 +72,6 @@ namespace BusinessLogic.BusinessObjects
                 {
                     log.Error(e);
                 }
-
                 return result;
             }
         }
@@ -108,7 +80,7 @@ namespace BusinessLogic.BusinessObjects
         {
             get
             {
-                string result = WindowsIdentity.GetCurrent().Name;
+                var result = WindowsIdentity.GetCurrent().Name;
                 try
                 {
                     result = thisGlobal.GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_RUNTERMINALUSER);
@@ -156,13 +128,14 @@ namespace BusinessLogic.BusinessObjects
 
         public string GetRatesList()
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            var stringBuilder = new StringBuilder();
             var list = data.GetRates(false);
             foreach (var rate in list)
             {
                 stringBuilder.Append(rate.Key);
                 stringBuilder.Append(",");
             }
+
             return stringBuilder.ToString();
         }
 
@@ -194,23 +167,17 @@ namespace BusinessLogic.BusinessObjects
             BrokerTimeZoneInfo = GetBrokerTimeZone();
 
             InitScheduler(true);
-            
+
             data.GetRates(true);
 
             SetVersion();
 
-            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STARTSERVER, 0);
+            var signal_startServer =
+                thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STARTSERVER, 0);
             PostSignalTo(signal_startServer);
 
             Initialized = true;
             // doMigration();
-        }
-
-        protected void SetVersion()
-        {
-            string date = File.GetLastWriteTime((Assembly.GetExecutingAssembly().Location)).ToShortDateString();
-
-            SetGlobalProp("VERSION", "{\"version\": \"" + xtradeConstants.FINCORE_VERSION + " " + date + "\" }");
         }
 
         /*protected void doMigration()
@@ -267,7 +234,8 @@ namespace BusinessLogic.BusinessObjects
 
         public void Dispose()
         {
-            SignalInfo signal_startServer = MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STOPSERVER, 0);
+            var signal_startServer =
+                thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_STOPSERVER, 0);
             PostSignalTo(signal_startServer);
 
             if (_gSchedulerService != null)
@@ -289,29 +257,10 @@ namespace BusinessLogic.BusinessObjects
             SchedulerService.sched.ResumeAll();
         }
 
-        public bool IsDebug()
-        {
-            if (isDebug == -1)
-            {
-                Assembly assembly = Assembly.GetExecutingAssembly();
-                bool isDebugBuild = assembly.GetCustomAttributes(false).OfType<DebuggableAttribute>()
-                    .Select(attr => attr.IsJITTrackingEnabled).FirstOrDefault();
-                if (isDebugBuild)
-                {
-                    isDebug = 1;
-                    return true;
-                }
-
-                isDebug = 0;
-                return false;
-            }
-
-            return isDebug > 0 ? true : false;
-        }
 
         public List<Wallet> GetWalletsState(DateTime date)
         {
-            List<Wallet> result = new List<Wallet>();
+            var result = new List<Wallet>();
             try
             {
                 result = data.GetWalletsState(date);
@@ -330,41 +279,14 @@ namespace BusinessLogic.BusinessObjects
             task.Start();
         }
 
-        private void DoWalletRangeAsync(int WID, DateTime fromDate, DateTime toDate)
-        {
-            var service = MainService.thisGlobal.Container.Resolve<IMessagingService>();
-            try
-            {
-                DateTime dt = fromDate;
-                int dateIteration = 3;
-                DateTime to = toDate;
-                Wallet res = null;
-                while (dt <= to)
-                {
-                    res = CalculateBalanceForDate(WID, dt);
-                    // result.Add(res);
-                    service.SendMessage(WsMessageType.ChartValue, res);
-                    dt = dt.AddDays(dateIteration);
-                }
-
-                res = CalculateBalanceForDate(WID, toDate);
-                service.SendMessage(WsMessageType.ChartValue, res);
-            }
-            catch (Exception e)
-            {
-                log.Error("Error: GetWalletBalanceRange: " + e);
-            }
-            service.SendMessage(WsMessageType.ChartDone, "");
-        }
-
         public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime toDate)
         {
-            List<Wallet> result = new List<Wallet>();
+            var result = new List<Wallet>();
             try
             {
-                DateTime dt = fromDate;
-                int dateIteration = 3;
-                DateTime to = toDate;
+                var dt = fromDate;
+                var dateIteration = 3;
+                var to = toDate;
                 while (dt <= to)
                 {
                     var res = CalculateBalanceForDate(WID, dt);
@@ -384,13 +306,13 @@ namespace BusinessLogic.BusinessObjects
 
         public bool UpdateAccountState(AccountState accState)
         {
-            bool result = false;
+            var result = false;
             try
             {
-                DBAccountstate newws = new DBAccountstate();
+                var newws = new DBAccountstate();
                 newws.Balance = accState.Balance;
                 newws.Date = DateTime.UtcNow;
-                DBAccount account = new DBAccount();
+                var account = new DBAccount();
                 account.Id = accState.AccountId;
                 newws.Account = account;
                 newws.Comment = accState.Comment;
@@ -405,6 +327,63 @@ namespace BusinessLogic.BusinessObjects
             return result;
         }
 
+        private void InitTypesMapping()
+        {
+            dicTypes = new Dictionary<EntitiesEnum, Tuple<Type, Type>>();
+            TupleMap<DBAccount, Account>(EntitiesEnum.Account);
+            TupleMap<DBTerminal, Terminal>(EntitiesEnum.Terminal);
+            TupleMap<DBMetasymbol, MetaSymbol>(EntitiesEnum.MetaSymbol);
+            TupleMap<DBWallet, Wallet>(EntitiesEnum.Wallet);
+            TupleMap<DBJobs, ScheduledJobView>(EntitiesEnum.Jobs);
+            TupleMap<DBDeals, DealInfo>(EntitiesEnum.Deals);
+            TupleMap<DBRates, Rates>(EntitiesEnum.Rates);
+            TupleMap<DBSymbol, Symbol>(EntitiesEnum.Symbol);
+            TupleMap<DBAccountstate, AccountState>(EntitiesEnum.AccountState);
+            TupleMap<DBAdviser, Adviser>(EntitiesEnum.Adviser);
+            TupleMap<DBSettings, Settings>(EntitiesEnum.Settings);
+            TupleMap<DBPerson, Person>(EntitiesEnum.Person);
+        }
+
+        private void TupleMap<DBT, DTO>(EntitiesEnum t)
+        {
+            dicTypes[t] = new Tuple<Type, Type>(typeof(DBT), typeof(DTO));
+        }
+
+        protected void SetVersion()
+        {
+            var date = File.GetLastWriteTime(Assembly.GetExecutingAssembly().Location).ToShortDateString();
+
+            SetGlobalProp("VERSION", "{\"version\": \"" + xtradeConstants.FINCORE_VERSION + " " + date + "\" }");
+        }
+
+        private void DoWalletRangeAsync(int WID, DateTime fromDate, DateTime toDate)
+        {
+            var service = thisGlobal.Container.Resolve<IMessagingService>();
+            try
+            {
+                var dt = fromDate;
+                var dateIteration = 3;
+                var to = toDate;
+                Wallet res = null;
+                while (dt <= to)
+                {
+                    res = CalculateBalanceForDate(WID, dt);
+                    // result.Add(res);
+                    service.SendMessage(WsMessageType.ChartValue, res);
+                    dt = dt.AddDays(dateIteration);
+                }
+
+                res = CalculateBalanceForDate(WID, toDate);
+                service.SendMessage(WsMessageType.ChartValue, res);
+            }
+            catch (Exception e)
+            {
+                log.Error("Error: GetWalletBalanceRange: " + e);
+            }
+
+            service.SendMessage(WsMessageType.ChartDone, "");
+        }
+
         /*
         private void RegisterContainer()
         {
@@ -415,9 +394,9 @@ namespace BusinessLogic.BusinessObjects
 
         protected TimeZoneInfo GetTimeZoneFromString(string propName)
         {
-            string strTimeZone = GetGlobalProp(propName);
-            ReadOnlyCollection<TimeZoneInfo> tz = TimeZoneInfo.GetSystemTimeZones();
-            foreach (TimeZoneInfo tzi in tz)
+            var strTimeZone = GetGlobalProp(propName);
+            var tz = TimeZoneInfo.GetSystemTimeZones();
+            foreach (var tzi in tz)
                 if (tzi.StandardName.Equals(strTimeZone))
                     return tzi;
             return null;
@@ -426,12 +405,12 @@ namespace BusinessLogic.BusinessObjects
         public Wallet CalculateBalanceForDate(int walletId, DateTime dt)
         {
             IList<Wallet> result = data.GetWalletsState(dt);
-            int count = result.Count;
+            var count = result.Count;
             if (count > 0)
             {
                 if (walletId != 0) return result.Where(x => x.Id == walletId).FirstOrDefault();
 
-                Wallet wb = new Wallet();
+                var wb = new Wallet();
                 wb.Id = walletId;
                 if (dt.Equals(DateTime.MaxValue))
                     wb.Date = DateTime.UtcNow;
@@ -451,11 +430,11 @@ namespace BusinessLogic.BusinessObjects
 
         public IEnumerable<DBAdviser> GetAdvisersByTerminal(long terminalId)
         {
-            List<DBAdviser> advisers = new List<DBAdviser>();
+            var advisers = new List<DBAdviser>();
             try
             {
                 IQueryable<DBAdviser> res = null;
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     res = Session.Query<DBAdviser>().Where(x => x.Terminal.Id == terminalId && x.Retired == false);
                     foreach (var adviser in res)
@@ -474,18 +453,18 @@ namespace BusinessLogic.BusinessObjects
 
         public IEnumerable<Adviser> GetAdvisersByMetaSymbolId(long masterId)
         {
-            List<Adviser> advisers = new List<Adviser>();
+            var advisers = new List<Adviser>();
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
                     var adv = Session.Query<DBAdviser>()
-                        .Where(x => x.Symbol.Metasymbol.Id == (int)masterId);
+                        .Where(x => x.Symbol.Metasymbol.Id == (int) masterId);
                     if (adv == null || advisers.Count() == 0)
                         return advisers; // it is not master expert
                     foreach (var adviser in adv)
                     {
-                        Adviser a = new Adviser();
+                        var a = new Adviser();
                         if (ExpertsRepository.toDTO(adviser, ref a))
                             advisers.Add(a);
                     }
@@ -539,101 +518,16 @@ namespace BusinessLogic.BusinessObjects
             SchedulerService.SetJobCronSchedule(group, name, cron);
         }
 
-        [DllImport("kernel32.dll")]
-        private static extern int GetPrivateProfileString(int Section, string Key,
-            string Value, [MarshalAs(UnmanagedType.LPArray)] byte[] Result,
-            int Size, string FileName);
-
-        [DllImport("kernel32.dll", EntryPoint = "GetPrivateProfileStringW", SetLastError = true,
-            CharSet = CharSet.Unicode)]
-        private static extern int GetPrivateProfileStringW(string lpApplicationName, string lpKeyName, string lpDefault,
-            [MarshalAs(UnmanagedType.LPArray, SizeParamIndex = 4)]
-            char[] lpReturnedString, int nSize, string Filename);
-
-        [DllImport("kernel32.dll", EntryPoint = "WritePrivateProfileStringW", CharSet = CharSet.Unicode)]
-        private static extern int WritePrivateProfileStringW(string lpApplicationName, int lpKeyName, int lpString,
-            string lpFileName);
-
-        [DllImport("kernel32.dll", EntryPoint = "WritePrivateProfileStringW", CharSet = CharSet.Unicode)]
-        private static extern int WritePrivateProfileStringW2(string lpApplicationName, string lpKeyName,
-            string lpString,
-            string lpFileName);
-
-        // The Function called to obtain the SectionHeaders,
-        // and returns them in an Dynamic Array.
-        public string[] GetSectionNames(string path)
-        {
-            try
-            {
-                //    Sets the maxsize buffer to 500, if the more
-                //    is required then doubles the size each time.
-                for (int maxsize = CHAR_BUFF_SIZE; ; maxsize *= 2)
-                {
-                    //    Obtains the information in bytes and stores
-                    //    them in the maxsize buffer (Bytes array)
-                    byte[] bytes = new byte[maxsize];
-                    int size = GetPrivateProfileString(0, "", "", bytes, maxsize, path);
-
-                    // Check the information obtained is not bigger
-                    // than the allocated maxsize buffer - 2 bytes.
-                    // if it is, then skip over the next section
-                    // so that the maxsize buffer can be doubled.
-                    if (size < maxsize - 2)
-                    {
-                        // Converts the bytes value into an ASCII char. This is one long string.
-                        string Selected = Encoding.ASCII.GetString(bytes, 0,
-                            size - (size > 0 ? 1 : 0));
-                        // Splits the Long string into an array based on the "\0"
-                        // or null (Newline) value and returns the value(s) in an array
-                        return Selected.Split('\0');
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error("Failed to get Section Names from file: " + path + ". Error: " + e);
-            }
-
-            return new[] { "" };
-        }
-
-        public static string GetPrivateProfileString(string fileName, string sectionName, string keyName)
-        {
-            char[] ret = new char[CHAR_BUFF_SIZE];
-
-            while (true)
-            {
-                int length = GetPrivateProfileStringW(sectionName, keyName, null, ret, ret.Length, fileName);
-                if (length == 0)
-                    Marshal.ThrowExceptionForHR(Marshal.GetHRForLastWin32Error());
-
-                // This function behaves differently if both sectionName and keyName are null
-                if (sectionName != null && keyName != null)
-                {
-                    if (length == ret.Length - 1)
-                        ret = new char[ret.Length * 2];
-                    else
-                        return new string(ret, 0, length);
-                }
-                else
-                {
-                    if (length == ret.Length - 2)
-                        ret = new char[ret.Length * 2];
-                    else
-                        return new string(ret, 0, length - 1);
-                }
-            }
-        }
 
         public ExpertInfo InitExpert(ExpertInfo expert)
         {
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    string msg = "";
-                    long accNumber = long.Parse(expert.Account);
-                    Terminal terminal = data.getTerminalByNumber(Session, accNumber);
+                    var msg = "";
+                    var accNumber = long.Parse(expert.Account);
+                    var terminal = data.getTerminalByNumber(Session, accNumber);
                     if (terminal == null)
                     {
                         msg = $"Unknown AccountNumber {expert.Account}. Please Register Account in DB.";
@@ -643,10 +537,10 @@ namespace BusinessLogic.BusinessObjects
                         return expert;
                     }
 
-                    string strSymbol = expert.Symbol;
+                    var strSymbol = expert.Symbol;
                     if (strSymbol.Contains("_i"))
                         strSymbol = strSymbol.Substring(0, strSymbol.Length - 2);
-                    DBSymbol symbol = data.getSymbolByName(strSymbol);
+                    var symbol = data.getSymbolByName(strSymbol);
                     if (symbol == null)
                     {
                         msg = $"Unknown Symbol {strSymbol}. Please register Symbol in DB.";
@@ -655,14 +549,14 @@ namespace BusinessLogic.BusinessObjects
                         return expert;
                     }
 
-                    DBAdviser adviser = data.getAdviser(Session, terminal.Id, symbol.Id, expert.EAName);
+                    var adviser = data.getAdviser(Session, terminal.Id, symbol.Id, expert.EAName);
                     if (adviser == null)
                     {
                         adviser = new DBAdviser();
                         adviser.Name = expert.EAName;
                         adviser.Timeframe = expert.ChartTimeFrame;
                         adviser.Retired = false;
-                        DBTerminal dbt = new DBTerminal();
+                        var dbt = new DBTerminal();
                         dbt.Id = terminal.Id;
                         adviser.Terminal = dbt;
                         adviser.Symbol = symbol;
@@ -676,21 +570,18 @@ namespace BusinessLogic.BusinessObjects
                     if (adviser.Id <= 0)
                         data.SaveInsertAdviser(Session, adviser);
 
-                    var dynProps = this.data.GetPropertiesInstance((short)EntitiesEnum.Adviser, adviser.Id);
-                    if ((dynProps == null) || (dynProps.Vals == null) || (dynProps.Vals.Length == 0))
+                    var dynProps = data.GetPropertiesInstance((short) EntitiesEnum.Adviser, adviser.Id);
+                    if (dynProps == null || Utils.HasAny(dynProps.Vals) == false)
                     {
                         expert.Data = "";
                     }
                     else
                     {
-                        Dictionary<string, DynamicProperty> res = JsonConvert.DeserializeObject<Dictionary<string, DynamicProperty>>(dynProps.Vals);
+                        var res = JsonConvert.DeserializeObject<Dictionary<string, DynamicProperty>>(dynProps.Vals);
                         var state = DefaultProperties.transformProperties(res);
                         expert.Data = JsonConvert.SerializeObject(state);
                     }
-                    //if (!string.IsNullOrEmpty(adviser.State))
-                    //    expert.Data = adviser.State;
-
-                    GetOrdersListToLoad(adviser, ref expert);
+                    LoadSavedOrders(adviser, ref expert);
                     expert.Magic = adviser.Id;
                     SubscribeToSignals(adviser.Id);
 
@@ -712,21 +603,23 @@ namespace BusinessLogic.BusinessObjects
         {
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    long accNumber = long.Parse(expert.Account);
-                    Terminal terminal = data.getTerminalByNumber(Session, accNumber);
+                    var accNumber = long.Parse(expert.Account);
+                    var terminal = data.getTerminalByNumber(Session, accNumber);
                     if (terminal == null)
                     {
-                        string msg = $"Unknown AccountNumber {expert.Account} ERROR";
+                        var msg = $"Unknown AccountNumber {expert.Account} ERROR";
                         log.Log(msg);
                         expert.Magic = accNumber;
                         expert.Reason = msg;
                         return expert;
                     }
+
                     SubscribeToSignals(accNumber);
                     log.Info($"Terminal <{accNumber}> Subscribed.");
                 }
+
                 return expert;
             }
             catch (Exception e)
@@ -734,6 +627,7 @@ namespace BusinessLogic.BusinessObjects
                 log.Error(e);
                 expert.Magic = 0;
             }
+
             return expert;
         }
 
@@ -741,7 +635,7 @@ namespace BusinessLogic.BusinessObjects
         {
             try
             {
-                long accNumber = long.Parse(expert.Account);
+                var accNumber = long.Parse(expert.Account);
                 UnSubscribeFromSignals(accNumber);
                 log.Info($"Terminal: <{accNumber}> UnSubscribed.");
             }
@@ -754,111 +648,115 @@ namespace BusinessLogic.BusinessObjects
         public SignalInfo SendSignal(SignalInfo signal)
         {
             SignalInfo result = null;
-            switch ((EnumSignals)signal.Id)
+            switch ((EnumSignals) signal.Id)
             {
                 case EnumSignals.SIGNAL_POST_LOG:
-                    {
-                        if (signal.Data == null)
-                            break;
-                        DoLog(signal);
-                        result = signal;
-                    }
+                {
+                    if (signal.Data == null)
+                        break;
+                    DoLog(signal);
+                    result = signal;
+                }
                     break;
                 case EnumSignals.SIGNAL_INIT_EXPERT:
                     if (signal.Data != null)
                     {
-                        ExpertInfo ei = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
+                        var ei = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
                         var expertInfo = InitExpert(ei);
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
+                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id,
+                            signal.ChartId);
 
-                        result.Data = JsonConvert.SerializeObject(expertInfo);
+                        result.SetData(JsonConvert.SerializeObject(expertInfo));
                     }
+
                     break;
                 case EnumSignals.SIGNAL_INIT_TERMINAL:
                     if (signal.Data != null)
                     {
-                        ExpertInfo ei = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
+                        var ei = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data.ToString());
                         var expertInfo = InitTerminal(ei);
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
-                        result.Data = JsonConvert.SerializeObject(expertInfo);
+                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id,
+                            signal.ChartId);
+                        result.SetData(JsonConvert.SerializeObject(expertInfo));
                     }
+
                     break;
                 case EnumSignals.SIGNAL_TODAYS_STAT:
-                    {
-                        var ds = Container.Resolve<ITerminalEvents>();
-                        if (ds == null)
-                            break;
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
-                        var stat = ds.GetTodayStat();
-                        result.Data = JsonConvert.SerializeObject(stat);
-                    }
+                {
+                    var ds = Container.Resolve<ITerminalEvents>();
+                    if (ds == null)
+                        break;
+                    result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id, signal.ChartId);
+                    var stat = ds.GetTodayStat();
+                    result.SetData(JsonConvert.SerializeObject(stat));
+                }
                     break;
                 case EnumSignals.SIGNAL_CHECK_TRADEALLOWED:
+                {
+                    var ds = Container.Resolve<ITerminalEvents>();
+                    if (ds == null && signal.Data == null)
+                        break;
+                    var info = Utils.ExtractList<BalanceInfo>(signal.Data);
+                    if (Utils.HasAny(info))
                     {
-                        var ds = Container.Resolve<ITerminalEvents>();
-                        if ((ds == null) && (signal.Data == null))
-                            break;
-                        JArray arr = signal.Data as JArray;
-                        if ((arr == null) || (arr.Count <= 0))
-                            break;
-                        string data = arr.FirstOrDefault().ToString();
-                        Dictionary<string, string> paramsList = JsonConvert.DeserializeObject<Dictionary<string, string>>(data);
-                        signal.Data = paramsList["Balance"];
+                        BalanceInfo balanceInfo = info.FirstOrDefault();
+                        signal.SetData(balanceInfo.ToString());
                         ds.GetTodayStat();
                         ds.CheckTradeAllowed(signal);
                         result = signal;
                     }
+                }
                     break;
                 case EnumSignals.SIGNAL_GETMAINLOGPATH:
-                    {
-                        string path = GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_INSTALLDIR);
-                        //var di = new DirectoryInfo(path);
-                        //if (!di.Exists)
-                        //    path = MainLogFilePath;
-                        path = Path.Combine(path, "FinCore.MainServer.log");
-                        signal.Data = path;
-                        result = signal;
-                    }
+                {
+                    var path = GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_INSTALLDIR);
+                    //var di = new DirectoryInfo(path);
+                    //if (!di.Exists)
+                    //    path = MainLogFilePath;
+                    path = Path.Combine(path, "FinCore.MainServer.log");
+                    signal.SetData(path);
+                    result = signal;
+                }
                     break;
                 case EnumSignals.SIGNAL_LEVELS4SYMBOL:
-                    {
-                        string symbol = signal.Data.ToString();
-                        string levelsString = Levels4Symbol(symbol);
-                        result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals)signal.Id, signal.ChartId);
-                        result.Data = levelsString;
-                    }
+                {
+                    var symbol = signal.Data.ToString();
+                    var levelsString = Levels4Symbol(symbol);
+                    result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id, signal.ChartId);
+                    result.SetData(levelsString);
+                }
                     break;
             }
+
             return result;
         }
 
         public string Levels4Symbol(string strSymbol)
         {
-            string result = "";
+            var result = "";
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    DBSymbol dbSymbol = data.getSymbolByName(strSymbol);
+                    var dbSymbol = data.getSymbolByName(strSymbol);
                     if (dbSymbol == null)
                     {
                         log.Error("ERROR. Unknown Symbol: " + strSymbol + " .");
                         return "";
                     }
-                    DBMetasymbol metaSymbol = dbSymbol.Metasymbol;
+
+                    var metaSymbol = dbSymbol.Metasymbol;
                     if (metaSymbol == null)
                     {
                         log.Error("ERROR. Metasymbol is null for symbol " + strSymbol + " .");
                         return "";
                     }
-                    DynamicProperties props = data.GetPropertiesInstance((short)EntitiesEnum.MetaSymbol, metaSymbol.Id);
-                    if (!String.IsNullOrEmpty(props.Vals) && props.Vals.Contains("Level"))
+
+                    var props = data.GetPropertiesInstance((short) EntitiesEnum.MetaSymbol, metaSymbol.Id);
+                    if (!string.IsNullOrEmpty(props.Vals) && props.Vals.Contains("Level"))
                     {
-                        Dictionary<string, DynamicProperty> propsList = JsonConvert.DeserializeObject<Dictionary<string, DynamicProperty>>(props.Vals);
-                        if (propsList.Any())
-                        {
-                            return propsList["Levels"].value;
-                        }
+                        var propsList = JsonConvert.DeserializeObject<Dictionary<string, DynamicProperty>>(props.Vals);
+                        if (propsList.Any()) return propsList["Levels"].value;
                     }
                 }
             }
@@ -866,41 +764,47 @@ namespace BusinessLogic.BusinessObjects
             {
                 log.Error(e);
             }
+
             return result;
         }
 
         public string SaveLevels4Symbol(string strSymbol, string levels)
         {
-            string result = "";
+            var result = "";
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    DBSymbol dbSymbol = data.getSymbolByName(strSymbol);
+                    var dbSymbol = data.getSymbolByName(strSymbol);
                     if (dbSymbol == null)
                     {
                         log.Error("ERROR. Unknown Symbol: " + strSymbol + " .");
                         return "";
                     }
-                    DBMetasymbol metaSymbol = dbSymbol.Metasymbol;
+
+                    var metaSymbol = dbSymbol.Metasymbol;
                     if (metaSymbol == null)
                     {
                         log.Error("ERROR. Metasymbol is null for symbol " + strSymbol + " .");
                         return "";
                     }
-                    DynamicProperties props = data.GetPropertiesInstance((short)EntitiesEnum.MetaSymbol, metaSymbol.Id);
-                    Dictionary<string, DynamicProperty> propsList = JsonConvert.DeserializeObject<Dictionary<string, DynamicProperty>>(props.Vals);
+
+                    var props = data.GetPropertiesInstance((short) EntitiesEnum.MetaSymbol, metaSymbol.Id);
+                    var propsList = JsonConvert.DeserializeObject<Dictionary<string, DynamicProperty>>(props.Vals);
                     if (propsList.Any())
                     {
                         if (propsList.ContainsKey("Levels"))
+                        {
                             propsList["Levels"].value = levels;
+                        }
                         else
                         {
-                            DynamicProperty newProp = new DynamicProperty();
+                            var newProp = new DynamicProperty();
                             newProp.type = "string";
                             newProp.value = levels;
                             propsList.Add("Levels", newProp);
                         }
+
                         props.Vals = JsonConvert.SerializeObject(propsList);
                         data.SavePropertiesInstance(props);
                     }
@@ -910,207 +814,26 @@ namespace BusinessLogic.BusinessObjects
             {
                 log.Error(e);
             }
-            return result;
-        }
-
-
-        private bool GetOrdersListToLoad(DBAdviser adviser, ref ExpertInfo expert)
-        {
-            //if (expert.OrderTicketsToLoad == null)
-            //    expert.OrderTicketsToLoad = new List<string>();
-            /*
-            List<PositionInfo> positions = new List<PositionInfo>();
-            string filePath = GetAdviserFilePath(adviser);
-            if (!File.Exists(filePath))
-                return false;
-            string[] sections = GetSectionNames(filePath);
-            if (sections.Length > 0)
-            {
-                List<string> sectionsList = sections.ToList();
-                if ((sectionsList != null) && (sectionsList.Count() > 0))
-                {
-                    foreach (var order in sectionsList)
-                    {
-                        if (order.Equals(xtradeConstants.GLOBAL_SECTION_NAME) )
-                            continue;
-                        string roleString = GetPrivateProfileString(filePath, order, "role");
-                        if (!String.IsNullOrEmpty(roleString))
-                        {
-                            ENUM_ORDERROLE role = (ENUM_ORDERROLE)Int32.Parse(roleString);
-                            if (role != ENUM_ORDERROLE.History)
-                            {
-                                //string ticketString = GetPrivateProfileString(filePath, order, "ticket");
-                                expert.OrderTicketsToLoad.Add(order);
-                            }
-                        }
-                        //DeleteSection(order, filePath);
-                        //if (!order.Equals(xtradeConstants.GLOBAL_SECTION_NAME))
-                        //    WritePrivateProfileStringW(order, 0, 0, filePath);
-                    }
-                }
-            }
-            return true;
-            */
-            return false;
-        }
-
-        /* public void SaveExpert(ExpertInfo expert)
-        {
-            try
-            {
-                int magicNumber = (int) expert.Magic;
-                using (ISession Session = ConnectionHelper.CreateNewSession())
-                {
-                    DBAdviser adviser = data.getAdviserByMagicNumber(Session, magicNumber);
-                    if (adviser == null)
-                    {
-                        log.Log("Expert with Magic=" + magicNumber + " doesn't exist");
-                        return;
-                    }
-
-                    adviser.Running = true;
-                    adviser.Lastupdate = DateTime.UtcNow;
-                    if (!string.IsNullOrEmpty(expert.Data))
-                        if (string.IsNullOrEmpty(adviser.State)) // || (expert.Data.CompareTo(adviser.State) != 0)
-                            adviser.State = expert.Data;
-
-                    var terminals = Container.Resolve<ITerminalEvents>();
-                    if (terminals != null)
-                    {
-                        long accountNumber = long.Parse(expert.Account);
-                        List<PositionInfo> positions = null;
-                        if (!String.IsNullOrEmpty(expert.Orders))
-                            positions = JsonConvert.DeserializeObject<List<PositionInfo>>(expert.Orders);
-                        else
-                            positions = new List<PositionInfo>();
-                        terminals.UpdateSLTP(magicNumber, accountNumber, positions);
-                    }
-
-
-                    data.SaveInsertAdviser(Session, adviser);
-                }
-            }
-            catch (Exception e)
-            {
-                log.Error(e);
-            }
-        }*/
-
-        public int DeleteHistoryOrders(string filePath)
-        {
-            int result = 0;
-            string[] sections = GetSectionNames(filePath);
-            if (sections.Length > 0)
-            {
-                List<string> sectionsList = sections.ToList();
-                if (sectionsList != null && sectionsList.Count() > 0)
-                    foreach (var sectionName in sectionsList)
-                    {
-                        if (sectionName.Equals(xtradeConstants.GLOBAL_SECTION_NAME))
-                            continue;
-
-                        string roleString = GetPrivateProfileString(filePath, sectionName, "role");
-                        if (!string.IsNullOrEmpty(roleString))
-                        {
-                            ENUM_ORDERROLE role = (ENUM_ORDERROLE)int.Parse(roleString);
-                            if (role.Equals(ENUM_ORDERROLE.History))
-                            {
-                                // Deletes section!!!
-                                WritePrivateProfileStringW(sectionName, 0, 0, filePath);
-                                result++;
-                            }
-                        }
-                    }
-            }
 
             return result;
         }
-
-        protected string GetAdviserFilePath(DBAdviser adviser)
+        
+        private void LoadSavedOrders(DBAdviser adviser, ref ExpertInfo expert)
         {
-            string path = GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_MTCOMMONFILES);
-            string sym = adviser.Symbol.Name;
-            //if (sym.Length > 6)
-            //    sym = sym.Remove(3, 1);
-            string filePath = $"{path}\\{adviser.Terminal.Accountnumber}_{sym}_{adviser.Timeframe}_{adviser.Id}.set";
-            return filePath;
+            var terminals = Container.Resolve<ITerminalEvents>();
+            List<PositionInfo> positions = terminals.GetPositions4Adviser(adviser.Id);
+            if (Utils.HasAny(positions))
+                expert.Orders = JsonConvert.SerializeObject(positions);
         }
-
-        public bool FileLocked(string FileName)
-        {
-            FileStream fs = null;
-
-            try
-            {
-                // NOTE: This doesn't handle situations where file is opened for writing by another process but put into write shared mode, it will not throw an exception and won't show it as write locked
-                fs = File.Open(FileName, FileMode.Open, FileAccess.ReadWrite,
-                    FileShare.None); // If we can't open file for reading and writing then it's locked by another process for writing
-            }
-            catch (UnauthorizedAccessException) // https://msdn.microsoft.com/en-us/library/y973b725(v=vs.110).aspx
-            {
-                // This is because the file is Read-Only and we tried to open in ReadWrite mode, now try to open in Read only mode
-                try
-                {
-                    fs = File.Open(FileName, FileMode.Open, FileAccess.Read, FileShare.None);
-                }
-                catch (Exception)
-                {
-                    return true; // This file has been locked, we can't even open it to read
-                }
-            }
-            catch (Exception)
-            {
-                return true; // This file has been locked
-            }
-            finally
-            {
-                if (fs != null)
-                    fs.Close();
-            }
-
-            return false;
-        }
-
-        private string ReasonToString(int Reason)
-        {
-            switch (Reason)
-            {
-                case 0: //0
-                    return
-                        "0 <REASON_PROGRAM> - Expert Advisor terminated its operation by calling the _ExpertRemove()_ function";
-                case 1: //1
-                    return "1 <REASON_REMOVE> Program has been deleted from the chart";
-                case 2: // 2
-                    return "2 <REASON_RECOMPILE> Program has been recompiled";
-                case 3: //3
-                    return "3 <REASON_CHARTCHANGE> Symbol or chart period has been changed";
-                case 4:
-                    return "4 <REASON_CHARTCLOSE> Chart has been closed";
-                case 5:
-                    return "5 <REASON_PARAMETERS> Input parameters have been changed by a user";
-                case 6:
-                    return
-                        "6 <REASON_ACCOUNT> Another account has been activated or reconnection to the trade server has occurred due to changes in the account settings";
-                case 7:
-                    return "7 <REASON_TEMPLATE> A new template has been applied";
-                case 8:
-                    return
-                        "8 <REASON_INITFAILED> This value means that _OnInit()_ handler has returned a nonzero value";
-                case 9:
-                    return "9 <REASON_CLOSE> Terminal has been closed";
-            }
-
-            return $"Unknown reason: {Reason}";
-        }
-
+        
         public void DeInitExpert(ExpertInfo expert)
         {
             try
             {
-                using (ISession Session = ConnectionHelper.CreateNewSession())
+                using (var Session = ConnectionHelper.CreateNewSession())
                 {
-                    int magicNumber = (int)expert.Magic;
-                    DBAdviser adviser = data.getAdviserByMagicNumber(Session, magicNumber);
+                    var magicNumber = (int) expert.Magic;
+                    var adviser = data.getAdviserByMagicNumber(Session, magicNumber);
                     if (adviser == null)
                     {
                         log.Error("Expert with MagicNumber=" + magicNumber + " doesn't exist");
@@ -1122,7 +845,7 @@ namespace BusinessLogic.BusinessObjects
                     adviser.Running = false;
 
                     data.SaveInsertAdviser(Session, adviser);
-                    string infoMsg = $"Expert On <{adviser.Symbol.Name}> Closed";
+                    var infoMsg = $"Expert On <{adviser.Symbol.Name}> Closed";
                     log.Info(infoMsg); // with reason {ReasonToString(expert.Reason)}.
                 }
             }
@@ -1136,16 +859,16 @@ namespace BusinessLogic.BusinessObjects
         {
             try
             {
-                var terminals = (List<object>)data.GetObjects(EntitiesEnum.Terminal);
+                var terminals = (List<object>) data.GetObjects(EntitiesEnum.Terminal);
                 foreach (var term in terminals)
                 {
-                    Terminal terminal = (Terminal)term;
+                    var terminal = (Terminal) term;
                     if (terminal.Retired)
                         continue;
-                    DirectoryInfo sourceDir = new DirectoryInfo(sourceFolder);
-                    string fileName = string.Format(@"deployto_{0}.bat", terminal.AccountNumber);
-                    StreamWriter SW = new StreamWriter(fileName);
-                    SW.Write(ProcessFolder("", terminal, sourceFolder, CopyFile));
+                    var sourceDir = new DirectoryInfo(sourceFolder);
+                    var fileName = $@"deployto_{terminal.AccountNumber}.bat";
+                    var SW = new StreamWriter(fileName);
+                    SW.Write(ProcessFolder("", terminal, sourceFolder, Utils.CopyFile));
                     SW.Write(ProcessFolder("", terminal, sourceFolder, CompileFile));
                     SW.Flush();
                     SW.Close();
@@ -1164,10 +887,10 @@ namespace BusinessLogic.BusinessObjects
         {
             try
             {
-                var terminal = (Terminal)data.GetObject(EntitiesEnum.Terminal, id);
+                var terminal = (Terminal) data.GetObject(EntitiesEnum.Terminal, id);
                 if (terminal != null)
                 {
-                    ProcessImpersonation pi = new ProcessImpersonation(log);
+                    var pi = new ProcessImpersonation(log);
                     pi.CloseTerminal(terminal.FullPath);
                 }
             }
@@ -1183,7 +906,7 @@ namespace BusinessLogic.BusinessObjects
         {
             if (isDeploying)
             {
-                string message = "Application already deploying: Skip...";
+                var message = "Application already deploying: Skip...";
                 log.Error(message);
                 return message;
             }
@@ -1191,13 +914,13 @@ namespace BusinessLogic.BusinessObjects
             try
             {
                 isDeploying = true;
-                var terminal = (Terminal)data.GetObject(EntitiesEnum.Terminal, id);
+                var terminal = (Terminal) data.GetObject(EntitiesEnum.Terminal, id);
                 if (terminal != null)
                 {
-                    string installDir = GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_INSTALLDIR);
-                    ProcessImpersonation pi = new ProcessImpersonation(log);
-                    string fileName = string.Format(@"{0}\deployto_{1}.bat", installDir, terminal.AccountNumber);
-                    string logFile = string.Format(@"{0}\deployto_{1}.log", installDir, terminal.AccountNumber);
+                    var installDir = GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_INSTALLDIR);
+                    var pi = new ProcessImpersonation(log);
+                    var fileName = string.Format(@"{0}\deployto_{1}.bat", installDir, terminal.AccountNumber);
+                    var logFile = string.Format(@"{0}\deployto_{1}.log", installDir, terminal.AccountNumber);
                     CloseTerminal(terminal.Id);
                     pi.StartProcessInNewThread(fileName, logFile, terminal.FullPath);
                     return $"Deploy process started for terminal {terminal.AccountNumber}!";
@@ -1221,29 +944,20 @@ namespace BusinessLogic.BusinessObjects
 
         public delegate string DeployFunc(string folder, Terminal terminal, string file, string targetFolder);
 
-        public string CopyFile(string folder, Terminal terminal, string file, string targetFolder)
-        {
-            return string.Format(@"xcopy /y {0} {1}{2}", file, targetFolder, Environment.NewLine);
-        }
-
-        public bool IsMQL5(string path)
-        {
-            return path.Contains("MQL5");
-        }
 
         public string CompileFile(string folder, Terminal terminal, string file, string targetFolder)
         {
-            string ext = Path.GetExtension(file);
+            var ext = Path.GetExtension(file);
             if (ext.Contains("mq5") || ext.Contains("mq4"))
             {
-                string compilerApp = "\\metaeditor";
-                if (IsMQL5(targetFolder))
+                var compilerApp = "\\metaeditor";
+                if (Utils.IsMQL5(targetFolder))
                     compilerApp += "64.exe";
                 else
                     compilerApp += ".exe";
 
-                string compilerPath = Path.GetDirectoryName(terminal.FullPath) + compilerApp;
-                string targetFile = terminal.CodeBase + folder + "\\" + Path.GetFileName(file);
+                var compilerPath = Path.GetDirectoryName(terminal.FullPath) + compilerApp;
+                var targetFile = terminal.CodeBase + folder + "\\" + Path.GetFileName(file);
                 return string.Format(@"""{0}"" /compile:""{1}"" {2}", compilerPath, targetFile, Environment.NewLine);
             }
 
@@ -1252,8 +966,8 @@ namespace BusinessLogic.BusinessObjects
 
         public string ProcessFolder(string folder, Terminal terminal, string sourceFolder, DeployFunc func)
         {
-            string result = "";
-            string currentSourceFolder = sourceFolder;
+            var result = "";
+            var currentSourceFolder = sourceFolder;
             if (folder.Length > 0)
                 currentSourceFolder += folder;
             if (!Directory.Exists(currentSourceFolder))
@@ -1264,7 +978,7 @@ namespace BusinessLogic.BusinessObjects
                 foreach (var file in folders)
                     if (Directory.Exists(file))
                     {
-                        string subF = folder + "\\" + Path.GetFileName(file);
+                        var subF = folder + "\\" + Path.GetFileName(file);
                         result += ProcessFolder(subF, terminal, sourceFolder, func);
                     }
 
@@ -1272,7 +986,7 @@ namespace BusinessLogic.BusinessObjects
                 foreach (var file in files)
                     if (File.Exists(file))
                     {
-                        string targetFolder = terminal.CodeBase + folder;
+                        var targetFolder = terminal.CodeBase + folder;
                         // process file
                         result += func(folder, terminal, file, targetFolder);
                         // result += string.Format(@"xcopy /y {0} {1}{2}", file, targetFolder, Environment.NewLine);
@@ -1289,7 +1003,7 @@ namespace BusinessLogic.BusinessObjects
 
         public void SubscribeToSignals(long objectId)
         {
-            ConcurrentQueue<SignalInfo> que = new ConcurrentQueue<SignalInfo>();
+            var que = new ConcurrentQueue<SignalInfo>();
             if (!signalQue.ContainsKey(objectId))
             {
                 if (signalQue.TryAdd(objectId, que))
@@ -1301,7 +1015,7 @@ namespace BusinessLogic.BusinessObjects
 
         public void UnSubscribeFromSignals(long objectId)
         {
-            ConcurrentQueue<SignalInfo> que = new ConcurrentQueue<SignalInfo>();
+            var que = new ConcurrentQueue<SignalInfo>();
             signalQue.TryRemove(objectId, out que);
         }
 
@@ -1314,28 +1028,27 @@ namespace BusinessLogic.BusinessObjects
 
         public void PostSignalTo(SignalInfo signal)
         {
-            SignalFlags to = (SignalFlags)signal.Flags;
+            var to = (SignalFlags) signal.Flags;
             if (to == SignalFlags.AllTerminals)
             {
                 foreach (var que in signalQue) que.Value.Enqueue(signal);
             }
-            else if ((to == SignalFlags.Expert) || (to == SignalFlags.Terminal))
+            else if (to == SignalFlags.Expert || to == SignalFlags.Terminal)
             {
                 PostSignal(signal);
             }
             else if (to == SignalFlags.Server)
             {
-                ISignalHandler handler = Container.Resolve<ISignalHandler>();
-                if (handler != null)
-                    handler.PostSignal(signal, null);
+                var handler = Container.Resolve<ISignalHandler>();
+                handler?.PostSignal(signal, null);
             }
             else if (to == SignalFlags.Cluster)
             {
                 var advisers = GetAdvisersByMetaSymbolId(signal.ObjectId);
-                if (advisers != null && advisers.Count() > 0)
+                if (Utils.HasAny(advisers))
                     foreach (var adv in advisers)
                     {
-                        signal.Flags = (long)SignalFlags.Expert;
+                        signal.Flags = (long) SignalFlags.Expert;
                         signal.ObjectId = adv.Id;
                         PostSignal(signal);
                     }
@@ -1346,13 +1059,14 @@ namespace BusinessLogic.BusinessObjects
         {
             if (signalQue.ContainsKey(ObjectId))
             {
-                ConcurrentQueue<SignalInfo> que = signalQue[ObjectId];
+                var que = signalQue[ObjectId];
                 if (que.Count > 0)
                 {
                     SignalInfo si;
                     if (que.TryDequeue(out si)) return si;
                 }
             }
+
             return null;
         }
 
@@ -1360,14 +1074,13 @@ namespace BusinessLogic.BusinessObjects
         {
             data.UpdateBalance(AccountNumber, Balance, Equity);
             var ds = Container.Resolve<ITerminalEvents>();
-            if (ds != null)
-                ds.UpdateBalance(AccountNumber, Balance, Equity);
+            ds?.UpdateBalance(AccountNumber, Balance, Equity);
         }
 
         public bool UpdateAdviser(Adviser adviser)
         {
-            int result = data.UpdateObject(EntitiesEnum.Adviser, adviser.Id, JsonConvert.SerializeObject(adviser));
-            SignalInfo signal = CreateSignal(SignalFlags.Expert, adviser.Id, EnumSignals.SIGNAL_UPDATE_EXPERT, 0);
+            var result = data.UpdateObject(EntitiesEnum.Adviser, adviser.Id, JsonConvert.SerializeObject(adviser));
+            var signal = CreateSignal(SignalFlags.Expert, adviser.Id, EnumSignals.SIGNAL_UPDATE_EXPERT, 0);
             signal.Value = result;
             PostSignalTo(signal);
             return result > 0;
@@ -1375,9 +1088,9 @@ namespace BusinessLogic.BusinessObjects
 
         public SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id, long chartId)
         {
-            SignalInfo signal = new SignalInfo();
-            signal.Flags = (long)flags;
-            signal.Id = (int)Id;
+            var signal = new SignalInfo();
+            signal.Flags = (long) flags;
+            signal.Id = (int) Id;
             signal.ObjectId = ObjectId;
             signal.Value = 1;
             signal.ChartId = chartId;
@@ -1386,10 +1099,10 @@ namespace BusinessLogic.BusinessObjects
 
         public void DoLog(SignalInfo signal)
         {
-            StringBuilder message = new StringBuilder();
+            var message = new StringBuilder();
             message.Append("<" + signal.ObjectId + ">:");
             message.Append("(" + signal.Sym + "):");
-            message.Append(signal.Data.ToString());
+            message.Append(signal.Data);
             log.Log(message.ToString());
             log.Info(message);
         }
@@ -1412,7 +1125,7 @@ namespace BusinessLogic.BusinessObjects
 
         public void UpdateRates(List<RatesInfo> rates)
         {
-            if ((rates == null) || (rates.Count <= 0))
+            if (rates == null || rates.Count <= 0)
                 return;
             data.UpdateRates(rates);
         }
@@ -1451,14 +1164,11 @@ namespace BusinessLogic.BusinessObjects
 
         public object LogList()
         {
-            if (LogItems == null)
-            {
-                LogItems = new List<LogItem>();
-            }
-            if (LogItems.Count() > 0)
+            if (LogItems == null) LogItems = new List<LogItem>();
+            if (Utils.HasAny(LogItems))
                 LogItems.Clear();
 
-            LogItem item0 = new LogItem();
+            var item0 = new LogItem();
             item0.Name = "log0";
             item0.TabTitle = "UI Log";
             item0.DataSource = "";
@@ -1466,7 +1176,7 @@ namespace BusinessLogic.BusinessObjects
             item0.Theme = "ace/theme/terminal";
             LogItems.Add(item0);
 
-            LogItem item1 = new LogItem();
+            var item1 = new LogItem();
             item1.Name = "log1";
             item1.TabTitle = "FinCore Log";
             item1.DataSource = "";
@@ -1477,36 +1187,40 @@ namespace BusinessLogic.BusinessObjects
 
             try
             {
-                int i = 2;
-                var terminals = (List<object>)data.GetObjects(EntitiesEnum.Terminal);
+                var i = 2;
+                var terminals = (List<object>) data.GetObjects(EntitiesEnum.Terminal);
                 foreach (var term in terminals)
                 {
-                    Terminal terminal = (Terminal)term;
+                    var terminal = (Terminal) term;
                     if (terminal.Retired)
                         continue;
                     // add expert log
-                    LogItem itemx = new LogItem();
+                    var itemx = new LogItem();
                     itemx.Name = $"log{i}";
                     itemx.TabTitle = terminal.Broker + " Expert";
                     itemx.DataSource = "";
                     itemx.TextChangedEvent = "";
                     itemx.Theme = "ace/theme/solarized_light";
 
-                    var directory = new DirectoryInfo(terminal.CodeBase + "/Logs");
+                    var directory = new DirectoryInfo(terminal.CodeBase + "\\Logs");
                     if (directory.Exists)
                     {
-                        var logFile = (from f in directory.GetFiles()
-                                       orderby f.LastWriteTime descending
-                                       select f).First();
-                        if (logFile.Exists)
-                            itemx.Path = logFile.FullName; //  terminal.CodeBase + "/Logs";
+                        if (Utils.HasAny(directory.GetFiles()))
+                        {
+                            var logFile = (from f in directory.GetFiles()
+                                orderby f.LastWriteTime descending
+                                select f).First();
+                            if (logFile.Exists)
+                                itemx.Path = logFile.FullName; //  terminal.CodeBase + "/Logs";
+                        }
                     }
+
                     LogItems.Add(itemx);
                     i++;
 
 
                     // Add sys log
-                    LogItem itemy = new LogItem();
+                    var itemy = new LogItem();
                     itemy.Name = $"log{i}";
                     itemy.TabTitle = terminal.Broker + " System";
                     itemy.DataSource = "";
@@ -1517,70 +1231,72 @@ namespace BusinessLogic.BusinessObjects
                     if (directory2.Exists)
                     {
                         directory2 = new DirectoryInfo(directory2.Parent.FullName + "/logs");
-                        var logFile2 = (from f in directory2.GetFiles()
-                                        orderby f.LastAccessTime descending
-                                        select f).First();
-                        if (logFile2.Exists)
-                            itemy.Path = logFile2.FullName;
+                        if (Utils.HasAny(directory2.GetFiles()))
+                        {
+                            var logFile2 = (from f in directory2.GetFiles()
+                                orderby f.LastAccessTime descending
+                                select f).First();
+                            if (logFile2.Exists)
+                                itemy.Path = logFile2.FullName;
+                        }
                     }
+
                     LogItems.Add(itemy);
                     i++;
                 }
             }
             catch (Exception e)
             {
-                log.Info("Failed to get Metatrader Logs: " + e.ToString());
+                log.Info("Failed to get Metatrader Logs: " + e); 
             }
+
             return LogItems;
         }
 
         public string GetLogContent(string logName, long numberOfLines)
         {
-            string result = "";
+            var result = "";
             try
             {
-                if (LogItems == null || LogItems.Count <= 0)
+                if (!Utils.HasAny(LogItems))
                     return "No Logs Found";
                 var logitems = LogItems.Where(x => x.Name.CompareTo(logName) == 0);
-                if (logitems.Count() <= 0)
+                if (!Utils.HasAny(logitems))
                     return $"No log file with key name found: {logName}";
-                string logPath = logitems.FirstOrDefault().Path;
-                if (String.IsNullOrEmpty(logPath))
+                var logPath = logitems.FirstOrDefault().Path;
+                if (string.IsNullOrEmpty(logPath))
                     return "";
-                if (!(new FileInfo(logPath)).Exists)
+                if (!new FileInfo(logPath).Exists)
                     return $"Log file with path {logPath} doesn't exists";
 
-                using (FileStream fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (var fs = new FileStream(logPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
                 {
-                    StreamReader reader = new StreamReader(fs);
+                    var reader = new StreamReader(fs);
                     reader.BaseStream.Seek(0, SeekOrigin.End);
-                    long totallines = (numberOfLines <= 0) ? 1000000 : numberOfLines;
-                    int count = 0;
-                    while ((count < totallines) && (reader.BaseStream.Position > 0))
+                    var totallines = numberOfLines <= 0 ? 1000000 : numberOfLines;
+                    var count = 0;
+                    while (count < totallines && reader.BaseStream.Position > 0)
                     {
                         reader.BaseStream.Position--;
-                        int c = reader.BaseStream.ReadByte();
+                        var c = reader.BaseStream.ReadByte();
                         if (reader.BaseStream.Position > 0)
                             reader.BaseStream.Position--;
-                        if (c == Convert.ToInt32('\n'))
-                        {
-                            ++count;
-                        }
+                        if (c == Convert.ToInt32('\n')) ++count;
                     }
+
                     result = reader.ReadToEnd();
                     //string[] arr = str.Replace("\r", "").Split('\n');
                     reader.Close();
                 }
-                return result;
 
+                return result;
             }
             catch (Exception e)
             {
                 return e.ToString();
             }
         }
+
         #endregion
-
-
     }
 }

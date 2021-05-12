@@ -1,7 +1,8 @@
-﻿using Autofac;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Autofac;
+using BusinessObjects.BusinessObjects;
 
 namespace BusinessObjects
 {
@@ -39,21 +40,15 @@ namespace BusinessObjects
         void ResumeScheduler();
 
         TimeZoneInfo GetBrokerTimeZone();
-
-        bool IsDebug();
-
+        
         ExpertInfo InitExpert(ExpertInfo expert);
 
         ExpertInfo InitTerminal(ExpertInfo expert);
-
-        // void SaveExpert(ExpertInfo expert);
-
+        
         void DeInitExpert(ExpertInfo expert);
 
         void DeInitTerminal(ExpertInfo expert);
-
-        int DeleteHistoryOrders(string filePath);
-
+        
         void DeployToTerminals(string sourceFolder);
 
         string DeployToAccount(int id);

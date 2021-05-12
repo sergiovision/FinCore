@@ -1,7 +1,7 @@
-﻿using BusinessLogic.Scheduler;
-using Quartz;
-using System;
+﻿using System;
 using System.Threading.Tasks;
+using BusinessLogic.Scheduler;
+using Quartz;
 
 namespace BusinessLogic.Jobs
 {
@@ -19,12 +19,12 @@ namespace BusinessLogic.Jobs
 
         protected Task CleanMemory()
         {
-            long before = GC.GetTotalMemory(false);
+            var before = GC.GetTotalMemory(false);
             // Collect all generations of memory.
             GC.Collect();
-            long after = GC.GetTotalMemory(true);
-            log.Log(String.Format("Memory Cleanup From: {0:N0} => To {1:N0}",
-                                before, after));
+            var after = GC.GetTotalMemory(true);
+            log.Log(string.Format("Memory Cleanup From: {0:N0} => To {1:N0}",
+                before, after));
             return Task.CompletedTask;
         }
 

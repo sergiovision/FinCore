@@ -1,14 +1,15 @@
-﻿using Autofac;
-using BusinessLogic.BusinessObjects;
-using BusinessObjects;
-using Quartz;
-using Quartz.Impl;
-using Quartz.Impl.Matchers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using BusinessLogic.BusinessObjects;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using Quartz;
+using Quartz.Impl;
+using Quartz.Impl.Matchers;
 
 namespace BusinessLogic.Scheduler
 {
@@ -30,7 +31,7 @@ namespace BusinessLogic.Scheduler
 
         public static JobDataMap GetJobDataMap(JobKey key)
         {
-            IJobDetail jd = sched.GetJobDetail(key).Result;
+            var jd = sched.GetJobDetail(key).Result;
             if (jd != null)
                 return jd.JobDataMap;
             return null;
@@ -39,7 +40,7 @@ namespace BusinessLogic.Scheduler
         public static void SetJobDataMap(JobKey key, JobDataMap map)
         {
             var jobDetail = sched.GetJobDetail(key);
-            IJobDetail jd = jobDetail.Result;
+            var jd = jobDetail.Result;
             if (jd == null)
                 return;
             jd.JobDataMap.PutAll(map);
@@ -64,7 +65,7 @@ namespace BusinessLogic.Scheduler
             log.Info("------- Initializing Scheduler -------------------");
             try
             {
-                XTradeConfig config = MainService.thisGlobal.Container.Resolve<XTradeConfig>();
+                var config = MainService.thisGlobal.Container.Resolve<XTradeConfig>();
                 var properties = config.Quartz();
 
                 // First we must get a reference to a scheduler
@@ -83,7 +84,7 @@ namespace BusinessLogic.Scheduler
                 log.Info("IsStarted=" + sched.IsStarted);
                 log.Info("InstanceId=" + sched.SchedulerInstanceId);
                 log.Info("SchedulerName=" + sched.SchedulerName);
-                SchedulerMetaData metadata = sched.GetMetaData().Result;
+                var metadata = sched.GetMetaData().Result;
                 log.Info("IS REMOTE (CLUSTERED )=" + metadata.SchedulerRemote);
                 isClustered = metadata.SchedulerRemote;
 
@@ -102,7 +103,7 @@ namespace BusinessLogic.Scheduler
 
         public static void RunJobSupervisor()
         {
-            IJobDetail job = JobBuilder.Create<JobSupervisor>()
+            var job = JobBuilder.Create<JobSupervisor>()
                 //.OfType<JobSupervisor>()
                 .WithIdentity("JobSupervisor", "DefaultGroup")
                 .WithDescription("Main Job that starts and manages others")
@@ -111,7 +112,7 @@ namespace BusinessLogic.Scheduler
 
             if (!sched.CheckExists(job.Key).Result)
             {
-                ITrigger trigger = TriggerBuilder.Create()
+                var trigger = TriggerBuilder.Create()
                     .WithIdentity("JobSupervisorTrigger")
                     .ForJob(job)
                     .StartNow() // run once now
@@ -125,7 +126,7 @@ namespace BusinessLogic.Scheduler
         {
             var triggers = sched.GetTriggersOfJob(jobKey);
             var trigs = triggers.Result;
-            foreach (ITrigger trigger in trigs) sched.UnscheduleJob(trigger.Key);
+            foreach (var trigger in trigs) sched.UnscheduleJob(trigger.Key);
         }
 
         public void Shutdown()
@@ -140,7 +141,7 @@ namespace BusinessLogic.Scheduler
             if (bInitialized)
             {
                 log.Info("------- Shutting Down ---------------------");
-                SchedulerMetaData metaData = sched.GetMetaData().Result;
+                var metaData = sched.GetMetaData().Result;
                 log.Info(string.Format("Executed {0} jobs.", metaData.NumberOfJobsExecuted));
                 sched.Shutdown(true);
                 log.Info("------- Shutdown Complete -----------------");
@@ -150,7 +151,7 @@ namespace BusinessLogic.Scheduler
         // preffered method, use it
         public static object GetJobProp(IJobExecutionContext context, string prop)
         {
-            IJobDetail detail = context.JobDetail;
+            var detail = context.JobDetail;
             if (detail == null)
                 return null;
             if (detail.JobDataMap == null)
@@ -161,8 +162,8 @@ namespace BusinessLogic.Scheduler
         public static string GetJobProp(string group, string name, string prop)
         {
             var key = new JobKey(name, group);
-            IJobDetail detail = sched.GetJobDetail(key).Result;
-            string res = "";
+            var detail = sched.GetJobDetail(key).Result;
+            var res = "";
             if (detail == null)
                 return res;
             if (detail.JobDataMap == null)
@@ -175,17 +176,15 @@ namespace BusinessLogic.Scheduler
 
         public static void LogJob(IJobExecutionContext context, string strMessage)
         {
-            IJobDetail detailc = context.JobDetail;
+            var detailc = context.JobDetail;
             if (detailc == null)
-                return;
-            if (detailc.JobDataMap == null)
                 return;
             detailc.JobDataMap.Put("log", strMessage);
         }
 
         public static void SetRunning(IJobExecutionContext context, bool value)
         {
-            IJobDetail detailc = context.JobDetail;
+            var detailc = context.JobDetail;
             if (detailc == null)
                 return;
             if (detailc.JobDataMap == null)
@@ -195,12 +194,12 @@ namespace BusinessLogic.Scheduler
 
         public static void SetJobProp(IJobExecutionContext context, string prop, object value)
         {
-            IJobDetail detailc = context.JobDetail;
+            var detailc = context.JobDetail;
             if (detailc == null)
                 return;
             if (detailc.JobDataMap == null)
                 return;
-            string valc = value.ToString();
+            var valc = value.ToString();
             detailc.JobDataMap.Put(prop, valc);
         }
 
@@ -210,20 +209,20 @@ namespace BusinessLogic.Scheduler
             {
                 var key = new JobKey(name, group);
                 // now store value in jobstore dictionary
-                IJobDetail detail = sched.GetJobDetail(key).Result;
+                var detail = sched.GetJobDetail(key).Result;
                 if (detail == null)
                     return;
 
-                ITrigger trigger = GetJobTrigger(group, name);
+                var trigger = GetJobTrigger(group, name);
                 if (trigger != null)
                 {
-                    TriggerKey triggerkey = trigger.Key;
-                    string triggerName = trigger.Key.Name;
-                    string triggerGroup = trigger.Key.Group;
+                    var triggerkey = trigger.Key;
+                    var triggerName = trigger.Key.Name;
+                    var triggerGroup = trigger.Key.Group;
                     //int Priority = trigger.Priority;
 
                     //removeJobTriggers(detail);
-                    var newtrigger = (ICronTrigger)TriggerBuilder.Create()
+                    var newtrigger = (ICronTrigger) TriggerBuilder.Create()
                         .WithIdentity(triggerName, triggerGroup)
                         .WithCronSchedule(cron)
                         //.WithPriority(Priority)
@@ -235,34 +234,34 @@ namespace BusinessLogic.Scheduler
                         var xtrade = container.Resolve<IMainService>();
                         if (xtrade != null)
                         {
-                            TimeZoneInfo tz = xtrade.GetBrokerTimeZone();
+                            var tz = xtrade.GetBrokerTimeZone();
                             newtrigger.TimeZone = tz;
                         }
                     }
 
-                    DateTimeOffset? ft = sched.RescheduleJob(triggerkey, newtrigger).Result;
+                    var ft = sched.RescheduleJob(triggerkey, newtrigger).Result;
                     log.Info(key + " has been rescheduled");
                 }
             }
             catch (Exception e)
             {
-                log.Error("Error" + e.ToString());
+                log.Error("Error" + e);
             }
         }
 
         public static ITrigger GetJobTrigger(string group, string name)
         {
             var trigs = sched.GetTriggersOfJob(new JobKey(name, group)).Result;
-            foreach (ITrigger trigger in trigs) return trigger;
+            foreach (var trigger in trigs) return trigger;
             return null;
         }
 
         public static DateTime? GetJobNextTime(string group, string name)
         {
-            ITrigger trig = GetJobTrigger(group, name);
+            var trig = GetJobTrigger(group, name);
             if (trig == null)
                 return null;
-            DateTimeOffset? next = trig.GetNextFireTimeUtc();
+            var next = trig.GetNextFireTimeUtc();
             if (next.HasValue)
                 return next.Value.DateTime;
             return null;
@@ -270,10 +269,10 @@ namespace BusinessLogic.Scheduler
 
         public static DateTime? GetJobPrevTime(string group, string name)
         {
-            ITrigger trig = GetJobTrigger(group, name);
+            var trig = GetJobTrigger(group, name);
             if (trig == null)
                 return null;
-            DateTimeOffset? next = trig.GetPreviousFireTimeUtc();
+            var next = trig.GetPreviousFireTimeUtc();
             if (next.HasValue)
                 return next.Value.DateTime;
             return null;
@@ -305,12 +304,12 @@ namespace BusinessLogic.Scheduler
                 return list;
             var jobGroups = sched.GetJobGroupNames().Result;
             var runninglist = GetRunningJobs();
-            foreach (string group in jobGroups)
+            foreach (var group in jobGroups)
             {
                 var keys = sched.GetJobKeys(GroupMatcher<JobKey>.GroupEquals(group));
-                foreach (JobKey key in keys.Result)
+                foreach (var key in keys.Result)
                 {
-                    IJobDetail detail = sched.GetJobDetail(key).Result;
+                    var detail = sched.GetJobDetail(key).Result;
                     if (detail == null)
                         continue;
                     var jobview = new ScheduledJobInfo();
@@ -318,16 +317,16 @@ namespace BusinessLogic.Scheduler
                     jobview.Group = detail.Key.Group;
                     if (runninglist.ContainsKey(jobview.Group + jobview.Name))
                         jobview.IsRunning = true;
-                    string strMessage = detail.JobDataMap.GetString("log");
+                    var strMessage = detail.JobDataMap.GetString("log");
                     jobview.Log = strMessage;
                     var trigs = sched.GetTriggersOfJob(detail.Key).Result;
                     if (trigs != null)
-                        foreach (ITrigger trigger in trigs)
+                        foreach (var trigger in trigs)
                         {
-                            DateTimeOffset? prev = trigger.GetPreviousFireTimeUtc();
+                            var prev = trigger.GetPreviousFireTimeUtc();
                             if (prev.HasValue)
                                 jobview.PrevTime = prev.Value.DateTime.ToBinary();
-                            DateTimeOffset? next = trigger.GetNextFireTimeUtc();
+                            var next = trigger.GetNextFireTimeUtc();
                             if (next.HasValue)
                                 jobview.NextTime = next.Value.DateTime.ToBinary();
                             var crontrig = trigger as ICronTrigger;
@@ -348,7 +347,7 @@ namespace BusinessLogic.Scheduler
                 return list;
             var ilist = sched.GetCurrentlyExecutingJobs();
             Task.WaitAll(ilist);
-            foreach (IJobExecutionContext ic in ilist.Result)
+            foreach (var ic in ilist.Result)
             {
                 var view = new ScheduledJobInfo();
                 view.Group = ic.JobDetail.Key.Group;
@@ -366,7 +365,7 @@ namespace BusinessLogic.Scheduler
                 return false;
             var ilist = sched.GetCurrentlyExecutingJobs();
             Task.WaitAll(ilist);
-            foreach (IJobExecutionContext ic in ilist.Result)
+            foreach (var ic in ilist.Result)
                 if (ic.JobDetail.Key.Name == jk.Name && ic.JobDetail.Key.Group == jk.Group)
                     return true;
 

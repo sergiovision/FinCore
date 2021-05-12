@@ -1,13 +1,14 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.Net;
+using Autofac;
 using BusinessLogic.Repo;
 using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
-using System.Net;
 
 namespace FinCore.Controllers
 {
@@ -104,15 +105,14 @@ namespace FinCore.Controllers
             {
                 SignalInfo signalPos = null;
                 if (Ticket > 0)
-                {
-                    signalPos = MainService.CreateSignal(SignalFlags.Terminal, account, EnumSignals.SIGNAL_CLOSE_POSITION, 0);
-                }
+                    signalPos = MainService.CreateSignal(SignalFlags.Terminal, account,
+                        EnumSignals.SIGNAL_CLOSE_POSITION, 0);
                 else
-                {
-                    signalPos = MainService.CreateSignal(SignalFlags.Expert, Magic, EnumSignals.SIGNAL_CLOSE_POSITION, 0);
-                }
+                    signalPos = MainService.CreateSignal(SignalFlags.Expert, Magic, EnumSignals.SIGNAL_CLOSE_POSITION,
+                        0);
                 signalPos.Value = Ticket;
-                signalPos.Data = Magic.ToString();
+                signalPos.SetData(Magic.ToString());
+                //signalPos.Data = Magic.ToString();
                 MainService.PostSignalTo(signalPos);
                 var terminals = MainService.Container.Resolve<ITerminalEvents>();
                 if (terminals != null)
@@ -136,13 +136,14 @@ namespace FinCore.Controllers
         {
             try
             {
-                List<object> mss = (List<object>)MainService.GetObjects(EntitiesEnum.MetaSymbol);
+                var mss = (List<object>) MainService.GetObjects(EntitiesEnum.MetaSymbol);
                 foreach (var m in mss)
                 {
-                    MetaSymbol ms = (MetaSymbol)m;
+                    var ms = (MetaSymbol) m;
                     if (ms.Retired)
                         continue;
-                    SignalInfo signalC = MainService.CreateSignal(SignalFlags.Cluster, ms.Id, EnumSignals.SIGNAL_ACTIVE_ORDERS, 0);
+                    var signalC = MainService.CreateSignal(SignalFlags.Cluster, ms.Id, EnumSignals.SIGNAL_ACTIVE_ORDERS,
+                        0);
                     MainService.PostSignalTo(signalC);
                 }
 

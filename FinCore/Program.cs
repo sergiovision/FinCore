@@ -1,16 +1,16 @@
-using Autofac;
-using Autofac.Extensions.DependencyInjection;
-using BusinessLogic;
-using BusinessObjects;
-using log4net;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Hosting;
 using System;
-using System.Diagnostics;
 using System.Runtime.ExceptionServices;
 using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using BusinessLogic;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using log4net;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Topshelf;
 using Host = Microsoft.Extensions.Hosting.Host;
 
@@ -24,42 +24,44 @@ namespace FinCore
 
         private static void TaskScheduler_UnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            String message = "Caught TaskScheduler_UnobservedTaskException!!!!" + sender.ToString();
+            var message = "Caught TaskScheduler_UnobservedTaskException!!!!" + sender;
             Console.Write(message);
             Log.Error(message);
         }
 
-        static void HanldeGlobalExceptions()
+        private static void HanldeGlobalExceptions()
         {
             TaskScheduler.UnobservedTaskException += TaskScheduler_UnobservedTaskException;
             //Application.ThreadException += new ThreadExceptionEventHandler(Application_ThreadException);
             //Application.SetUnhandledExceptionMode(UnhandledExceptionMode.CatchException);
-            AppDomain.CurrentDomain.UnhandledException += new UnhandledExceptionEventHandler(CurrentDomain_UnhandledException);
+            AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
         [HandleProcessCorruptedStateExceptions]
         [SecurityCritical]
-        static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
+        private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
             if (e != null)
             {
-                Log.Error("CurrentDomain_UnhandledException: " + e.ToString());
+                Log.Error("CurrentDomain_UnhandledException: " + e);
                 if (e.ExceptionObject is Exception o)
                 {
-                    string errMsg = o.ToString();
+                    var errMsg = o.ToString();
                     Console.Write(errMsg);
                     Log.Error(errMsg);
                 }
             }
         }
 
-        static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
+        private static void Application_ThreadException(object sender, ThreadExceptionEventArgs e)
         {
             try
             {
                 Log.Error(e.ToString());
             }
-            catch { }
+            catch
+            {
+            }
         }
 
         [HandleProcessCorruptedStateExceptions]
@@ -75,13 +77,12 @@ namespace FinCore
                 x.SetServiceName(Configuration.ServiceName);
                 x.RunAsLocalSystem();
 
-                x.Service(factory =>
-                {
-                    return QuartzServer.Server;
-                });
+                x.Service(factory => { return QuartzServer.Server; });
             });
-            var exitCode = (int)Convert.ChangeType(rc, rc.GetTypeCode());
-            string msg = string.Format("------------------------------- FinCore Exited with code: (%d) --------------------------------", exitCode);
+            var exitCode = (int) Convert.ChangeType(rc, rc.GetTypeCode());
+            var msg = string.Format(
+                "------------------------------- FinCore Exited with code: (%d) --------------------------------",
+                exitCode);
             Log.Info(msg);
             Environment.ExitCode = exitCode;
         }
@@ -99,10 +100,9 @@ namespace FinCore
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
                     webBuilder
-                    .UseUrls("http://*:" + xtradeConstants.WebBackend_PORT.ToString())
-                    .UseStartup<Startup>();
+                        .UseUrls("http://*:" + xtradeConstants.WebBackend_PORT)
+                        .UseStartup<Startup>();
                 });
         }
-
     }
 }

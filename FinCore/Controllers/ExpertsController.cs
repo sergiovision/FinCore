@@ -1,10 +1,11 @@
-﻿using BusinessObjects;
+﻿using System;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System;
 
 namespace FinCore.Controllers
 {
@@ -21,7 +22,7 @@ namespace FinCore.Controllers
         {
             try
             {
-                string sourceFolder = MainService.GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_MQLSOURCEFOLDER);
+                var sourceFolder = MainService.GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_MQLSOURCEFOLDER);
                 MainService.DeployToTerminals(sourceFolder);
                 return Ok("Deploy Scripts OK");
             }
@@ -29,6 +30,7 @@ namespace FinCore.Controllers
             {
                 log.Error(e.ToString());
             }
+
             return Problem("Failed to deploy");
         }
 
@@ -44,7 +46,7 @@ namespace FinCore.Controllers
             catch (Exception e)
             {
                 log.Error(e.ToString());
-                return Problem($"Deploy to Account: {Id} FAILED: {e.ToString()}");
+                return Problem($"Deploy to Account: {Id} FAILED: {e}");
             }
         }
 
@@ -58,9 +60,11 @@ namespace FinCore.Controllers
             try
             {
                 if (adviser == null)
-                    return Problem("Empty Adviser passed to UpdateAdviserState method!", "Error", StatusCodes.Status417ExpectationFailed);
+                    return Problem("Empty Adviser passed to UpdateAdviserState method!", "Error",
+                        StatusCodes.Status417ExpectationFailed);
 
-                if (MainService.UpdateObject(EntitiesEnum.Adviser, adviser.Id, JsonConvert.SerializeObject(adviser)) > 0)
+                if (MainService.UpdateObject(EntitiesEnum.Adviser, adviser.Id, JsonConvert.SerializeObject(adviser)) >
+                    0)
                     return Ok();
                 return Problem("Failed to update", "Error", StatusCodes.Status417ExpectationFailed);
             }
@@ -71,5 +75,4 @@ namespace FinCore.Controllers
             }
         }
     }
-
 }

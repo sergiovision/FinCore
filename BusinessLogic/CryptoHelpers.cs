@@ -8,9 +8,9 @@ namespace BusinessLogic
     {
         public static string Encode(string value)
         {
-            SHA1 hash = SHA1.Create();
+            var hash = SHA1.Create();
             var encoder = new ASCIIEncoding();
-            byte[] combined = encoder.GetBytes(value ?? "");
+            var combined = encoder.GetBytes(value ?? "");
             return BitConverter.ToString(hash.ComputeHash(combined)).ToLower().Replace("-", "");
         }
     }

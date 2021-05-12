@@ -1,8 +1,7 @@
-﻿namespace BusinessObjects
+﻿namespace BusinessObjects.BusinessObjects
 {
     public class Adviser : Idable
     {
-        public int Id { get; set; }
         public string Name { get; set; }
         public long AccountNumber { get; set; }
         public string Broker { get; set; }
@@ -17,5 +16,6 @@
         public bool Running { get; set; }
         public bool Retired { get; set; }
         public bool IsMaster { get; set; }
+        public int Id { get; set; }
     }
 }

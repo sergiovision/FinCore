@@ -248,13 +248,6 @@
           "control": "GeneralDouble",
           "defaultValue": 1.0,
           "description": "Coeff Break Even in Bricks Number"
-        },
-        { "type": "integer",
-          "name": "PendingOrderStep",
-          "group": "Volume",
-          "control": "GeneralInteger",
-          "defaultValue": 4,
-          "description": "PendingOrderStep"
         }
         ],
         "Renko": [

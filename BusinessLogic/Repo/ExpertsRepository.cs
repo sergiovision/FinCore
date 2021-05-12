@@ -1,8 +1,9 @@
 ﻿//using BusinessLogic.BusinessObjects;
-using BusinessObjects;
-//using Newtonsoft.Json;
-using NHibernate;
+
 using System.Collections.Generic;
+using BusinessLogic.Repo.Domain;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects; //using Newtonsoft.Json;
 
 namespace BusinessLogic.Repo
 {
@@ -10,13 +11,13 @@ namespace BusinessLogic.Repo
     {
         public List<Adviser> GetAdvisers()
         {
-            List<Adviser> results = new List<Adviser>();
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            var results = new List<Adviser>();
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
                 var advisers = Session.Query<DBAdviser>();
                 foreach (var dbadv in advisers)
                 {
-                    Adviser adv = new Adviser();
+                    var adv = new Adviser();
                     if (toDTO(dbadv, ref adv))
                         results.Add(adv);
                 }

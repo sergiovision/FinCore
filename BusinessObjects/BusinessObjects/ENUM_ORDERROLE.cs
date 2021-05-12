@@ -1,4 +1,4 @@
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public enum ENUM_ORDERROLE
     {
@@ -11,5 +11,5 @@ namespace BusinessObjects
         PendingStop,
         LongInvestment,
         ShortInvestment
-    };
+    }
 }

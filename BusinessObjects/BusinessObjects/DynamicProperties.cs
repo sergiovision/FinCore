@@ -1,10 +1,9 @@
-
-
 using System;
 using System.Collections.Generic;
 using System.Drawing;
+using System.Globalization;
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public enum EntitiesEnum
     {
@@ -52,9 +51,10 @@ namespace BusinessObjects
 
     public class DefaultProperties
     {
-        public static Dictionary<string, DynamicProperty> fillProperties(ref Dictionary<string, DynamicProperty> result, EntitiesEnum etype, int id, int objid, string value)
+        public static Dictionary<string, DynamicProperty> fillProperties(ref Dictionary<string, DynamicProperty> result,
+            EntitiesEnum etype, int id, int objid, string value)
         {
-            DynamicProperty p1 = new DynamicProperty()
+            var p1 = new DynamicProperty
             {
                 type = "integer",
                 value = id.ToString()
@@ -63,7 +63,7 @@ namespace BusinessObjects
                 result.Add("ID", p1);
             else
                 result["ID"] = p1;
-            DynamicProperty p2 = new DynamicProperty()
+            var p2 = new DynamicProperty
             {
                 type = "integer",
                 value = objid.ToString()
@@ -72,9 +72,9 @@ namespace BusinessObjects
                 result.Add("ObjectID", p2);
             else
                 result["ObjectID"] = p2;
-            DynamicProperty p3 = new DynamicProperty()
+            var p3 = new DynamicProperty
             {
-                type = "integer",
+                type = "integer"
             };
             return result;
         }
@@ -86,26 +86,25 @@ namespace BusinessObjects
 
         public static Dictionary<string, object> transformProperties(Dictionary<string, DynamicProperty> dbProps)
         {
-            Dictionary<string, object> result = new Dictionary<string, object>();
-            if ((dbProps == null) || (dbProps.Count == 0))
+            var result = new Dictionary<string, object>();
+            if (dbProps == null || dbProps.Count == 0)
                 return result;
             foreach (var prop in dbProps)
-            {
                 switch (prop.Value.type)
                 {
                     case "integer":
                         result.Add(prop.Key, int.Parse(prop.Value.value));
                         break;
                     case "hexinteger":
-                        {
-                            string hexValue = prop.Value.value;
-                            if (hexValue.StartsWith("#"))
-                                hexValue = hexValue.Substring(1);
-                            int value = int.Parse(hexValue, System.Globalization.NumberStyles.HexNumber);
-                            Color c = Color.FromArgb(value);
-                            value = RGBtoInt(c.R, c.G, c.B);
-                            result.Add(prop.Key, value);
-                        }
+                    {
+                        var hexValue = prop.Value.value;
+                        if (hexValue.StartsWith("#"))
+                            hexValue = hexValue.Substring(1);
+                        var value = int.Parse(hexValue, NumberStyles.HexNumber);
+                        var c = Color.FromArgb(value);
+                        value = RGBtoInt(c.R, c.G, c.B);
+                        result.Add(prop.Key, value);
+                    }
                         break;
                     case "double":
                         result.Add(prop.Key, double.Parse(prop.Value.value));
@@ -117,11 +116,8 @@ namespace BusinessObjects
                         result.Add(prop.Key, prop.Value.value);
                         break;
                 }
-            }
+
             return result;
-
         }
-
     }
-
 }

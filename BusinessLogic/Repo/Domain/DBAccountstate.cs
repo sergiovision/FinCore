@@ -1,7 +1,6 @@
 using System;
 
-
-namespace BusinessLogic.Repo
+namespace BusinessLogic.Repo.Domain
 {
     public class DBAccountstate : BaseEntity<DBAccountstate>
     {

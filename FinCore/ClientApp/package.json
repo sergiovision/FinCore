@@ -37,7 +37,6 @@
     "angular-calendar": "^0.28.22",
     "angular2-text-mask": "^9.0.0",
     "bootstrap": "^4.5.3",
-    "chart.js": "2.9.3",
     "core-js": "^3.8.0",
     "date-fns": "^2.21.1",
     "devextreme": "20.2.6",
@@ -80,7 +79,6 @@
     "@types/node": "^12.20.10",
     "caniuse-lite": "^1.0.30001209",
     "codelyzer": "^6.0.0",
-    "fsevents": "^2.2.1",
     "jasmine": "^3.6.3",
     "jasmine-core": "~3.6.0",
     "jasmine-spec-reporter": "~5.0.0",
@@ -105,5 +103,8 @@
   },
   "main": "karma.conf.js",
   "keywords": [],
-  "license": "ISC"
+  "license": "ISC",
+  "optionalDependencies": {
+    "fsevents": "^2.3.2"
+  }
 }

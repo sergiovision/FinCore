@@ -1,12 +1,13 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using Autofac;
 using BusinessLogic.Repo;
 using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 
 namespace FinCore.Controllers
 {
@@ -30,6 +31,7 @@ namespace FinCore.Controllers
             {
                 log.Error(e.ToString());
             }
+
             return null;
         }
 
@@ -49,6 +51,7 @@ namespace FinCore.Controllers
             {
                 log.Error(e.ToString());
             }
+
             return null;
         }
 
@@ -58,7 +61,6 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [ProducesResponseType(StatusCodes.Status417ExpectationFailed)]
         [Route("[action]")]
-
         public ActionResult SaveInstance(DynamicProperties props)
         {
             try
@@ -80,9 +82,5 @@ namespace FinCore.Controllers
                 return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
             }
         }
-
-
-
     }
 }
-

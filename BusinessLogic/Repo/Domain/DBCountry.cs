@@ -1,4 +1,4 @@
-namespace BusinessLogic.Repo
+namespace BusinessLogic.Repo.Domain
 {
     public class DBCountry : BaseEntity<DBCountry>
     {

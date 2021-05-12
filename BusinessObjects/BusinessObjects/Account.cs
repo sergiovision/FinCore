@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public enum AccountType
     {
@@ -15,7 +15,6 @@ namespace BusinessObjects
 
     public class Account : Idable
     {
-        public int Id { get; set; }
         public string Description { get; set; }
         public decimal Balance { get; set; }
         public decimal Equity { get; set; }
@@ -32,5 +31,13 @@ namespace BusinessObjects
         public decimal DailyMaxGain { get; set; }
         public bool StopTrading { get; set; }
         public string StopReason { get; set; }
+        public int Id { get; set; }
+    }
+
+    public class BalanceInfo
+    {
+        public decimal Balance { get; set; }
+        public decimal Equity { get; set; }
+        public long Account { get; set; }
     }
 }

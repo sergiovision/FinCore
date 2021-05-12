@@ -1,14 +1,15 @@
-﻿using Autofac;
-using BusinessLogic.BusinessObjects;
-using BusinessLogic.Repo;
-using BusinessObjects;
-using Quartz;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Autofac;
+using BusinessLogic.BusinessObjects;
+using BusinessLogic.Repo;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
+using Quartz;
 
 namespace BusinessLogic.Jobs
 {
@@ -34,23 +35,23 @@ namespace BusinessLogic.Jobs
             {
                 thisJobDetail = context.JobDetail;
                 sched = context.Scheduler;
-                if (MainService.thisGlobal.IsDebug())
+                if (Utils.IsDebug())
                     log.Info("TerminalMonitoringJob: ------- Monitor Terminals -------");
 
-                DataService dataService = MainService.thisGlobal.Container.Resolve<DataService>();
+                var dataService = MainService.thisGlobal.Container.Resolve<DataService>();
 
-                IEnumerable<object> results = (IEnumerable<object>)dataService.GetObjects(EntitiesEnum.Terminal);
+                var results = (IEnumerable<object>) dataService.GetObjects(EntitiesEnum.Terminal);
 
-                results = results.Where(x => ((x as Terminal).Retired == false) &&
-                                ((x as Terminal).Stopped == false));
+                results = results.Where(x => (x as Terminal).Retired == false &&
+                                             (x as Terminal).Stopped == false);
                 foreach (var resRow in results)
                 {
                     var oPath = (resRow as Terminal).FullPath;
                     if (oPath != null)
                     {
                         strPath = oPath;
-                        string appName = Path.GetFileNameWithoutExtension(strPath);
-                        Process[] processlist = Process.GetProcessesByName(appName);
+                        var appName = Path.GetFileNameWithoutExtension(strPath);
+                        var processlist = Process.GetProcessesByName(appName);
                         if (processlist == null || processlist.Length == 0)
                         {
                             procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
@@ -59,7 +60,7 @@ namespace BusinessLogic.Jobs
                         {
                             var procL = processlist.Where(d =>
                                 d.MainModule.FileName.Equals(strPath, StringComparison.InvariantCultureIgnoreCase));
-                            if (procL == null || procL.Count() == 0) procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
+                            if (Utils.HasAny(procL)) procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
                         }
                     }
                 }

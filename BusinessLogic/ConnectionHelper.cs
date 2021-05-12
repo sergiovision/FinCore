@@ -1,12 +1,13 @@
-﻿using Autofac;
+﻿using System.IO;
+using System.Net;
+using Autofac;
 using BusinessLogic.BusinessObjects;
 using BusinessLogic.Repo;
+using BusinessLogic.Repo.Domain;
 using BusinessObjects;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
-using System.IO;
-using System.Net;
 
 namespace BusinessLogic
 {
@@ -27,7 +28,7 @@ namespace BusinessLogic
             if (_sessionFactory == null)
             {
                 InitConfig();
-                string connection = config.ConnectionString();
+                var connection = config.ConnectionString();
 
                 if (config.ConnectionStringName().Contains("SQLite"))
                 {
@@ -44,8 +45,8 @@ namespace BusinessLogic
                         .Mappings(m => m.FluentMappings.AddFromAssemblyOf<DBAdviser>())
                         .BuildSessionFactory();
                 }
-
             }
+
             lock (lockObject) // Session is not thread safe thus - should be locked.
             {
                 return _sessionFactory.OpenSession();
@@ -55,21 +56,21 @@ namespace BusinessLogic
         private static string GetComputer_InternetIP()
         {
             // check IP using DynDNS's service
-            WebRequest request = WebRequest.Create("http://checkip.dyndns.org");
+            var request = WebRequest.Create("http://checkip.dyndns.org");
             // IMPORTANT: set Proxy to null, to drastically INCREASE the speed of request
             request.Proxy = null;
-            WebResponse response = request.GetResponse();
+            var response = request.GetResponse();
             var stream = new StreamReader(response.GetResponseStream());
 
 
             // read complete response
-            string html = stream.ReadToEnd();
+            var html = stream.ReadToEnd();
 
             // replace everything and keep only IP
-            string ipAddress = html.Replace(
+            var ipAddress = html.Replace(
                     "<html><head><title>Current IP Check</title></head><body>Current IP Address: ", string.Empty)
                 .Replace("</body></html>", string.Empty);
-            char[] trim = { '\r', '\n' };
+            char[] trim = {'\r', '\n'};
             ipAddress = ipAddress.TrimEnd(trim);
             return ipAddress;
         }

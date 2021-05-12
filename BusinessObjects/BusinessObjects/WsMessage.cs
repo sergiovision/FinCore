@@ -1,4 +1,4 @@
-﻿namespace BusinessObjects
+﻿namespace BusinessObjects.BusinessObjects
 {
     public enum WsMessageType
     {
@@ -22,6 +22,5 @@
         public virtual long chartId { get; set; }
         public virtual string From { get; set; }
         public virtual string Message { get; set; }
-
     }
 }

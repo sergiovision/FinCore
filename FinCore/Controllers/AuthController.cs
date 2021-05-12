@@ -1,13 +1,14 @@
-﻿using Autofac;
+﻿using System;
+using System.Collections.Generic;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Autofac;
 using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 
 namespace FinCore.Controllers
 {
@@ -45,11 +46,8 @@ namespace FinCore.Controllers
         [HttpPost("token")]
         public IActionResult GenerateToken(LoginInfo loginInfo)
         {
-            Person result = MainService.LoginPerson(loginInfo.UserName, loginInfo.Password);
-            if (result == null)
-            {
-                return Unauthorized("Username or password is wrong!");
-            }
+            var result = MainService.LoginPerson(loginInfo.UserName, loginInfo.Password);
+            if (result == null) return Unauthorized("Username or password is wrong!");
 
             var claims = new List<Claim>();
 
@@ -60,17 +58,17 @@ namespace FinCore.Controllers
             var key = new SymmetricSecurityKey(_jwtSettings.Key);
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
             var token = new JwtSecurityToken(
-                    issuer: _jwtSettings.Issuer,
-                    audience: _jwtSettings.Audience,
-                    claims: claims,
-                    expires: DateTime.Now.AddHours(xtradeConstants.TOKEN_LIFETIME_HOURS),
-                    signingCredentials: creds
-                );
+                _jwtSettings.Issuer,
+                _jwtSettings.Audience,
+                claims,
+                expires: DateTime.Now.AddHours(xtradeConstants.TOKEN_LIFETIME_HOURS),
+                signingCredentials: creds
+            );
 
             var user = new UserToken();
             user.access_token = new JwtSecurityTokenHandler().WriteToken(token);
             user.token_type = "Bearer";
-            user.expires_in = (int)TimeSpan.FromHours(xtradeConstants.TOKEN_LIFETIME_HOURS).TotalSeconds;
+            user.expires_in = (int) TimeSpan.FromHours(xtradeConstants.TOKEN_LIFETIME_HOURS).TotalSeconds;
             user.userName = loginInfo.UserName;
             return Ok(user);
         }
@@ -92,6 +90,5 @@ namespace FinCore.Controllers
                 return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
             }
         }
-
     }
 }

@@ -1,4 +1,4 @@
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
     public class DealInfo
     {

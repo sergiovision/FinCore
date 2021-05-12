@@ -1,6 +1,8 @@
-﻿using BusinessObjects;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
+using BusinessLogic.Repo.Domain;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 
 namespace BusinessLogic.Repo
 {
@@ -17,7 +19,7 @@ namespace BusinessLogic.Repo
         {
             if (persons.ContainsKey(userModel.Mail)) throw new Exception($"User {userModel.Mail} already exists!!!");
 
-            DBPerson person = new DBPerson
+            var person = new DBPerson
             {
                 Mail = userModel.Mail,
                 Credential = userModel.Credential,
@@ -49,7 +51,7 @@ namespace BusinessLogic.Repo
 
         private Person toDTO(DBPerson result)
         {
-            Person person = new Person();
+            var person = new Person();
             person.Id = result.Id;
             person.Languageid = result.Languageid;
             person.Mail = result.Mail;

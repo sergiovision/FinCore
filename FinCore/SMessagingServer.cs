@@ -1,24 +1,26 @@
-﻿using Autofac;
+﻿using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using Autofac;
 using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using log4net;
 using NetCoreServer;
 using Newtonsoft.Json;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
 
 namespace FinCore
 {
-    class SMessageSession : WssSession
+    internal class SMessageSession : WssSession
     {
-        private ILog log;
-        private ISignalHandler handler;
-        private IMessagingServer mServer;
+        private readonly ISignalHandler handler;
+        private readonly ILog log;
+        private readonly IMessagingServer mServer;
+
         public SMessageSession(WssServer server, ILog l, ISignalHandler signalHandler) : base(server)
         {
             log = l;
             handler = signalHandler;
-            mServer = (IMessagingServer)server;
+            mServer = (IMessagingServer) server;
         }
 
         public override void OnWsConnected(HttpRequest request)
@@ -33,15 +35,12 @@ namespace FinCore
 
         public override void OnWsReceived(byte[] buffer, long offset, long size)
         {
-            string message = Encoding.UTF8.GetString(buffer, (int)offset, (int)size);
+            var message = Encoding.UTF8.GetString(buffer, (int) offset, (int) size);
 #if DEBUG
             log.Debug("Incoming: " + message);
 #endif
-            WsMessage wsMessage = JsonConvert.DeserializeObject<WsMessage>(message);
-            if (wsMessage != null)
-            {
-                handler.ProcessMessage(wsMessage, mServer);
-            }
+            var wsMessage = JsonConvert.DeserializeObject<WsMessage>(message);
+            if (wsMessage != null) handler.ProcessMessage(wsMessage, mServer);
         }
 
         protected override void OnError(SocketError error)
@@ -55,13 +54,15 @@ namespace FinCore
         private static readonly ILog log = LogManager.GetLogger(typeof(SMessagingServer));
 
         public SMessagingServer(SslContext ctx, IPAddress address, int port)
-            : base(ctx, address, port) { }
+            : base(ctx, address, port)
+        {
+        }
 
         protected override SslSession CreateSession()
         {
             if (Program.Container == null)
                 return null;
-            ISignalHandler handler = Program.Container.Resolve<ISignalHandler>();
+            var handler = Program.Container.Resolve<ISignalHandler>();
             return new SMessageSession(this, log, handler);
         }
 
@@ -70,5 +71,4 @@ namespace FinCore
             log.Error($"WebSocket server caught an error with code {error}");
         }
     }
-
 }

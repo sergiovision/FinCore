@@ -1,9 +1,10 @@
+using System;
+using System.Threading.Tasks;
 using Autofac;
 using BusinessLogic.BusinessObjects;
 using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Quartz;
-using System;
-using System.Threading.Tasks;
 
 namespace BusinessLogic.Scheduler
 {
@@ -32,15 +33,15 @@ namespace BusinessLogic.Scheduler
         public bool Begin(IJobExecutionContext context)
         {
             runTime = SystemTime.UtcNow();
-            JobKey key = context.JobDetail.Key;
+            var key = context.JobDetail.Key;
             return false;
         }
 
         public async void Exit(IJobExecutionContext context)
         {
-            DateTimeOffset now = SystemTime.UtcNow();
-            TimeSpan duration = now - runTime;
-            strMessage += ". For " + (long)duration.TotalMilliseconds + " ms. At " +
+            var now = SystemTime.UtcNow();
+            var duration = now - runTime;
+            strMessage += ". For " + (long) duration.TotalMilliseconds + " ms. At " +
                           now.ToString(xtradeConstants.MTDATETIMEFORMAT) + " GMT";
             SchedulerService.LogJob(context, strMessage);
             if (log != null && !string.IsNullOrEmpty(strMessage))

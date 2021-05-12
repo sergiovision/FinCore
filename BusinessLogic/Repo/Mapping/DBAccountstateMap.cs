@@ -1,6 +1,7 @@
+using BusinessLogic.Repo.Domain;
 using FluentNHibernate.Mapping;
 
-namespace BusinessLogic.Repo
+namespace BusinessLogic.Repo.Mapping
 {
     public class DBAccountstateMap : ClassMap<DBAccountstate>
     {

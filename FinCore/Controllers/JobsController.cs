@@ -1,10 +1,11 @@
-﻿using BusinessObjects;
+﻿using System;
+using System.Collections.Generic;
+using BusinessObjects;
+using BusinessObjects.BusinessObjects;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
 
 namespace FinCore.Controllers
 {
@@ -19,9 +20,9 @@ namespace FinCore.Controllers
         {
             try
             {
-                List<ScheduledJobView> jobs = new List<ScheduledJobView>();
+                var jobs = new List<ScheduledJobView>();
                 var list = MainService.GetAllJobsList();
-                int i = 1;
+                var i = 1;
                 foreach (var job in list)
                     jobs.Add(CreateJobView(i++, job));
                 return jobs;
@@ -41,9 +42,9 @@ namespace FinCore.Controllers
         {
             try
             {
-                List<ScheduledJobView> jobs = new List<ScheduledJobView>();
+                var jobs = new List<ScheduledJobView>();
                 var list = MainService.GetRunningJobs();
-                int i = 1;
+                var i = 1;
                 foreach (var job in list)
                     jobs.Add(CreateJobView(i++, job.Value));
                 return jobs;
@@ -81,7 +82,8 @@ namespace FinCore.Controllers
             try
             {
                 if (query == null)
-                    return Problem("Empty Params passed to RunJob method!", "Error", StatusCodes.Status500InternalServerError);
+                    return Problem("Empty Params passed to RunJob method!", "Error",
+                        StatusCodes.Status500InternalServerError);
 
                 MainService.RunJobNow(query.Group, query.Name);
                 return Ok($"Job {query.Name} Launched!");
@@ -103,7 +105,8 @@ namespace FinCore.Controllers
             try
             {
                 if (query == null)
-                    return Problem("Empty Params passed to RunJob method!", "Error", StatusCodes.Status500InternalServerError);
+                    return Problem("Empty Params passed to RunJob method!", "Error",
+                        StatusCodes.Status500InternalServerError);
 
                 MainService.StopJobNow(query.Group, query.Name);
                 return Ok($"Job {query.Name} Stop Request Sent!");

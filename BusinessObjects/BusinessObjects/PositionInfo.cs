@@ -1,8 +1,7 @@
 ﻿using System;
 
-namespace BusinessObjects
+namespace BusinessObjects.BusinessObjects
 {
-
     public class PositionInfo
     {
         private static readonly Random random = new Random();
@@ -22,22 +21,27 @@ namespace BusinessObjects
         public double contractSize { get; set; }
         public string cur { get; set; }
         public double Value { get; set; }
+        
+        public double Vsl { get; set; }
+        public double Realsl { get; set; }
+        public double Vtp { get; set; }
+        public double Realtp { get; set; }
 
         public void Update()
         {
-            double change = GenerateChange();
-            double newProfit = change;
+            var change = GenerateChange();
+            var newProfit = change;
             Profit = newProfit;
         }
 
         public double calculateValue()
         {
-            return this.Lots * this.contractSize * this.Openprice;
+            return Lots * contractSize * Openprice;
         }
 
         private double GenerateChange()
         {
-            return (double)random.Next(-200, 200) / 10000;
+            return (double) random.Next(-200, 200) / 10000;
         }
     }
 }
