@@ -132,6 +132,14 @@ FinCore folders structure:
   `netsh interface portproxy add v4tov4 listenport=2022 listenaddress=127.0.0.1 connectport=2022 connectaddress='docker container address'`
 
   After that all experts in Metatrader will use be able to synchronize with FinCore app running in Docker or on another machine/OS.
+  
+  To expose Fincore application through NGINX webserver add the following text in nginx.conf file under server { } section : 
+    location ^~ /fincore/ {
+        proxy_pass      http://127.0.0.1:2020/;
+        proxy_set_header Host $host;
+        proxy_set_header   X-Real-IP        $remote_addr;
+        proxy_set_header   X-Forwarded-For  $proxy_add_x_forwarded_for;
+    } 
 
   Default login for fincore_empty file is: <br>mail: `test@test.com`<br>
   password: `test`
