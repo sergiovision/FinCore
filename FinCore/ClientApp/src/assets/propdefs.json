@@ -659,12 +659,16 @@
           "defaultValue": 1,
           "items": [ {"ID":1, "name": "USD"}, {"ID": 2,"name": "EUR" }, {"ID":3, "name": "GBP"},
             {"ID":4, "name": "AUD"}, {"ID":5, "name": "CHF"},{"ID":6, "name": "CAD"},
-            {"ID":11, "name": "MXN"},{"ID":18, "name": "BTC"},{"ID":19, "name": "ETH"},{"ID":20, "name": "XMR.jt"},
+            {"ID":11, "name": "MXN"},{"ID":18, "name": "BTC"},
+            {"ID":19, "name": "ETH"},{"ID":20, "name": "XMR"},
             {"ID":21, "name": "RUB"},{"ID":22, "name": "BYN"},
-            {"ID":23, "name": "XAU"} ],
+            {"ID":23, "name": "XAU"},{"ID":24, "name": "XRP"},
+            {"ID":25, "name": "DOG"},{"ID":26, "name": "BRL"},
+            {"ID":27, "name": "AED"},{"ID":28, "name": "TRY"} ],
           "description": "Currency"
         },
         {
+          "type": "integer",
           "type": "integer",
            "name": "Number",
            "group": "System",
@@ -707,7 +711,15 @@
           "group": "System",
           "control": "LabelText",
           "defaultValue": "",
-          "description": "Property Name"
+          "description": "MetaSymbol"
+        },
+        {
+          "type": "string",
+          "name": "Symbol",
+          "group": "System",
+          "control": "TextBox",
+          "defaultValue": "",
+          "description": "Symbol"
         },
         {
           "type": "string",
@@ -850,9 +862,11 @@
           "group": "System",
           "control": "GenericEnum",
           "defaultValue": "0",
-          "items": [ {"ID":"RegularTrail", "name": "RegularTrail"}, {"ID": "GridHead","name": "GridHead" }, {"ID": "GridTail","name": "GridTail" },
+          "items": [ {"ID":"RegularTrail", "name": "RegularTrail"},
             {"ID": "ShouldBeClosed","name": "ShouldBeClosed" }, {"ID": "History","name": "History" }, {"ID": "PendingLimit","name": "PendingLimit" },
-            {"ID": "PendingStop","name": "PendingStop" }, {"ID": "LongInvestment","name": "LongInvestment" }, {"ID": "ShortInvestment","name": "ShortInvestment" } ],
+            {"ID": "PendingStop","name": "PendingStop" }, {"ID": "LongInvestment","name": "LongInvestment" }, {"ID": "ShortInvestment","name": "ShortInvestment" },
+            {"ID": "RealPendingLimit","name": "RealPendingLimit" }, {"ID": "RealPendingStop","name": "RealPendingStop" }
+          ],
           "description": "Account type"
         },
         {
@@ -862,6 +876,14 @@
           "control": "LabelText",
           "defaultValue": "",
           "description": "AccountName"
+        },
+        {
+          "type": "string",
+          "name": "Expiration",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "",
+          "description": "Expiration time"
         },
         {
           "type": "string",
@@ -878,6 +900,62 @@
           "control": "LabelInteger",
           "defaultValue": "",
           "description": "Lots"
+        },
+        {
+          "type": "string",
+          "name": "contractSize",
+          "group": "System",
+          "control": "LabelInteger",
+          "defaultValue": "",
+          "description": "contractSize"
+        },
+        {
+          "type": "double",
+          "name": "Vsl",
+          "group": "System",
+          "control": "GeneralDouble",
+          "defaultValue": "0",
+          "description": "Virtual StopLoss"
+        },
+        {
+          "type": "double",
+          "name": "Realsl",
+          "group": "System",
+          "control": "GeneralDouble",
+          "defaultValue": "0",
+          "description": "Real StopLoss"
+        },
+        {
+          "type": "double",
+          "name": "Vtp",
+          "group": "System",
+          "control": "GeneralDouble",
+          "defaultValue": "0",
+          "description": "Virtual TakProfit"
+        },
+        {
+          "type": "double",
+          "name": "Realtp",
+          "group": "System",
+          "control": "GeneralDouble",
+          "defaultValue": "0",
+          "description": "Real TakProfit"
+        },
+        {
+          "type": "double",
+          "name": "Swap",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "0",
+          "description": "Swap"
+        },
+        {
+          "type": "double",
+          "name": "Commission",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "0",
+          "description": "Commission"
         }
 
       ]

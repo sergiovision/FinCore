@@ -26,7 +26,10 @@ namespace BusinessObjects.BusinessObjects
         public double Realsl { get; set; }
         public double Vtp { get; set; }
         public double Realtp { get; set; }
-
+        public double Swap { get; set; }
+        public double Commission { get; set; }
+        public string Expiration { get; set; } 
+        
         public void Update()
         {
             var change = GenerateChange();

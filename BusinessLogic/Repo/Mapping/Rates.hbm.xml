@@ -5,6 +5,9 @@
     <many-to-one name="Metasymbol">
       <column name="MetaSymbolId" sql-type="int(10)" not-null="true" />
     </many-to-one>
+    <property name="Symbol">
+      <column name="Symbol" sql-type="varchar(64)" not-null="false" />
+    </property>
     <property name="Ratebid">
       <column name="Ratebid" sql-type="decimal(19,8)" not-null="true" />
     </property>

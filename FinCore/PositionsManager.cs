@@ -258,18 +258,20 @@ namespace FinCore
 
         public List<DealInfo> GetTodayDeals()
         {
-            var xtrade = Program.Container.Resolve<IMainService>();
             if (xtrade == null)
                 return null;
             var deals = xtrade.TodayDeals();
-            if (deals != null)
+            if (Utils.HasAny(deals))
                 foreach (var deal in deals)
                 {
                     if (todayDeals.ContainsKey(deal.Ticket))
                         continue;
                     var currency = terminals[deal.Account].Currency;
                     deal.Profit = (double) xtrade.ConvertToUSD(new decimal(deal.Profit), currency);
-                    var IsDemo = terminals[deal.Account].Demo;
+                    if (deal.Commission != 0)
+                        deal.Commission = (double)xtrade.ConvertToUSD(new decimal(deal.Commission), currency);
+                    if (deal.Swap != 0)
+                       deal.Swap = (double)xtrade.ConvertToUSD(new decimal(deal.Swap), currency);
                     todayDeals.Add(deal.Ticket, deal);
                 }
 
@@ -278,9 +280,9 @@ namespace FinCore
             foreach (var val in todayDeals)
             {
                 var time = DateTime.Parse(val.Value.CloseTime);
-                if (now.DayOfYear != time.DayOfYear) toDelete.Add(val.Key);
+                if (!Utils.IsSameDay(time, now))
+                    toDelete.Add(val.Key);
             }
-
             foreach (var val in toDelete) todayDeals.Remove(val);
             return todayDeals.Values.OrderByDescending(x => x.CloseTime).ToList();
         }
@@ -428,19 +430,20 @@ namespace FinCore
         {
             var dow = DateTime.Now.DayOfWeek;
             // || (dow == DayOfWeek.Wednesday)
-            if (dow == DayOfWeek.Sunday || dow == DayOfWeek.Saturday)
-            {
-                acc.StopReason = "Today is non trading day of the week: " + dow + "!!! RELAX!";
+            //if (dow == DayOfWeek.Sunday || dow == DayOfWeek.Saturday)
+            //{
+            //    acc.StopReason = "Today is non trading day of the week: " + dow + "!!! RELAX!";
+            //    acc.StopTrading = true;
+            //    return;
+            //}
+
+            //var allowedLoss = todayStat.RISK_PER_DAY * acc.Balance;
+            var startBalance = acc.Balance; //allowedLoss +
+            if (startBalance <= 0) {
+                acc.StopReason = string.Format("Account [{0}] has zero balance!", acc.Number);
                 acc.StopTrading = true;
                 return;
             }
-
-            var allowedLoss = todayStat.RISK_PER_DAY * acc.Balance;
-            var startBalance = acc.Balance; //allowedLoss +
-            if (startBalance <= 0)
-                //acc.StopReason = string.Format("Account [{0}] has zero balance!", acc.Number);
-                //acc.StopTrading = true;
-                return;
             /* if (acc.DailyProfit < 0)
             {
                 decimal currentDailyRisk = Math.Abs(acc.DailyProfit) / startBalance;

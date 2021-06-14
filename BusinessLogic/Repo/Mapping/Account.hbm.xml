@@ -21,10 +21,10 @@
       <column name="Description" sql-type="varchar(256)" not-null="false" />
     </property>
     <property name="Balance">
-      <column name="Balance" sql-type="decimal(10,2)" not-null="false" />
+      <column name="Balance" sql-type="decimal(12,6)" not-null="false" />
     </property>
     <property name="Equity">
-      <column name="Equity" sql-type="decimal(10,2)" not-null="false" />
+      <column name="Equity" sql-type="decimal(12,6)" not-null="false" />
     </property>
     <property name="Lastupdate">
       <column name="LastUpdate" sql-type="datetime" not-null="false" />

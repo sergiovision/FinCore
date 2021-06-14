@@ -20,7 +20,7 @@
 
     <dxi-column dataField="Role" caption="Role" [allowSorting]="true" groupIndex="0" sortOrder="desc"></dxi-column>
 
-    <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolCellTemplate">
+    <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolCellTemplate" sortOrder="asc">
       <div *dxTemplate="let cell of 'symbolCellTemplate'" [class.inc]="cell.data.Type === 0" [class.dec]="cell.data.Type === 1">
         <span class="arrow"></span>
         <a [href]="this.deals.externChartURL(cell.value)" target="_blank" >
@@ -76,6 +76,8 @@
     <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolDealCellTemplate">
     </dxi-column>
     <dxi-column dataField="Lots" alignment="left" format="#0.##" [width]="120" [hidingPriority]="2"></dxi-column>
+    <dxi-column dataField="Commission" caption="Commission" alignment="left" format="#0.####" [width]="100" [hidingPriority]="2"></dxi-column>
+    <dxi-column dataField="Swap" caption="Swap" alignment="left" format="#0.####" [width]="80" [hidingPriority]="2"></dxi-column>
     <dxi-column dataField="Profit" [allowSorting]="true" [width]="120" format="#0.##"></dxi-column>
 
     <div *dxTemplate="let cell of 'symbolDealCellTemplate'" [class.inc]="cell.data.Type === 1"

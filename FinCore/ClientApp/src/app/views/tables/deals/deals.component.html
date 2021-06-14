@@ -25,9 +25,10 @@
       </div>
       <dxo-header-filter [allowSearch]="true"></dxo-header-filter>
     </dxi-column>
-    <dxi-column dataField="Lots" format="#0.##" [width]="120" [hidingPriority]="2"></dxi-column>
-    <dxi-column dataField="Profit" [allowSorting]="true" [width]="120" format="#0.##"></dxi-column>
-
+    <dxi-column dataField="Lots" format="#0.####" [width]="120" [hidingPriority]="2"></dxi-column>
+    <dxi-column dataField="Commission" caption="Commission" [allowSorting]="false" [width]="100" format="#0.######"></dxi-column>
+    <dxi-column dataField="SwapValue" caption="Swap" [allowSorting]="false" [width]="80" format="#0.######"></dxi-column>
+    <dxi-column dataField="Profit" [allowSorting]="true" [width]="120" format="#0.######"></dxi-column>
     <dxo-summary>
       <dxi-total-item
           column="Ticket"

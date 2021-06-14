@@ -9,7 +9,7 @@
       <column name="Date" sql-type="datetime" not-null="true" />
     </property>
     <property name="Balance">
-      <column name="Balance" sql-type="decimal(10,2)" not-null="true" />
+      <column name="Balance" sql-type="decimal(12,6)" not-null="true" />
     </property>
     <property name="Comment">
       <column name="Comment" sql-type="varchar(4096)" not-null="false" />

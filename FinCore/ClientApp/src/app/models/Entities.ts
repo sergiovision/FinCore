@@ -140,7 +140,9 @@ export class Terminal {
     OpenTime: Date;
     CloseTime: Date;
     Comment: string;
-  }
+    SwapValue: number;
+    Commission: number;
+}
 
   export class PositionInfo {
     set Id(val: number) {
@@ -169,7 +171,10 @@ export class Terminal {
     Realsl: number;
     Vtp: number;
     Realtp: number;
-// calcValue(): number {
+    Swap: number;
+    Commission: number;
+    Expiration: Date;
+    // calcValue(): number {
     //   return this.Lots * this.contractSize * this.Openprice + this.Profit;
     // }
   }
@@ -414,15 +419,16 @@ export class SymbolS {
 export class Rates {
     Id: number;
     MetaSymbol: string;
+    Symbol: string;
     C1: string;
     C2: string;
     Ratebid: number;
     Rateask: number;
     Lastupdate: Date;
     Retired: false;
-
     createNew(): Rates {
       this.MetaSymbol = 'BTCUSD';
+      this.Symbol = 'BTCUSD';
       this.C1 = 'BTC';
       this.C2 = 'USD';
       this.Ratebid = 1;

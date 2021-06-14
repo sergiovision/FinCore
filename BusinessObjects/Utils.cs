@@ -31,7 +31,12 @@ namespace BusinessObjects
                 return false;
             return true;
         }
-        
+
+        public static bool IsSameDay(DateTime d1, DateTime d2)
+        {
+            return d1.DayOfYear == d2.DayOfYear && d2.Year == d1.Year;
+        }
+
         public  static List<T> ExtractList<T>(string dataStr)
         {
             List<T> positions = null;

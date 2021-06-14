@@ -147,7 +147,7 @@ namespace BusinessLogic.Repo
                 {
                     var deals = Session.Query<DBDeals>().OrderByDescending(x => x.Closetime);
                     foreach (var dbd in deals)
-                        if (isSameDay(dbd.Closetime.Value, now))
+                        if (Utils.IsSameDay(dbd.Closetime.Value, now))
                             result.Add(toDTO(dbd));
                 }
             }
@@ -164,7 +164,7 @@ namespace BusinessLogic.Repo
             using (var Session = ConnectionHelper.CreateNewSession())
             {
                 var terms = Session.Query<DBTerminal>().Where(x => x.Accountnumber == AccountNumber);
-                if (terms == null || terms.Count() <= 0)
+                if (!Utils.HasAny(terms))
                     return;
                 var terminal = terms.FirstOrDefault();
                 if (terminal == null)
@@ -246,9 +246,7 @@ namespace BusinessLogic.Repo
 
         public void SaveDeals(List<DealInfo> deals)
         {
-            if (deals == null)
-                return;
-            if (deals.Count() <= 0)
+            if (!Utils.HasAny(deals))
                 return;
             try
             {
@@ -288,7 +286,7 @@ namespace BusinessLogic.Repo
                                         dbDeal.Orderid = (int) deal.OrderId;
                                         dbDeal.Profit = (decimal) deal.Profit;
                                         dbDeal.Price = (decimal) deal.ClosePrice;
-                                        dbDeal.Swap = (decimal) deal.SwapValue;
+                                        dbDeal.Swap = (decimal) deal.Swap;
                                         dbDeal.Typ = deal.Type;
                                         dbDeal.Volume = (decimal) deal.Lots;
                                         Session.Save(dbDeal);
@@ -325,7 +323,7 @@ namespace BusinessLogic.Repo
                     var dbrates = Session.Query<DBRates>();
                     foreach (var rate in dbrates)
                     {
-                        var symbolName = rate.Metasymbol.Name;
+                        var symbolName = rate.Symbol;  // rate.Metasymbol.Name; change to active chart symbol
                         var currentRate = rInfo.FirstOrDefault(d => d.Symbol.CompareTo(symbolName) == 0);
                         if (currentRate == null)
                             continue;
@@ -348,10 +346,6 @@ namespace BusinessLogic.Repo
             }
         }
 
-        public bool isSameDay(DateTime d1, DateTime d2)
-        {
-            return d1.DayOfYear == d2.DayOfYear && d2.Year == d1.Year;
-        }
 
         public List<Asset> AssetsDistribution(int type)
         {
@@ -626,7 +620,7 @@ namespace BusinessLogic.Repo
         {
             try
             {
-                if (crates.Count() > 0 && !IsReread)
+                if (Utils.HasAny(crates) && !IsReread)
                     return crates;
                 using (var Session = ConnectionHelper.CreateNewSession())
                 {
@@ -642,7 +636,6 @@ namespace BusinessLogic.Repo
             {
                 log.Error("Error: GetRates: " + e);
             }
-
             return crates;
         }
 
@@ -716,7 +709,7 @@ namespace BusinessLogic.Repo
                 result.AccountName = deal.Terminal.Broker;
             }
 
-            result.SwapValue = (double) deal.Swap;
+            result.Swap = (double) deal.Swap;
             if (deal.Symbol != null)
                 result.Symbol = deal.Symbol.Name;
             if (deal.Orderid.HasValue)
@@ -729,6 +722,7 @@ namespace BusinessLogic.Repo
         {
             var result = new Rates();
             result.MetaSymbol = rates.Metasymbol.Name;
+            result.Symbol = rates.Symbol;
             result.C1 = rates.Metasymbol.C1;
             result.C2 = rates.Metasymbol.C2;
             result.Ratebid = rates.Ratebid;

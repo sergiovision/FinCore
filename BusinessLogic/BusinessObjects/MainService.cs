@@ -132,10 +132,12 @@ namespace BusinessLogic.BusinessObjects
             var list = data.GetRates(false);
             foreach (var rate in list)
             {
-                stringBuilder.Append(rate.Key);
-                stringBuilder.Append(",");
+                if (!string.IsNullOrEmpty(rate.Value.Symbol))
+                {
+                    stringBuilder.Append(rate.Value.Symbol);
+                    stringBuilder.Append(',');
+                }
             }
-
             return stringBuilder.ToString();
         }
 
@@ -1125,7 +1127,7 @@ namespace BusinessLogic.BusinessObjects
 
         public void UpdateRates(List<RatesInfo> rates)
         {
-            if (rates == null || rates.Count <= 0)
+            if (!Utils.HasAny(rates))
                 return;
             data.UpdateRates(rates);
         }

@@ -24,16 +24,16 @@
       <column name="Typ" sql-type="tinyint(6)" not-null="true" />
     </property>
     <property name="Volume">
-      <column name="Volume" sql-type="decimal(11,2)" not-null="false" />
+      <column name="Volume" sql-type="decimal(12,4)" not-null="false" />
     </property>
     <property name="Price">
-      <column name="Price" sql-type="decimal(18,8)" not-null="false" />
+      <column name="Price" sql-type="decimal(12,6)" not-null="false" />
     </property>
     <property name="Sl">
-      <column name="SL" sql-type="decimal(18,8)" not-null="false" />
+      <column name="SL" sql-type="decimal(12,6)" not-null="false" />
     </property>
     <property name="Tp">
-      <column name="TP" sql-type="decimal(18,8)" not-null="false" />
+      <column name="TP" sql-type="decimal(12,6)" not-null="false" />
     </property>
     <property name="Closetime">
       <column name="Closetime" sql-type="datetime" not-null="false" />
@@ -42,13 +42,13 @@
       <column name="comment" sql-type="varchar(256)" not-null="false" />
     </property>
     <property name="Commission">
-      <column name="Commission" sql-type="decimal(11,2)" not-null="false" />
+      <column name="Commission" sql-type="decimal(12,6)" not-null="false" />
     </property>
     <property name="Swap">
-      <column name="Swap" sql-type="decimal(11,2)" not-null="false" />
+      <column name="Swap" sql-type="decimal(12,6)" not-null="false" />
     </property>
     <property name="Profit">
-      <column name="Profit" sql-type="decimal(11,2)" not-null="false" />
+      <column name="Profit" sql-type="decimal(12,6)" not-null="false" />
     </property>
   </class>
 </hibernate-mapping>

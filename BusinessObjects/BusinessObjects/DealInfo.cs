@@ -13,7 +13,8 @@ namespace BusinessObjects.BusinessObjects
         public string OpenTime { get; set; }
         public string CloseTime { get; set; }
         public double Profit { get; set; }
-        public double SwapValue { get; set; }
+        
+        public double Swap { get; set; }
         public double Commission { get; set; }
         public long Account { get; set; }
         public string AccountName { get; set; }
