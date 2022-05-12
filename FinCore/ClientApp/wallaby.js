@@ -73,7 +73,7 @@ module.exports = function(wallaby) {
         /* Initialize Test Environment for Wallaby */
         [path.basename(__filename)]: file => `
    import '@angular-devkit/build-angular/src/angular-cli-files/models/jit-polyfills';
-   import 'zone.js/dist/zone-testing';
+   import 'zone.js/testing';
    import { getTestBed } from '@angular/core/testing';
    import { BrowserDynamicTestingModule,  platformBrowserDynamicTesting} from '@angular/platform-browser-dynamic/testing';
   

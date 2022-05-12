@@ -8,6 +8,8 @@ using BusinessObjects;
 using FluentNHibernate.Cfg;
 using FluentNHibernate.Cfg.Db;
 using NHibernate;
+using NHibernate.Dialect;
+using NHibernate.Driver;
 
 namespace BusinessLogic
 {
@@ -32,11 +34,16 @@ namespace BusinessLogic
 
                 if (config.ConnectionStringName().Contains("SQLite"))
                 {
+                    
                     // http://qaru.site/questions/754091/getting-fluent-nhibernate-to-work-with-sqlite
-                    var dbConfig = SQLiteConfiguration.Standard.ConnectionString(connection);
+                    var dbConfig = MsSqliteConfiguration.Standard.ConnectionString(connection).Dialect<CustomDialect>(); 
+                    //.Driver<SQLiteCustomDriver>();
+                    
+                    // SqliteConnection
                     _sessionFactory = Fluently.Configure().Database(dbConfig)
                         .Mappings(m => m.FluentMappings.AddFromAssemblyOf<DBAdviser>())
                         .BuildSessionFactory();
+                    
                 }
                 else
                 {

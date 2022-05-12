@@ -6,6 +6,7 @@ import { BaseComponent } from '../../../base/base.component';
 import { WebsocketService } from '../../../services/websocket.service';
 import CustomStore from 'devextreme/data/custom_store';
 import notify from 'devextreme/ui/notify';
+import { DeepPartial } from 'devextreme/core';
 
 @Component({
   templateUrl: 'capital.component.html',
@@ -118,11 +119,12 @@ export class CapitalComponent extends BaseComponent implements OnInit, OnDestroy
           const data: Wallet = JSON.parse(msg.Message);
           if (this.store && data) {
             this.dataSource.push(data);
+            const dp_data: DeepPartial<Wallet> = data as DeepPartial<Wallet>;
             this.store.push([
               {
                 type: 'insert',
                 key: data.Date,
-                data: data
+                data: dp_data
               }
             ]);
           }

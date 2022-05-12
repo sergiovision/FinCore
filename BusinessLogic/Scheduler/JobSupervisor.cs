@@ -33,9 +33,6 @@ namespace BusinessLogic.Scheduler
                 sched = context.Scheduler;
                 log.Info("JobSuperviser: ------- Scheduling Jobs -------");
 
-                //ScheduleThriftJob<XTradeMQLServerJob>(xtradeConstants.JOBGROUP_THRIFT, "XTradeMQLServerJob", xtradeConstants.XTradeMQL_PORT, 5);
-                //ScheduleJobWithParam<TerminalMonitoringJob>(xtradeConstants.JOBGROUP_THRIFT, "TerminalMonitoringJob", MainService.SETTINGS_TEMINAL_MONITOR_CRON, "noparam", "");
-
                 // CronExpression decoder
                 // https://www.freeformatter.com/cron-expression-generator-quartz.html
 
@@ -151,7 +148,7 @@ namespace BusinessLogic.Scheduler
             var trigger = (ICronTrigger) TriggerBuilder.Create()
                 .WithIdentity(triggerName, group)
                 .WithCronSchedule(cron)
-                //.WithPriority(1)
+                // .WithPriority(1)
                 .Build();
             SetTimeZoneForTrigger(trigger);
 

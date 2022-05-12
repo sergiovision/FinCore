@@ -37,7 +37,6 @@ namespace FinCore
             AppDomain.CurrentDomain.UnhandledException += CurrentDomain_UnhandledException;
         }
 
-        [HandleProcessCorruptedStateExceptions]
         [SecurityCritical]
         private static void CurrentDomain_UnhandledException(object sender, UnhandledExceptionEventArgs e)
         {
@@ -64,7 +63,6 @@ namespace FinCore
             }
         }
 
-        [HandleProcessCorruptedStateExceptions]
         [SecurityCritical]
         public static void Main(string[] args)
         {

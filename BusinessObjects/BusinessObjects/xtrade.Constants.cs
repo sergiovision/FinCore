@@ -2,7 +2,7 @@ namespace BusinessObjects.BusinessObjects
 {
     public static class xtradeConstants
     {
-        public const string FINCORE_VERSION = "0.9.9";
+        public const string FINCORE_VERSION = "0.9.10";
         public const double GAP_VALUE = -125;
         public const string MTDATETIMEFORMAT = "yyyy.MM.dd HH:mm";
         public const string MYSQLDATETIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
