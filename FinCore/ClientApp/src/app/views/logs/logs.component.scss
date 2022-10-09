@@ -14,13 +14,16 @@
 
 .dx-tab-panel {
   margin: 10px;
-  height: 100%;
+  // height: 100%;
 }
 
-ace-editor {
-  min-height: 600px;
+.code-editor {
+  //.editor-container {
+  //  height: calc(100vh - 100px);
+  //}
+ // min-height: 600px;
   width: 100%;
-  height: 100%;
+  height: 660px;
   overflow: scroll;
 }
 

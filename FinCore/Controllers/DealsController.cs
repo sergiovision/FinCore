@@ -77,14 +77,14 @@ namespace FinCore.Controllers
         [HttpGet]
         [AcceptVerbs("GET")]
         [Route("[action]")]
-        public IEnumerable<MetaSymbolStat> MetaSymbolStatistics([FromQuery] int type)
+        public IEnumerable<MetaSymbolStat> MetaSymbolStatistics([FromQuery] int count)
         {
             try
             {
                 var ds = MainService.Container.Resolve<DataService>();
                 if (ds == null)
                     return null;
-                return ds.MetaSymbolStatistics(type);
+                return ds.MetaSymbolStatistics(count);
             }
             catch (Exception e)
             {
@@ -99,25 +99,18 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]")]
-        public ActionResult ClosePosition([FromQuery] int account, [FromQuery] int Magic, [FromQuery] int Ticket)
+        public ActionResult ClosePosition([FromQuery] int account, [FromQuery] int magic, [FromQuery] int Ticket)
         {
             try
             {
                 SignalInfo signalPos = null;
-                if (Ticket > 0)
-                    signalPos = MainService.CreateSignal(SignalFlags.Terminal, account,
-                        EnumSignals.SIGNAL_CLOSE_POSITION, 0);
-                else
-                    signalPos = MainService.CreateSignal(SignalFlags.Expert, Magic, EnumSignals.SIGNAL_CLOSE_POSITION,
-                        0);
+                signalPos = MainService.CreateSignal(SignalFlags.Terminal, account,EnumSignals.SIGNAL_CLOSE_POSITION, 0);
                 signalPos.Value = Ticket;
-                signalPos.SetData(Magic.ToString());
-                //signalPos.Data = Magic.ToString();
+                signalPos.SetData(magic.ToString());
                 MainService.PostSignalTo(signalPos);
                 var terminals = MainService.Container.Resolve<ITerminalEvents>();
                 if (terminals != null)
                     terminals.DeletePosition(Ticket);
-
                 return Ok();
             }
             catch (Exception e)
@@ -136,7 +129,7 @@ namespace FinCore.Controllers
         {
             try
             {
-                var mss = (List<object>) MainService.GetObjects(EntitiesEnum.MetaSymbol);
+                var mss = (List<object>) MainService.GetObjects(EntitiesEnum.MetaSymbol, false);
                 foreach (var m in mss)
                 {
                     var ms = (MetaSymbol) m;

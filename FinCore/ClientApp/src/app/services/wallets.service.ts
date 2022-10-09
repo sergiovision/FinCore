@@ -8,8 +8,8 @@ import { AccountState, Terminal } from '../models/Entities';
 export class WalletsService extends BaseService {
     constructor(http: HttpClient) { super(http); }
 
-    public getAll() {
-      return super.getAll('/api/wallets');
+    public getAllWithRetired(showRetired: boolean) {
+      return super.getAll(`/api/wallets?showRetired=${showRetired}`);
     }
 
     public genDeployScripts() {

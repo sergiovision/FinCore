@@ -30,8 +30,7 @@
       </div>
     </dxi-column>
 
-    <!-- <dxi-column dataField="Lots" [allowSorting]="true" [hidingPriority]="2"></dxi-column> -->
-    <dxi-column dataField="ProfitStopsPercent" caption="%" format="#0.##'%'" [allowSorting]="true"
+    <dxi-column dataField="Openprice" caption="%" [allowSorting]="true"
       cellTemplate="priceCellTemplate" [hidingPriority]="3">
       <dxo-format type="fixedPoint" [precision]="2"></dxo-format>
     </dxi-column>
@@ -53,7 +52,7 @@
 
     <div *dxTemplate="let data of 'totalStat'">
       <div>
-        <span [class.inc]="this.stat.TodayGainReal > 0" [class.dec]="this.stat.TodayGainReal < 0">PnL:
+        <span [class.inc]="this.stat.TodayGainReal > 0" [class.dec]="this.stat.TodayGainReal < 0">Real:
           ${{this.stat.TodayGainReal}} </span>
       </div>
     </div>

@@ -147,7 +147,11 @@ export class CapitalComponent extends BaseComponent implements OnInit, OnDestroy
   }
 
   public onError(evt: MessageEvent) {
-    notify('Connection Error: ' + evt);
+    const webS = evt.currentTarget as WebSocket;
+    if (webS)
+      notify('WebSocket Connection Error: ' + webS.url);
+    else
+      notify('WebSocket Connection Error: ' + evt.currentTarget);
     this.ws.doDisconnect();
   }
 

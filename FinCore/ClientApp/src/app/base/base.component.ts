@@ -10,6 +10,8 @@ import notify from 'devextreme/ui/notify';
 export class BaseComponent implements OnInit, OnDestroy {
   protected subs: SubSink = new SubSink();
 
+  protected showRetired = false;
+
   constructor() { }
 
   ngOnInit() {

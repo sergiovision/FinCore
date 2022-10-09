@@ -38,11 +38,9 @@ export class SettingsComponent extends BaseComponent implements OnInit {
   loadData(fullRefresh = false) {
     this.dataSource = new CustomStore({
         key: 'Id',
-        load: () => this.deals.loadParentData(EntitiesEnum.Settings)
+        load: () => this.deals.loadParentData(EntitiesEnum.Settings, this.showRetired)
             .toPromise()
-            .then((data: any) => {
-                this.dataSource = data;
-            })
+            .then(data => this.dataSource = data)
             .catch(error => this.logNotifyError(error)),
     });
   }

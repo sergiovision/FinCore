@@ -120,14 +120,6 @@
         },
         {
           "type": "boolean",
-           "name": "Demo",
-           "group": "System",
-           "control": "GeneralCheckbox",
-           "defaultValue": false,
-           "description": "Demo"
-        },
-        {
-          "type": "boolean",
            "name": "Stopped",
            "group": "System",
            "control": "GeneralCheckbox",
@@ -345,36 +337,6 @@
             "description": "Allow SELL"
           },
           {
-            "type": "string",
-            "name": "BUYBegin",
-            "group": "Limits",
-            "control": "GeneralTime",
-            "defaultValue": "03:00",
-            "description": "BUY Begin time"
-          },
-          { "type": "string",
-            "name": "BUYEnd",
-            "group": "Limits",
-            "control": "GeneralTime",
-            "defaultValue": "22:00",
-            "description": "BUY End Time"
-          },
-          { "type": "string",
-            "name": "SELLBegin",
-            "group": "Limits",
-            "control": "GeneralTime",
-            "defaultValue": "03:00",
-            "description": "SELL Begin Time"
-          },
-          {
-            "type": "string",
-            "name": "SELLEnd",
-            "group": "Limits",
-            "control": "GeneralTime",
-            "defaultValue": "22:00",
-            "description": "SELL End Time"
-          },
-          {
             "type": "boolean",
             "name": "AllowVirtualStops",
             "group": "Limits",
@@ -423,7 +385,8 @@
             "control": "GenericEnum",
             "defaultValue": 0,
             "items": [ {"ID":0, "name": "NoIndicator"}, {"ID": 1,"name": "CandleIndicator" }, {"ID":2, "name": "IshimokuIndicator"},
-              {"ID":3, "name": "IchimokuRenkoIndicator"}, {"ID":4, "name": "OsMAIndicator"}, {"ID":5, "name": "DefaultIndicator"} ],
+              {"ID":3, "name": "IchimokuRenkoIndicator"}, {"ID":4, "name": "OsMAIndicator"}, {"ID":5, "name": "DefaultIndicator"},
+              {"ID":7, "name": "DivergenceIndicator"} ],
             "description": "Signal Indicator"
           },
           {
@@ -443,40 +406,47 @@
             "defaultValue": 5,
             "description": "NumBarsToAnalyze"
           },
-          { "type": "integer",
-            "name": "IshimokuPeriod1",
+          { "type": "boolean",
+            "name": "EnableTrend",
             "group": "Indicators",
-            "control": "GeneralInteger",
-            "defaultValue": 7,
-            "description": "IshimokuPeriod1 Tenkan Sen"
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove PZ Trend"
           },
-          { "type": "integer",
-            "name": "IshimokuPeriod2",
+          { "type": "boolean",
+            "name": "EnableIchimoku",
             "group": "Indicators",
-            "control": "GeneralInteger",
-            "defaultValue": 35,
-            "description": "IshimokuPeriod2 Kijun Sen"
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove Ichimoku"
           },
-          { "type": "integer",
-            "name": "IshimokuPeriod3",
+          { "type": "boolean",
+            "name": "EnableHA",
             "group": "Indicators",
-            "control": "GeneralInteger",
-            "defaultValue": 105,
-            "description": "IshimokuPeriod3 Senkou Span B"
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove Heiken Ashi"
           },
-          { "type": "integer",
-            "name": "BandsPeriod",
+          { "type": "boolean",
+            "name": "EnableCandle",
             "group": "Indicators",
-            "control": "GeneralInteger",
-            "defaultValue": 20,
-            "description": "Bands Period"
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove Candle"
           },
-          { "type": "double",
-            "name": "BandsDeviation",
+          { "type": "boolean",
+            "name": "EnableMA",
             "group": "Indicators",
-            "control": "GeneralDouble",
-            "defaultValue": 1.6,
-            "description": "Bands Deviation"
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove Exponential Moving Average"
+          },
+          { "type": "boolean",
+            "name": "EnableDivergence",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "Add/Remove PZ Divergence indicator"
           },
           { "type": "boolean",
             "name": "EnableBBands",
@@ -529,9 +499,24 @@
             "control": "GeneralCheckbox",
             "defaultValue": false,
             "description": "Average Volumes"
+          },
+          {
+            "type": "boolean",
+            "name": "EnableZigZag",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "EnableZigZag"
+          },
+          {
+            "type": "boolean",
+            "name": "EnableHarmonic",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "EnableHarmonic"
           }
        ]
-
     },
     "Symbol": {
         "System": [

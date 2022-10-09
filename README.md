@@ -3,7 +3,7 @@
 # About FinCore
 <p id="doc_about">
 </p>
-  FinCore is a cool and free cross-platform personal finances manager written in .NET 6 with Angular 12.2 frontend. <br>
+  FinCore is a cool and free cross-platform personal finances manager written in .NET 6 with Angular 14 frontend. <br>
 
   <p>   This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.</p>
   
@@ -60,6 +60,22 @@ Applications need to be installed to run server properly:
 2. Optionally MySQL Server version 5 or later.
 
 SQLite database located in `/DB` folder. By default SQLite DB file used, but MySQL also supported, you can switch to MySQL in `/FinCore/appSettings.json` file.
+
+For configuring crypto module setup Api Keys for KuCoin and/or FTX providers:
+
+   For KuCoin exchange set the following properties in `/FinCore/appSettings.json`:
+  `KuCoinAPIKey`  - KuCoin Main API Key
+  `KuCoinAPISecret` - API Secret
+  `KuCoinPassPhrase` - Pass Phrase
+  
+  `KuCoinFutureAPIKey` - KuCoin Futures API Key
+  `KuCoinFutureAPISecret` - API Secret
+  `KuCoinFuturePassPhrase` - Futures Pass Phrase
+
+   For FTX Exchange:
+  `FTXAPIKey` - FTX API Key
+  `FTXAPISecret` - FTX API Secret
+
 
 Open `fincore_empty.sqlite` file in any DB editor that works with SQLite ( like Navicat ).
 

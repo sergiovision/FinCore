@@ -7,20 +7,26 @@
     "declaration": false,
     "experimentalDecorators": true,
     "moduleResolution": "node",
+    "forceConsistentCasingInFileNames": true,
+    "strict": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": true,
+    "downlevelIteration": true,
     "module": "es2020",
-    "target": "es2018",
+    "target": "es2020",
     "typeRoots": [
       "node_modules/@types"
     ],
     "lib": [
       "esnext",
-      "es2017.object",
-      "ES2015.Promise",
+      "es2018",
       "dom"
-    ],
-    "types": [
-      "node", "@types/node"
     ]
-
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": false
   }
 }

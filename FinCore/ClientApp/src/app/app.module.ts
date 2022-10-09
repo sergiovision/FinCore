@@ -56,13 +56,13 @@ import { BaseComponent } from './base/base.component';
 import { TviewComponent } from './views/tview/tview.component';
 import { ChartComponent } from './views/chart/chart.component';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
+import { CryptoComponent } from './views/crypto/crypto.component';
 import { DealsService } from './services/deals.service';
 import { WebsocketService } from './services/websocket.service';
 import { TablesModule } from './views/tables/tables.module';
 import { PropsService } from './services/props.service';
 import { DocComponent } from './views/doc/doc.component';
 import { DGaugeComponent } from './views/dgauge/dgauge.component';
-// import { PropertiesComponent } from './views/tables/properties/properties.component';
 
 @NgModule({
   imports: [
@@ -107,7 +107,8 @@ import { DGaugeComponent } from './views/dgauge/dgauge.component';
     TviewComponent,
     DocComponent,
     DGaugeComponent,
-    DashboardComponent
+    DashboardComponent,
+    CryptoComponent
   ],
   providers: [
     {

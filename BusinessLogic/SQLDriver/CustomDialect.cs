@@ -1,18 +1,7 @@
 using System.Data.Common;
 using NHibernate.Dialect;
-using NHibernate.Dialect.Function;
-using NHibernate.Engine;
-using NHibernate.SqlCommand;
-using NHibernate.Type;
-using NHibernate.Util;
-using System.Collections;
-using System.Collections.Generic;
-using System.Data;
-using System.Data.Common;
-using System.Linq;
-using System.Text;
 
-namespace BusinessLogic;
+namespace BusinessLogic.SQLDriver;
 
 public class CustomDialect : SQLiteDialect
 {

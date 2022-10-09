@@ -15,7 +15,7 @@
           <div class="dx-field-label">{{ def['name'] }}</div>
           <div class="dx-field-value">
             <dx-number-box #doubleNumberBox="ngModel" format="#0.####" [(ngModel)]="dataSource[ def['name'] ].value"
-              [name]="def['name']" showSpinButtons="true">
+              [name]="def['name']" [showSpinButtons]="true">
             </dx-number-box>
           </div>
         </div>
@@ -25,7 +25,7 @@
           <div class="dx-field-label">{{ def['name'] }}</div>
           <div class="dx-field-value">
             <dx-number-box #labelBox="ngModel" [ngModel]="dataSource[ def['name'] ].value" [name]="def['name']"
-              [disabled]="true" showSpinButtons="false">
+              [disabled]="true" [showSpinButtons]="false">
             </dx-number-box>
           </div>
         </div>
@@ -44,7 +44,7 @@
           <div class="dx-field-label">{{ def['name'] }}</div>
           <div class="dx-field-value">
             <dx-number-box #numberBox="ngModel" [(ngModel)]="dataSource[ def['name'] ].value" [name]="def['name']"
-              showSpinButtons="true" [disabled]="false">
+              [showSpinButtons]="true" [disabled]="false">
             </dx-number-box>
           </div>
         </div>

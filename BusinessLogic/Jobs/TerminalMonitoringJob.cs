@@ -40,7 +40,7 @@ namespace BusinessLogic.Jobs
 
                 var dataService = MainService.thisGlobal.Container.Resolve<DataService>();
 
-                var results = (IEnumerable<object>) dataService.GetObjects(EntitiesEnum.Terminal);
+                var results = (IEnumerable<object>) dataService.GetObjects(EntitiesEnum.Terminal, false);
 
                 results = results.Where(x => (x as Terminal).Retired == false &&
                                              (x as Terminal).Stopped == false);

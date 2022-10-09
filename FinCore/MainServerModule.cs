@@ -28,6 +28,7 @@ namespace FinCore
             builder.RegisterInstance(QuartzServer.Server);
             builder.RegisterType<PositionsManager>().As<ITerminalEvents>().SingleInstance();
             builder.RegisterType<WebLogManager>().As<IWebLog>().SingleInstance();
+            builder.RegisterType<CryptoPosManager>().Named<ITerminalEvents>("crypto").SingleInstance();
             RegisterMaps(builder);
         }
 

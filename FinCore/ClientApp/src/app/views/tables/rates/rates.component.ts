@@ -38,11 +38,9 @@ export class RatesComponent extends BaseComponent implements OnInit {
   loadData(fullRefresh = false) {
     this.dataSource = new CustomStore({
         key: 'Id',
-        load: () => this.experts.loadParentData(EntitiesEnum.Rates)
+        load: () => this.experts.loadParentData(EntitiesEnum.Rates, this.showRetired)
             .toPromise()
-            .then((data: any) => {
-                this.dataSource = data;
-            })
+            .then(data => this.dataSource = data)
             .catch(error => this.logNotifyError(error)),
     });
   }

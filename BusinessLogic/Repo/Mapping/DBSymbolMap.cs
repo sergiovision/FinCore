@@ -10,7 +10,7 @@ namespace BusinessLogic.Repo.Mapping
             Table("symbol");
             LazyLoad();
             Id(x => x.Id).GeneratedBy.Identity().Column("Id");
-            References(x => x.Metasymbol).Column("MetaSymbolId");
+            References(x => x.Metasymbol).Column("MetaSymbolId").Fetch.Join().Nullable();
             Map(x => x.Name).Column("Name").Not.Nullable();
             Map(x => x.Description).Column("Description");
             Map(x => x.Retired).Column("Retired");

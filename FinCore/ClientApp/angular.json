@@ -20,7 +20,8 @@
               "lodash", "rxjs-compat", "devextreme", "subsink", "rxjs/add/operator/map", "brace"
             ],
             "assets": [
-              "src/assets"
+              "src/assets",
+              { "glob": "**/*", "input": "node_modules/monaco-editor", "output": "assets/monaco-editor" }
             ],
             "styles": [
               "node_modules/flag-icon-css/css/flag-icon.css",
@@ -113,7 +114,6 @@
             "polyfills": "src/polyfills.ts",
             "tsConfig": "src/tsconfig.spec.json",
             "scripts": [],
-            "scripts": [],
             "styles": [
               "node_modules/flag-icon-css/css/flag-icon.css",
               "node_modules/font-awesome/css/font-awesome.css",
@@ -169,7 +169,6 @@
       }
     }
   },
-  "defaultProject": "ng",
   "schematics": {
     "@schematics/angular:component": {
       "prefix": "app",
@@ -178,5 +177,8 @@
     "@schematics/angular:directive": {
       "prefix": "app"
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

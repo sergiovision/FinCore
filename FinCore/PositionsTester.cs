@@ -42,6 +42,11 @@ namespace FinCore
             throw new NotImplementedException();
         }
 
+        public PositionInfo getPosition(long ticket)
+        {
+            return _positions[(int)ticket];
+        }
+
         private static List<PositionInfo> GeneratePositions()
         {
             return new List<PositionInfo>

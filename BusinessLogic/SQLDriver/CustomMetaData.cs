@@ -2,7 +2,7 @@ using System.Data.Common;
 using NHibernate.Dialect;
 using NHibernate.Dialect.Schema;
 
-namespace BusinessLogic;
+namespace BusinessLogic.SQLDriver;
 
 public class CustomMetaData : SQLiteDataBaseMetaData
 {

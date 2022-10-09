@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import 'rxjs/add/operator/map';
+// import 'rxjs/add/operator/map';
 import { UserToken, Env, JobParam, EntitiesEnum } from '../models/Entities';
 import { DatePipe } from '@angular/common';
 import CustomStore from 'devextreme/data/custom_store';
@@ -51,9 +51,9 @@ export class BaseService {
     return this.http.put<string>(this.baseURL + apiAction, body, { headers: this.authHeaders });
   }
 
-  public loadParentData(entity: EntitiesEnum) {
+  public loadParentData(entity: EntitiesEnum, showRetired: boolean) {
     const entityNum: number = entity;
-    const url = `${this.baseURL}/api/wallets/GetObjects/${entityNum}`;
+    const url = `${this.baseURL}/api/wallets/GetObjects/${entityNum}?showRetired=${showRetired}`;
     return this.http.get<any>(url, { headers: this.authHeaders });
   }
 
@@ -62,10 +62,10 @@ export class BaseService {
     console.log(message);
   }
 
-  public loadChildData(parentEntity: EntitiesEnum, childEntity: EntitiesEnum, key: number): CustomStore {
+  public loadChildData(parentEntity: EntitiesEnum, childEntity: EntitiesEnum, key: number, showRetired: boolean): CustomStore {
     const entityParentNum: number = parentEntity;
     const entityChildNum: number = childEntity;
-    const url = `${this.baseURL}/api/wallets/GetChildObjects/${entityParentNum}/${entityChildNum}/${key}`;
+    const url = `${this.baseURL}/api/wallets/GetChildObjects/${entityParentNum}/${entityChildNum}/${key}?showRetired=${showRetired}`;
     const loadResponse = this.http.get<any>(url, { headers: this.authHeaders });
     const result = new CustomStore({
       key: 'Id',

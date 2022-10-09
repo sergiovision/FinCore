@@ -19,11 +19,11 @@ namespace FinCore.Controllers
     {
         [HttpGet]
         [AcceptVerbs("GET")]
-        public IEnumerable<Wallet> Get()
+        public IEnumerable<Wallet> Get([FromQuery]bool showRetired)
         {
             try
             {
-                return MainService.GetWalletsState(DateTime.MaxValue);
+                return MainService.GetWalletsState(DateTime.MaxValue, showRetired);
             }
             catch (Exception e)
             {
@@ -36,11 +36,11 @@ namespace FinCore.Controllers
         [HttpGet]
         [AcceptVerbs("GET")]
         [Route("[action]/{id}")]
-        public Wallet Get(int id)
+        public Wallet Get(int id, [FromQuery] bool showRetired)
         {
             try
             {
-                var wb = MainService.GetWalletsState(DateTime.MaxValue);
+                var wb = MainService.GetWalletsState(DateTime.MaxValue, showRetired);
                 return wb.Where(d => d.Id.Equals(id)).FirstOrDefault();
             }
             catch (Exception e)

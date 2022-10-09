@@ -1,25 +1,14 @@
 import { AfterViewInit, Component, ViewChild, OnInit, OnDestroy, ViewChildren, QueryList } from '@angular/core';
-
-import 'brace/index';
-import 'brace/theme/eclipse';
-import 'brace/theme/monokai';
-import 'brace/mode/markdown';
-import 'brace/mode/javascript';
-import 'brace/ext/language_tools.js';
 import { LogsService } from '../../services/logs.service';
 import notify from 'devextreme/ui/notify';
 import { BaseComponent } from '../../base/base.component';
 import { WsMessage, WsMessageType, IWebsocketCallback, LogItem } from '../../models/Entities';
-import { environment } from '../../../environments/environment';
 import { WebsocketService } from '../../services/websocket.service';
-import { AceEditorComponent } from 'ng2-ace-editor';
-import { DxTabPanelComponent } from 'devextreme-angular';
-import 'brace/theme/terminal';
-import 'brace/theme/solarized_dark';
-import 'brace/theme/vibrant_ink';
-import 'brace/theme/github';
-import 'brace/theme/solarized_light';
-import 'brace/mode/yaml';
+import { EditorComponent, NgxEditorModel } from 'ngx-monaco-editor';
+import { fromEvent } from "rxjs";
+import { debounceTime, throttleTime } from "rxjs/operators";
+
+import { DxBoxComponent, DxTabPanelComponent } from 'devextreme-angular';
 
 
 @Component({
@@ -29,27 +18,26 @@ import 'brace/mode/yaml';
 })
 export class LogsComponent extends BaseComponent implements AfterViewInit, OnInit, OnDestroy, IWebsocketCallback {
   @ViewChild('tabPanel0') tabPanel0: DxTabPanelComponent;
-  @ViewChildren('editor') viewChildren: QueryList<AceEditorComponent>;
+  @ViewChild('boxitem') boxitem: DxBoxComponent;
+  // @ViewChildren('editor') editorElement: any; // viewChildren: QueryList<EditorComponent>;
+  public element: HTMLElement = document.body;
+  public editorHeight:number = 880;
+  public editor: any;
 
+  code: string = '';
 
-  // https://ace.c9.io/#nav=higlighter
-  // tester https://ace.c9.io/build/kitchen-sink.html
-  // https://codepen.io/ryancat/pen/mMyvpx/?css-preprocessor=sass
+  // https://microsoft.github.io/monaco-editor/playground.html#creating-the-editor-syntax-highlighting-for-html-elements
+  ///look file for options monako-editor/esm/vs/editor/editor.api.d.ts
   options: any = {
-    // maxLines: 1000,
-    printMargin: false,
-    theme: 'ace/theme/solarized_dark',
-    mode: 'ace/mode/yaml',
-    wrap: true,
-    readOnly: true,
-    showGutter: false,
-    highlightActiveLine: true,
-    cursorStyle: 'ace',
-    animatedScroll: true,
-    showLineNumbers: false,
-    showInvisibles: false,
-    newLineMode: 'auto'
+    theme: 'vs-dark', language: 'javascript',
+    lineNumbers: 'off',
+	  readOnly: true,
+    verticalHasArrows: true,
+		horizontalHasArrows: true,
+    contextmenu: false
+
   };
+
 
   public NumberOfLines = 500;
   public selectedIndex  = 0;
@@ -58,13 +46,26 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
 
   constructor(public logS: LogsService, public ws: WebsocketService) {
     super();
-    // this.text = '';
+
+    fromEvent(window, "resize")
+      .pipe(throttleTime(200), debounceTime(200))
+      .subscribe(() => this.setHeight());
   }
 
   public doConnect() {
 
     this.ws.doConnect(this);
 
+  }
+
+  ngAfterViewInit() {
+  }
+
+  private setHeight() {
+    if (this.element.offsetHeight > 0) {
+      this.editorHeight = this.element.offsetHeight - 200;
+      console.log('setHeight---' + this.editorHeight);
+    }
   }
 
   ngOnInit() {
@@ -77,6 +78,9 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
       },
         error => this.logConsoleError(error)
       );
+
+      this.setHeight();
+
   }
 
   public getText(): string {
@@ -86,6 +90,12 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
   public ClearLogs() {
     this.logz[0].DataSource = '';
     this.ws.doSend({ Type: WsMessageType.ClearLog, From: this.logS.currentUserToken.userName, Message: '' });
+    if (this.editor) {
+      var model = this.editor.getModel();
+      if (model)
+         model.setValue(this.getText());
+    }
+
   }
 
   public RefreshLogs() {
@@ -95,9 +105,6 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
   ngOnDestroy(): void {
     this.ws.doDisconnect();
     super.ngOnDestroy();
-  }
-
-  ngAfterViewInit() {
   }
 
   public writeToScreen(message) {
@@ -110,6 +117,13 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
     this.writeToScreen('connected logs\n');
   }
 
+  onInit(editor) {
+    this.editor = editor;
+    console.log('OnInit Monaco Editor' + editor);
+
+  }
+
+
   public selectTab(e) {
     const logitem = this.logz[this.selectedIndex];
     console.log('Click MainLog tab index: ' + this.selectedIndex + ', name: ' + logitem.Name);
@@ -119,28 +133,32 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
         if (this.selectedIndex > 0) {
           this.logz[this.selectedIndex].DataSource = data;
         }
-
-        const editorX = this.viewChildren.find((element, index) => index === this.selectedIndex);
-        // console.log(' viewChildren.count = ' + this.viewChildren.length + ', item: ' + editorX);
-        const editor = editorX.getEditor();
+        //const editorX = this.viewChildren.find((element, index) => index === this.selectedIndex);
+        //this.code = data;
         if (this.selectedIndex > 0) {
-          editorX.setText(data);
-        }
-        let NumOfLines = this.NumberOfLines;
-        if (this.selectedIndex === 0)   {
-          NumOfLines = editor.session.doc.getAllLines().length;
+          // console.log(' data = ' + data );
+          //this.code = data;
+          //var opt = this.options;
+          //opt.theme = this.logz[this.selectedIndex].Theme;
+          //this.options = opt;
+          //this.options = Object.assign({}, this.options, opt);
+          // console.log(' opt = ' + JSON.stringify(opt) );
         } else {
-          NumOfLines = this.NumberOfLines;
+          data = this.getText();
+          // console.log(data);
+          this.code = data;
         }
-        if (editor) {
-          this.options.theme = this.logz[this.selectedIndex].Theme;
-          editorX.setOptions(this.options);
-          console.log('NumOfLines ' + NumOfLines);
-          editor.resize(true);
-          editor.scrollToLine(NumOfLines, true, true, function () {});
-          editor.gotoLine(NumOfLines, 10, true);
-        }
+        if (this.editor) {
+           var model = this.editor.getModel();
+           if (model) {
+              model.setValue(data);
 
+              var lineCount = model.getLineCount();
+              console.log(' OnInit countlines: ' + lineCount);
+              this.editor.revealLine(lineCount, 1);
+
+           }
+        }
       },
       error => this.logConsoleError(error)
     );
@@ -175,7 +193,11 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
   }
 
   public onError(evt: MessageEvent) {
-    notify('Connection Error: ' + evt.data);
+    const webS = evt.currentTarget as WebSocket;
+    if (webS)
+      notify('WebSocket Connection Error: ' + webS.url);
+    else
+      notify('WebSocket Connection Error: ' + evt.currentTarget);
     this.ws.doDisconnect();
   }
 

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Specialized;
+using Autofac;
+using BusinessLogic.BusinessObjects;
 using BusinessObjects.BusinessObjects;
 using Microsoft.Extensions.Configuration;
 
@@ -11,6 +13,12 @@ namespace BusinessLogic
         public XTradeConfig(IConfiguration config)
         {
             Configuration = config;
+        }
+
+        public static XTradeConfig Self()
+        {
+            var config = MainService.thisGlobal.Container.Resolve<XTradeConfig>();
+            return config;
         }
 
         public string ConnectionStringName()
@@ -70,5 +78,29 @@ namespace BusinessLogic
                 return "http://localhost:4200";
             }
         }
+
+        private string Value(string name) 
+        {
+            return Configuration[name];
+        }
+
+        #region Crypto
+        public string KuCoinAPIKey => Value("KuCoinAPIKey");
+
+        public string KuCoinAPISecret => Value("KuCoinAPISecret");
+        
+        public string KuCoinPassPhrase => Value("KuCoinPassPhrase");
+        public string KuCoinFutureAPIKey => Value("KuCoinFutureAPIKey");
+
+        public string KuCoinFutureAPISecret => Value("KuCoinFutureAPISecret");
+        
+        public string KuCoinFuturePassPhrase => Value("KuCoinFuturePassPhrase");
+        
+        public string FTXAPIKey => Value("FTXAPIKey");
+
+        public string FTXAPISecret => Value("FTXAPISecret");
+
+        #endregion
+        
     }
 }

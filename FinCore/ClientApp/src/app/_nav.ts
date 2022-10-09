@@ -5,6 +5,11 @@ export const navItems = [
     icon: 'icon-speedometer'
   },
   {
+    name: 'Crypto',
+    url: '/crypto',
+    icon: 'icon-speedometer',
+  },
+  {
     title: true,
     name: 'Components'
   },

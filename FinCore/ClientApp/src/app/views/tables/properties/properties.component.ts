@@ -15,7 +15,7 @@ export class PropertiesComponent extends BaseComponent implements OnInit, OnDest
   @Output() parentVisibleChange = new EventEmitter<boolean>();
 
   public objId: number;
-  public defs: {[key: string]: any };
+  public defs: any[];//  {[key: string]: any };
   public responseData: DynamicProperties;
   public dataSource: {[key: string]: DynamicProperty<any> };
   public entityName = '';
@@ -153,7 +153,6 @@ export class PropertiesComponent extends BaseComponent implements OnInit, OnDest
       this.dataSource[ 'Id' ].value = this.responseData.Id;
     }
     if (!skipSave) {
-      // this.dataSource[ 'ObjectID' ].value = this.responseData.objId;
       if (this.responseData) {
         this.responseData.Vals = JSON.stringify(this.dataSource);
       }

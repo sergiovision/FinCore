@@ -27,6 +27,7 @@ export class DefaultLayoutComponent implements OnInit {
   }
 
   ngOnInit() {
+    // console.log('height---' + this.element.offsetHeight);
   }
 
 

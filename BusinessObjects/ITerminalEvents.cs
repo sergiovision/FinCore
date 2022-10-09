@@ -12,11 +12,13 @@ namespace BusinessObjects
         void UpdatePositions(long magicId, long AccountNumber, IEnumerable<PositionInfo> pos);
 
         void UpdateSLTP(long magicId, long AccountNumber, IEnumerable<PositionInfo> pos);
+        
 
         // methods and functions
         List<PositionInfo> GetAllPositions();
         List<PositionInfo> GetPositions4Adviser(long adviserId);
-        void DeletePosition(long Ticket);
+        PositionInfo getPosition(long ticket);
+        void DeletePosition(long ticket);
         List<DealInfo> GetTodayDeals();
 
         TodayStat GetTodayStat();

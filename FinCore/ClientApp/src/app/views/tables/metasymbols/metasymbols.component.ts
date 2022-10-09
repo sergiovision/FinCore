@@ -43,11 +43,9 @@ export class MetasymbolComponent extends BaseComponent implements OnInit {
 
     this.dataSource = new CustomStore({
         key: 'Id',
-        load: () => this.experts.loadParentData(EntitiesEnum.MetaSymbol)
+        load: () => this.experts.loadParentData(EntitiesEnum.MetaSymbol, this.showRetired)
                     .toPromise()
-                    .then((data: any) => {
-                        this.dataSource = data;
-                    })
+                    .then(data => this.dataSource = data)
                     .catch(error => this.logNotifyError(error)),
 
       });
@@ -94,6 +92,7 @@ export class MetasymbolComponent extends BaseComponent implements OnInit {
     }
   }
 
+
   addObjectClick(entityName: string, parentId?: number) {
     const entityType: EntitiesEnum = EntitiesEnum[entityName];
     switch (entityType) {
@@ -112,6 +111,12 @@ export class MetasymbolComponent extends BaseComponent implements OnInit {
     this.propsContainer.setData(undefined, entityName, this.currentObject);
   }
 
+  doChangeRetired(e: any) {
+    // console.log('doChangeRetired: ' + e.value);
+    this.showRetired = e.value;
+    this.loadData();
+  }
+
   getCurrentTitle(): string {
     if (this.propsContainer && this.propsContainer.entityName) {
       return `${this.propsContainer.entityName} Properties`;
@@ -120,7 +125,7 @@ export class MetasymbolComponent extends BaseComponent implements OnInit {
   }
 
   getChildData(childEntity: EntitiesEnum, parentId: number): CustomStore {
-    return this.experts.loadChildData(EntitiesEnum.MetaSymbol, childEntity, parentId);
+    return this.experts.loadChildData(EntitiesEnum.MetaSymbol, childEntity, parentId, this.showRetired);
   }
 
   loadSymbolsChildData(parentId: number) {
@@ -157,6 +162,16 @@ export class MetasymbolComponent extends BaseComponent implements OnInit {
             text: 'Add MetaSymbol',
             onClick: this.addObjectClick.bind(this, 'MetaSymbol')
         }
+      },
+      {
+          location: 'after',
+          widget: 'dxCheckBox',
+          options: {
+              width: 150,
+              text: 'Show Retired',
+              value: this.showRetired,
+              onValueChanged: this.doChangeRetired.bind(this)
+          }
       });
       /*,
       {

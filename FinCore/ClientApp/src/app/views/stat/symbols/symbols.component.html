@@ -16,7 +16,7 @@
           [visible]="true"
           [format]="{
               type: 'fixedPoint',
-              precision: '2'
+              precision: 2
           }">
       </dxo-label>
   </dxo-common-series-settings>
@@ -30,18 +30,5 @@
   </dxo-legend>
   <dxo-export [enabled]="true"></dxo-export>
 </dx-chart>
-</div>
-<div class="action">
-  <dx-select-box
-  horizontalAlignment="left"
-  id="selectbox"
-  [items]="AccountType"
-  [width]="150"
-  [value]="0"
-  valueExpr="id"
-  displayExpr="name"
-  (onValueChanged)="onValueChanged($event)"
-  ></dx-select-box>
-<div class="label">Account Type: </div>
 </div>
 

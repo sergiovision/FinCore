@@ -17,7 +17,8 @@ export enum EntitiesEnum {
   NewsEvent = 15,
   Person = 16,
   Site = 17,
-  Position = 18
+  Position = 18,
+  Indicators = 19
 }
 
 export interface DynamicProperty<T> {
@@ -110,7 +111,6 @@ export class Terminal {
     FullPath: string;
     CodeBase: string;
     Retired: boolean;
-    Demo: boolean;
     Stopped: boolean;
 }
 
@@ -153,9 +153,9 @@ export class Terminal {
     }
     Ticket: number;
     Account: number;
+    Magic: number;
     AccountName: string;
     Type: number;
-    Magic: number;
     Lots: number;
     Symbol: string;
     MetaSymbol: string;
@@ -191,11 +191,8 @@ export class Terminal {
 
   export class TodayStat {
       TodayGainReal: number;
-      TodayGainDemo: number;
       TodayGainRealPercent: number;
-      TodayGainDemoPercent: number;
       TodayBalanceReal: number;
-      TodayBalanceDemo: number;
       RISK_PER_DAY: number;
       DAILY_MIN_GAIN: number;
       DAILY_LOSS_AFTER_GAIN: number;
@@ -332,7 +329,10 @@ export enum WsMessageType {
     GetAllPerformance = 7,
     ChartValue = 8,
     ChartDone = 9,
-    GetAllCapital = 10
+    GetAllCapital = 10,
+    GetLevels = 11,
+    GetCryptoPositions = 12,
+    UpdateCryptoPosition = 13
 }
 
 export class WsMessage {

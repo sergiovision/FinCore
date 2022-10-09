@@ -13,7 +13,9 @@
         ChartValue = 8,
         ChartDone = 9,
         GetAllCapital = 10,
-        GetLevels = 11
+        GetLevels = 11,
+        GetCryptoPositions = 12,
+        UpdateCryptoPosition = 13
     }
 
     public class WsMessage

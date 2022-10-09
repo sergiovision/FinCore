@@ -3,18 +3,14 @@ import { Router, NavigationEnd } from '@angular/router';
 import { BaseComponent } from './base/base.component';
 
 @Component({
-  // tslint:disable-next-line
   selector: 'body',
   template: '<router-outlet></router-outlet>'
 })
 export class AppComponent extends BaseComponent implements OnInit {
-  // private script: any;
 
   constructor(private router: Router) {
     super();
 
-    // this.script = document.createElement('script');
-    // this.script.src = 'https://s3.tradingview.com/tv.js';
 
   }
 

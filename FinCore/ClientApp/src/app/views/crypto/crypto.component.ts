@@ -10,10 +10,10 @@ import { PropertiesComponent } from '../tables/properties/properties.component';
 import { DGaugeComponent } from '../dgauge/dgauge.component';
 
 @Component({
-  templateUrl: 'dashboard.component.html',
-  styleUrls: ['dashboard.component.scss']
+  templateUrl: 'crypto.component.html',
+  styleUrls: ['crypto.component.scss']
 })
-export class DashboardComponent extends BaseComponent implements OnInit, OnDestroy, IWebsocketCallback {
+export class CryptoComponent extends BaseComponent implements OnInit, OnDestroy, IWebsocketCallback {
   @ViewChild('positionsContainer') positionsContainer: DxDataGridComponent;
   @ViewChild(PropertiesComponent) propsContainer: PropertiesComponent;
   @ViewChild('dgauge') dgauge: DGaugeComponent;
@@ -47,13 +47,12 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   public onOpen(evt: MessageEvent) {
     this.UpdateDeals();
     this.connectionStarted = true;
-    // console.log('connected dashboard\n');
     this.loadData();
   }
 
   loadData() {
     if (this.currentUser) {
-      this.ws.doSend({ Type: WsMessageType.GetAllPositions, From: this.currentUser.userName, Message: '' });
+      this.ws.doSend({ Type: WsMessageType.GetCryptoPositions, From: this.currentUser.userName, Message: '' });
     }
   }
 
@@ -63,8 +62,6 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
 
   allowClosePositions(data): boolean {
     if (typeof data === 'string') {
-      // return false;
-      // console.log('should be disabled: ' + data);
       if (data === 'LongInvestment' || data === 'ShortInvestment') {
         return false;
       }
@@ -75,7 +72,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   public onMessage(msg: WsMessage) {
     if (msg) {
       switch (msg.Type) {
-        case WsMessageType.GetAllPositions:
+        case WsMessageType.GetCryptoPositions:
           {
             // console.log('Insert ' + msg.Message);
             const data = JSON.parse(msg.Message);
@@ -87,10 +84,9 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
             this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
           }
           break;
-        case WsMessageType.UpdatePosition:
+        case WsMessageType.UpdateCryptoPosition:
           {
             const data = JSON.parse(msg.Message);
-            // console.log('Update ' + msg.Message);
             if (this.dataSource) {
               this.dataSource.push([
                 {
@@ -102,7 +98,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
             }
           }
           break;
-        case WsMessageType.InsertPosition:
+        /* case WsMessageType.InsertPosition:
           {
             const data = JSON.parse(msg.Message);
             console.log('Insert ' + data);
@@ -130,7 +126,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
             }
             this.UpdateDeals();
           }
-          break;
+          break; */
       }
     }
   }
@@ -162,12 +158,14 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   }
 
   public UpdateDeals() {
+    /*
     this.subs.sink = this.deals.getTodayStat().subscribe(
       data => {
         this.stat = data;
       },
       error => this.logConsoleError(error)
     );
+    */
   }
 
   public onClickCell(e) {
@@ -184,34 +182,39 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     if (id === 5) {
       const pos: PositionInfo = e.data;
       if (this.allowClosePositions(pos.Role)) {
-        this.subs.sink = this.deals.closePosition(pos.Account, pos.Magic, pos.Ticket).subscribe(
-          data => {
-            console.log('Position close request sent ticket=' + pos.Ticket);
-          },
-          error => this.logConsoleError(error)
-        );
+        // TODO:
+        //this.subs.sink = this.deals.closePosition(pos.Account, pos.Ticket).subscribe(
+         // data => {
+         //   console.log('Position close request sent ticket=' + pos.Ticket);
+         // },
+         // error => this.logConsoleError(error)
+        //);
         return;
       }
     }
   }
 
   public refreshAll(e) {
+    /*
     this.subs.sink = this.deals.refreshAll().subscribe(
       data => {
         window.location.reload();
       },
       error => this.logConsoleError(error)
     );
+    */
   }
 
   public syncAll(e) {
     this.loadData();
+    /*
     this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
       data => {
         window.location.reload();
       },
       error => this.logNotifyError(error)
     );
+    */
   }
 
   onToolbarPreparing(e) {
@@ -263,9 +266,8 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     if (key) {
       const pos = JSON.stringify(this.toDBObj(key));
       // console.log(pos);
-      this.ws.doSend({ Type: WsMessageType.UpdatePosition, From: this.deals.currentUserToken.userName, Message: pos });
+      this.ws.doSend({ Type: WsMessageType.UpdateCryptoPosition, From: this.deals.currentUserToken.userName, Message: pos });
 
-      this.propsContainer.updateProperty(true, true);
       this.loadData();
     }
   }

@@ -17,5 +17,7 @@ namespace BusinessObjects.BusinessObjects
 
         public string Log { get; set; }
         public int Id { get; set; }
+        
+        public bool Retired { get; set; }
     }
 }

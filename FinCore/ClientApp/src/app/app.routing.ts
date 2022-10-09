@@ -11,6 +11,7 @@ import { LogoutComponent } from './views/logout/logout.component';
 import { RegisterComponent } from './views/register/register.component';
 import { AuthGuard } from './guards/AuthGuard';
 import { DashboardComponent } from './views/dashboard/dashboard.component';
+import { CryptoComponent } from './views/crypto/crypto.component';
 import { DocComponent } from './views/doc/doc.component';
 
 export const routes: Routes = [
@@ -65,6 +66,11 @@ export const routes: Routes = [
         path: 'dashboard',
         canActivate: [AuthGuard],
         component: DashboardComponent
+      },
+      {
+        path: 'crypto',
+        canActivate: [AuthGuard],
+        component: CryptoComponent
       },
       {
         path: 'logs',

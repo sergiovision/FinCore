@@ -24,9 +24,9 @@
 <dx-popup
 width="100%"
 height="100%"
-showTitle="true"
+[showTitle]="true"
 [title]="getCurrentTitle()"
-[closeOnOutsideClick]="true"
+[hideOnOutsideClick]="true"
 [dragEnabled]="false"
 [(visible)]="showProperties">
   <dxo-position
@@ -37,7 +37,7 @@ showTitle="true"
 
     <dx-button text="Save" (onClick)="onSave()"></dx-button>
     <dx-button text="Close" (onClick)="onClose()"></dx-button>
-    <dx-scroll-view #scrollView id="scrollview" scrollByContent="true" showScrollbar="always">
+    <dx-scroll-view #scrollView id="scrollview" [scrollByContent]="true" showScrollbar="always">
         <app-properties #propsContainer [(parentVisible)]="showProperties">
         </app-properties>
     </dx-scroll-view>

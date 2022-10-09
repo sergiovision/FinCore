@@ -9,5 +9,7 @@ namespace BusinessObjects.BusinessObjects
         public decimal Balance { get; set; }
         public string Comment { get; set; }
         public int Id { get; set; }
+        
+        public bool Retired { get; set; }
     }
 }

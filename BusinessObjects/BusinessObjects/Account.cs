@@ -11,6 +11,7 @@ namespace BusinessObjects.BusinessObjects
     public interface Idable
     {
         public int Id { get; set; }
+        public bool Retired { get; set; }
     }
 
     public class Account : Idable

@@ -3,7 +3,7 @@ using BusinessLogic.BusinessObjects;
 using NHibernate;
 using NHibernate.Driver;
 
-namespace BusinessLogic;
+namespace BusinessLogic.SQLDriver;
 
 using System.Data;
 using System.Data.Common;

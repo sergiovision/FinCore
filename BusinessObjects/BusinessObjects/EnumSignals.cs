@@ -30,6 +30,8 @@ namespace BusinessObjects.BusinessObjects
         SIGNAL_ADD_ORDERS = 1028,
         SIGNAL_DELETE_ORDERS = 1029,
         SIGNAL_UPDATE_ORDERS = 1030,
+        SIGNAL_LOAD_OBJECT = 1031,
+        SIGNAL_SAVE_OBJECT = 1032,
         SIGNAL_LAST = 2000
     }
 }

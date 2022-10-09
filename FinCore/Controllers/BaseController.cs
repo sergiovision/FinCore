@@ -92,12 +92,12 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{type}")]
-        public object GetObjects([FromRoute] int type)
+        public object GetObjects([FromRoute] int type, [FromQuery]bool showRetired)
         {
             try
             {
                 var t = (EntitiesEnum) type;
-                var result = MainService.GetObjects(t);
+                var result = MainService.GetObjects(t, showRetired);
                 if (result != null)
                     return Ok(result);
                 return Problem(string.Format("Failed to GetObjects{0}: result: {1}", t.ToString(), result), "Error",
@@ -114,13 +114,13 @@ namespace FinCore.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         [Route("[action]/{parentType}/{childType}/{parentKey}")]
-        public object GetChildObjects([FromRoute] int parentType, [FromRoute] int childType, [FromRoute] int parentKey)
+        public object GetChildObjects([FromRoute] int parentType, [FromRoute] int childType, [FromRoute] int parentKey, [FromQuery]bool showRetired)
         {
             try
             {
                 var pT = (EntitiesEnum) parentType;
                 var cT = (EntitiesEnum) childType;
-                var result = MainService.GetChildObjects(pT, cT, parentKey);
+                var result = MainService.GetChildObjects(pT, cT, parentKey, showRetired);
                 if (result != null)
                     return Ok(result);
                 return Problem(
@@ -233,5 +233,7 @@ namespace FinCore.Controllers
         }
 
         #endregion
+
+        
     }
 }

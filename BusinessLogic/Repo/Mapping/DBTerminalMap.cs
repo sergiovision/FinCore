@@ -16,7 +16,6 @@ namespace BusinessLogic.Repo.Mapping
             Map(x => x.Fullpath).Column("Fullpath").Not.Nullable();
             Map(x => x.Codebase).Column("Codebase");
             Map(x => x.Retired).Column("Retired");
-            Map(x => x.Demo).Column("Demo");
             Map(x => x.Stopped).Column("Stopped");
         }
     }

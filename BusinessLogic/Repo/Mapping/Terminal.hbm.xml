@@ -20,9 +20,6 @@
     <property name="Retired">
       <column name="Retired" sql-type="bit(1)" not-null="false" />
     </property>
-    <property name="Demo">
-      <column name="Demo" sql-type="bit(1)" not-null="false" />
-    </property>
     <bag name="Account">
       <key column="" />
       <one-to-many class="Account" />

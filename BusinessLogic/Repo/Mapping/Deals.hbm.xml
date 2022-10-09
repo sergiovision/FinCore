@@ -2,14 +2,11 @@
 <hibernate-mapping assembly="FXBusinessLogic.Repo" namespace="FXBusinessLogic.Repo" xmlns="urn:nhibernate-mapping-2.2">
   <class name="Deals" table="deals" lazy="true" >
     <id name="Id" column="Id" />
-    <many-to-one name="Account">
-      <column name="AccountId" sql-type="int(11)" not-null="true" />
-    </many-to-one>
     <many-to-one name="Symbol">
       <column name="SymbolId" sql-type="int(11)" not-null="true" />
     </many-to-one>
-    <many-to-one name="Adviser">
-      <column name="AdviserId" sql-type="int(11)" not-null="false" />
+    <many-to-one name="Terminal">
+      <column name="TerminalId" sql-type="int(11)" not-null="true" />
     </many-to-one>
     <property name="Orderid">
       <column name="OrderId" sql-type="bigint(18)" not-null="false" />

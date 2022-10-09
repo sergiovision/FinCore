@@ -37,7 +37,7 @@ export class WalletsComponent extends BaseComponent implements OnInit {
 
   loadData(fullRefresh = false) {
 
-   this.subs.sink = this.wallets.getAll()
+   this.subs.sink = this.wallets.getAllWithRetired(this.showRetired)
         .subscribe(
             data => {
               this.dataSource = data;
@@ -152,7 +152,7 @@ export class WalletsComponent extends BaseComponent implements OnInit {
   }
 
   getChildData(childEntity: EntitiesEnum, parentId: number): CustomStore {
-    return this.wallets.loadChildData(EntitiesEnum.Wallet, childEntity, parentId);
+    return this.wallets.loadChildData(EntitiesEnum.Wallet, childEntity, parentId, this.showRetired);
   }
 
   loadAccountsChildData(parentId: number) {
@@ -172,7 +172,23 @@ export class WalletsComponent extends BaseComponent implements OnInit {
           text: 'Add Wallet',
           onClick: this.addObjectClick.bind(this, 'Wallet')
         }
+    },
+    {
+      location: 'after',
+      widget: 'dxCheckBox',
+      options: {
+          width: 150,
+          text: 'Show Retired',
+          value: this.showRetired,
+          onValueChanged: this.doChangeRetired.bind(this)
+      }
     });
+  }
+
+  doChangeRetired(e: any) {
+    // console.log('doChangeRetired: ' + e.value);
+    this.showRetired = e.value;
+    this.loadData();
   }
 
   public onClickParentCell(e) {

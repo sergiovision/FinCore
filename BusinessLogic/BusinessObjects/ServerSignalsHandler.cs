@@ -75,20 +75,6 @@ namespace BusinessLogic.BusinessObjects
                     try
                     {
                         var jRates = Utils.ExtractList<RatesInfo>(signal.Data);
-                        if (Utils.HasAny(jRates))
-                        {
-                            var usdbynrateTask = GetBYNRates();
-                            var usdbynrate = usdbynrateTask.Result;
-                            if (usdbynrate > 0)
-                            {
-                                var rate = new RatesInfo();
-                                rate.Ask = usdbynrate;
-                                rate.Bid = usdbynrate;
-                                rate.Symbol = "USDBYN";
-                                jRates.Add(rate);
-                            }
-                        }
-
                         xtrade.UpdateRates(jRates);
                     }
                     catch (Exception e)
@@ -165,6 +151,28 @@ namespace BusinessLogic.BusinessObjects
                     log.Info($"Levels Saved For Symbol {signal.Sym}: {levels}");
                 }
                     break;
+                case EnumSignals.SIGNAL_SAVE_OBJECT:
+                {
+                    var ds = MainService.thisGlobal.Container.Resolve<DataService>();
+                    EntitiesEnum entityType = (EntitiesEnum)(short)signal.Value;
+                    DynamicProperties props = ds.GetPropertiesInstance((short) entityType, (int)signal.ObjectId);
+                    if (props == null)
+                    {
+                        props = new DynamicProperties()
+                        {
+                            objId = (int) signal.ObjectId,
+                            entityType = (short) entityType,
+                            Vals = signal.Data
+                        };
+                    }
+                    else
+                    {
+                        props.Vals = signal.Data;
+                    }
+                    bool res = ds.SavePropertiesInstance(props);
+                    log.Info($"SaveObject: {signal.Sym}, Entity: {entityType.ToString()}, Obj:{props.objId} success: {res}");
+                }
+                    break;
                 default:
                     if (server != null)
                     {
@@ -213,6 +221,18 @@ namespace BusinessLogic.BusinessObjects
                     server.MulticastText(send);
                 }
                     break;
+                case WsMessageType.GetCryptoPositions:
+                {
+                    var message = new WsMessage();
+                    message.From = wsMessage.From;
+                    message.Type = WsMessageType.GetCryptoPositions;
+                    var te = MainService.thisGlobal.Container.ResolveNamed<ITerminalEvents>("crypto");
+                    message.Message = JsonConvert.SerializeObject(te.GetAllPositions());
+                    var send = JsonConvert.SerializeObject(message);
+                    server.MulticastText(send);
+                }
+                    break;
+
                 case WsMessageType.GetAllPerformance:
                 {
                     var message = new WsMessage();
@@ -251,6 +271,16 @@ namespace BusinessLogic.BusinessObjects
                     }
                 }
                     break;
+                case WsMessageType.UpdateCryptoPosition:
+                {
+                    var result = JsonConvert.DeserializeObject<PositionInfo>(wsMessage.Message);
+                    if (result != null)
+                    {
+                        var te = MainService.thisGlobal.Container.ResolveNamed<ITerminalEvents>("crypto");
+                        te.UpdatePositionFromClient(result);
+                    }
+                }
+                    break;
                 case WsMessageType.GetLevels:
                 {
                     wsMessage.From = "Server";
@@ -270,27 +300,6 @@ namespace BusinessLogic.BusinessObjects
                 }
                     break;
             }
-        }
-
-        public async Task<double> GetBYNRates()
-        {
-            const string url = "https://www.nbrb.by/api/exrates/rates?periodicity=0";
-            var client = new HttpClient();
-            var stringTask = client.GetStringAsync(url);
-            // double result = 0;
-            await stringTask;
-            {
-                var stringData = stringTask.Result;
-                var data = JsonConvert.DeserializeObject<List<Dictionary<string, object>>>(stringData);
-                if (data != null)
-                    foreach (var item in data)
-                        if (item.ContainsKey("Cur_ID"))
-                        {
-                            var value = (long) item["Cur_ID"];
-                            if (value == 145) return (double) item["Cur_OfficialRate"];
-                        }
-            }
-            return 0;
         }
     }
 }

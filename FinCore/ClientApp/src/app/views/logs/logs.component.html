@@ -1,40 +1,29 @@
-<script src="ace-builds/src-min/ace.js"></script>
-<div class="options">
-    <p>
-        <dx-button
-          id="buttonClear"
-          text="Clear"
-          type="success"
-          (click)="ClearLogs()">
-        </dx-button>
-        <dx-button
-          id="buttonRefresh"
-          text="Refresh"
-          type="success"
-          (click)="RefreshLogs()">
-        </dx-button>
-    </p>
-</div>
-
+  <p>
+      <dx-button
+        id="buttonClear"
+        text="Clear"
+        type="success"
+        (click)="ClearLogs()">
+      </dx-button>
+      <dx-button
+        id="buttonRefresh"
+        text="Refresh"
+        type="success"
+        (click)="RefreshLogs()">
+      </dx-button>
+  </p>
 <dx-tab-panel  #tabPanel0 id="tabPanel0" class="dx-tab-panel"
-    (onSelectionChanged)="selectTab($event)"
-    [(selectedIndex)]="selectedIndex"
-    *ngIf="logz"
-    >
-    <dxi-item title="{{log.TabTitle}}" *ngFor="let log of logz">
-      <div class="tabpanel-item" >
-        <ace-editor #editor [id]="log.Name" [text]="log.DataSource" (textChanged)="log.TextChangedEvent" [options]="options"></ace-editor>
-      </div>
-    </dxi-item>
-
-
-<!--
-    [dataSource]="logs"  <div *dxTemplate="let log of 'title'">
-      <span>{{log.tabtitle}}</span>
+(onSelectionChanged)="selectTab($event)"
+[(selectedIndex)]="selectedIndex"
+*ngIf="logz"
+>
+  <dxi-item title="{{log.TabTitle}}" *ngFor="let log of logz">
+    <div class="tabpanel-item" >
     </div>
-    <div *dxTemplate="let log of 'item'" class="tabpanel-item">
-        <ace-editor #editor [id]="log.name" [text]="log.datasource" (textChanged)="log.textchangedevent"   [options]="options"></ace-editor>
-    </div> -->
-
+  </dxi-item>
 </dx-tab-panel>
+
+<ngx-monaco-editor class="code-editor" [style.height.px]="[this.editorHeight]" [options]="this.options" [(ngModel)]="this.code" (onInit)="onInit($event)"></ngx-monaco-editor>
+
+
 
