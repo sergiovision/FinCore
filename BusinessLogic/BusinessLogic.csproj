@@ -13,7 +13,7 @@
     <PackageReference Include="Microsoft.Data.Sqlite.Core" Version="6.0.7" />
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="6.0.1" />
     <PackageReference Include="MySql.Data" Version="8.0.30" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.2" />
     <PackageReference Include="NHibernate" Version="5.3.13" />
     <PackageReference Include="NHibernate.Extensions.Sqlite" Version="6.0.11" />
     <PackageReference Include="Quartz" Version="3.5.0" />
