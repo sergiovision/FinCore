@@ -63,6 +63,7 @@ import { TablesModule } from './views/tables/tables.module';
 import { PropsService } from './services/props.service';
 import { DocComponent } from './views/doc/doc.component';
 import { DGaugeComponent } from './views/dgauge/dgauge.component';
+// import { PropertiesComponent } from './views/tables/properties/properties.component';
 
 @NgModule({
   imports: [

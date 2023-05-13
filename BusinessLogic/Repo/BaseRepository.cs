@@ -1,61 +1,60 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace BusinessLogic.Repo
+namespace BusinessLogic.Repo;
+
+public class BaseRepository<T> : IRepository<T>
 {
-    public class BaseRepository<T> : IRepository<T>
+    public List<T> GetAll()
     {
-        public List<T> GetAll()
+        using (var Session = ConnectionHelper.CreateNewSession())
         {
-            using (var Session = ConnectionHelper.CreateNewSession())
+            return Session.Query<T>().ToList();
+        }
+    }
+
+    public T GetById(int id)
+    {
+        using (var Session = ConnectionHelper.CreateNewSession())
+        {
+            return Session.Get<T>(id);
+        }
+    }
+
+    public T Insert(T entity)
+    {
+        using (var Session = ConnectionHelper.CreateNewSession())
+        {
+            using (var Transaction = Session.BeginTransaction())
             {
-                return Session.Query<T>().ToList();
+                Session.Save(entity);
+                Transaction.Commit();
             }
         }
 
-        public T GetById(int id)
+        return entity;
+    }
+
+    public void Update(T entity)
+    {
+        using (var Session = ConnectionHelper.CreateNewSession())
         {
-            using (var Session = ConnectionHelper.CreateNewSession())
+            using (var Transaction = Session.BeginTransaction())
             {
-                return Session.Get<T>(id);
+                Session.Update(entity);
+                Transaction.Commit();
             }
         }
+    }
 
-        public T Insert(T entity)
+    public void Delete(int id)
+    {
+        using (var Session = ConnectionHelper.CreateNewSession())
         {
-            using (var Session = ConnectionHelper.CreateNewSession())
+            using (var Transaction = Session.BeginTransaction())
             {
-                using (var Transaction = Session.BeginTransaction())
-                {
-                    Session.Save(entity);
-                    Transaction.Commit();
-                }
-            }
-
-            return entity;
-        }
-
-        public void Update(T entity)
-        {
-            using (var Session = ConnectionHelper.CreateNewSession())
-            {
-                using (var Transaction = Session.BeginTransaction())
-                {
-                    Session.Update(entity);
-                    Transaction.Commit();
-                }
-            }
-        }
-
-        public void Delete(int id)
-        {
-            using (var Session = ConnectionHelper.CreateNewSession())
-            {
-                using (var Transaction = Session.BeginTransaction())
-                {
-                    Session.Delete(Session.Load<T>(id));
-                    Transaction.Commit();
-                }
+                Session.Delete(Session.Load<T>(id));
+                Transaction.Commit();
             }
         }
     }

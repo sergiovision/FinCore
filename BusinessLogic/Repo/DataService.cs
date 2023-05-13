@@ -281,7 +281,9 @@ public class DataService : IDataService
                 }
 
                 if (i > 0)
+                {
                     log.Log($"Saved {i} history deals in database");
+                }
             }
         }
         catch (Exception e)
@@ -297,14 +299,22 @@ public class DataService : IDataService
         return wallets.AssetsDistribution(type);
     }
 
-    public IEnumerable<MetaSymbolStat> MetaSymbolStatistics(int count)
+    public IEnumerable<MetaSymbolStat> MetaSymbolStatistics(int count, int option)
     {
         var result = new List<MetaSymbolStat>();
         try
         {
             using (var Session = ConnectionHelper.CreateNewSession())
             {
-                var symbols = Session.Query<DBMetasymbol>().Where(x => x.Retired == false).ToList();
+                List<DBMetasymbol> symbols = null;
+                if (option == 0)
+                    symbols = Session.Query<DBMetasymbol>().Where(x => x.Retired == false).ToList();
+                else if (option == 1)
+                {
+                    string listSymbolsString = GetGlobalProp(xtradeConstants.SETTINGS_METASYMBOLS_STATISTICS);
+                    string[] listMetaSymbols = new List<string>(listSymbolsString.Split(',')).ToArray();
+                    symbols = Session.Query<DBMetasymbol>().Where(x => x.Retired == false && listMetaSymbols.Contains(x.Name)).ToList();
+                }
                 foreach (var sym in symbols)
                 {
                     var deals = Session.Query<DBDeals>().Where(x => x.Symbol.Metasymbol.Id == sym.Id);

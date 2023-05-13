@@ -29,7 +29,7 @@ export class DealsComponent extends BaseComponent implements OnInit {
             });
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 

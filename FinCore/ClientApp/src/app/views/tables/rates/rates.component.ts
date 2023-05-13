@@ -45,7 +45,7 @@ export class RatesComponent extends BaseComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 

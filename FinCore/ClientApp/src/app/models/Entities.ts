@@ -18,7 +18,9 @@ export enum EntitiesEnum {
   Person = 16,
   Site = 17,
   Position = 18,
-  Indicators = 19
+  Indicators = 19,
+
+  TrendLine = 20
 }
 
 export interface DynamicProperty<T> {
@@ -317,6 +319,13 @@ export class SelectMonth {
     name: string;
     value: number;
 }
+
+export class SelectOption {
+  id: number;
+  name: string;
+  value: number;
+}
+
 
 export enum WsMessageType {
     WriteLog = 0,

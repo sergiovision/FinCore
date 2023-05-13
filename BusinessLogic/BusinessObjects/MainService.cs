@@ -627,6 +627,23 @@ public class MainService : IMainService
         return expert;
     }
 
+    public long GetObjectIdIfNotProvided(DataService ds, SignalInfo signal)
+    {
+        if (signal.ObjectId == 0 && signal.Value == (int)EntitiesEnum.TrendLines)
+        {
+            var dbSymbol = ds.getSymbolByName(signal.Sym);
+            if (dbSymbol != null)
+            {
+                var metaSymbol = dbSymbol.Metasymbol;
+                if (metaSymbol != null)
+                {
+                    signal.ObjectId = metaSymbol.Id;
+                }
+            }
+        }
+        return signal.ObjectId;
+    }
+
     public void DeInitTerminal(ExpertInfo expert)
     {
         try
@@ -681,6 +698,9 @@ public class MainService : IMainService
             {
                 var ds = Container.Resolve<DataService>();
                 EntitiesEnum entityType = (EntitiesEnum)signal.Value;
+                if (signal.ObjectId == 0)
+                    signal.ObjectId = GetObjectIdIfNotProvided(ds, signal);
+                
                 DynamicProperties props = ds.GetPropertiesInstance((short)entityType, (int)signal.ObjectId);
                 result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id,
                     signal.ChartId);

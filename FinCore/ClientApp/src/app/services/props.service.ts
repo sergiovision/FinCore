@@ -11,7 +11,7 @@ export class PropsService extends BaseService {
     super(http);
   }
 
-  public getAll() {
+  public override getAll() {
     return super.getAll('/api/props');
   }
 

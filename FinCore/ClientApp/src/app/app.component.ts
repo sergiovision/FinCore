@@ -14,10 +14,10 @@ export class AppComponent extends BaseComponent implements OnInit {
 
   }
 
-  ngOnInit() {
+  override ngOnInit() {
 
     this.subs.sink = this.router.events.subscribe((evt: any ) => {
-/*
+      /*
      if (evt.url) {
         if ( evt.url.indexOf('/chart') !== -1) {
           console.log(' app event: ' + evt.url);

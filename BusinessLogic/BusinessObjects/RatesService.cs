@@ -177,7 +177,7 @@ public class RatesService
                 return rate;
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
             return null;
         }

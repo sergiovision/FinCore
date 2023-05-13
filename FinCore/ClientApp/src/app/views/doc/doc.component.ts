@@ -19,7 +19,7 @@ export class DocComponent extends BaseComponent implements OnInit {
     this.width = this.parentView.mainView.nativeElement.offsetWidth * 0.8;
   }
 
-  ngOnInit(): void {
+  override ngOnInit(): void {
     this.loadData();
   }
 

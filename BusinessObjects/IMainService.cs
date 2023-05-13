@@ -4,87 +4,86 @@ using System.Collections.Generic;
 using Autofac;
 using BusinessObjects.BusinessObjects;
 
-namespace BusinessObjects
+namespace BusinessObjects;
+
+public interface IMainService : IDataService
 {
-    public interface IMainService : IDataService
-    {
-        ILifetimeScope Container { get; }
+    ILifetimeScope Container { get; }
 
 
-        void Init(ILifetimeScope container);
+    void Init(ILifetimeScope container);
 
-        void Dispose();
+    void Dispose();
 
-        bool InitScheduler(bool bServerMode);
+    bool InitScheduler(bool bServerMode);
 
-        void RunJobNow(string group, string name);
+    void RunJobNow(string group, string name);
 
-        void StopJobNow(string group, string name);
+    void StopJobNow(string group, string name);
 
-        string GetJobProp(string group, string name, string prop);
+    string GetJobProp(string group, string name, string prop);
 
-        void SetJobCronSchedule(string group, string name, string cron);
+    void SetJobCronSchedule(string group, string name, string cron);
 
-        public List<DealInfo> GetDeals();
+    public List<DealInfo> GetDeals();
 
-        List<ScheduledJobInfo> GetAllJobsList();
+    List<ScheduledJobInfo> GetAllJobsList();
 
-        Dictionary<string, ScheduledJobInfo> GetRunningJobs();
+    Dictionary<string, ScheduledJobInfo> GetRunningJobs();
 
-        DateTime? GetJobNextTime(string group, string name);
+    DateTime? GetJobNextTime(string group, string name);
 
-        DateTime? GetJobPrevTime(string group, string name);
+    DateTime? GetJobPrevTime(string group, string name);
 
-        void PauseScheduler();
+    void PauseScheduler();
 
-        void ResumeScheduler();
+    void ResumeScheduler();
 
-        TimeZoneInfo GetBrokerTimeZone();
-        
-        ExpertInfo InitExpert(ExpertInfo expert);
+    TimeZoneInfo GetBrokerTimeZone();
+    
+    ExpertInfo InitExpert(ExpertInfo expert);
 
-        ExpertInfo InitTerminal(ExpertInfo expert);
-        
-        void DeInitExpert(ExpertInfo expert);
+    ExpertInfo InitTerminal(ExpertInfo expert);
+    
+    void DeInitExpert(ExpertInfo expert);
 
-        void DeInitTerminal(ExpertInfo expert);
-        
-        void DeployToTerminals(string sourceFolder);
+    void DeInitTerminal(ExpertInfo expert);
+    
+    void DeployToTerminals(string sourceFolder);
 
-        string DeployToAccount(int id);
+    string DeployToAccount(int id);
 
-        List<Wallet> GetWalletBalanceRange(int WalletId, DateTime from, DateTime to);
+    List<Wallet> GetWalletBalanceRange(int WalletId, DateTime from, DateTime to);
 
-        void GetWalletBalanceRangeAsync(int WalletId, DateTime from, DateTime to);
+    void GetWalletBalanceRangeAsync(int WalletId, DateTime from, DateTime to);
 
-        bool UpdateAccountState(AccountState accState);
+    bool UpdateAccountState(AccountState accState);
 
-        SignalInfo ListenSignal(long ReciverObj, long flags);
+    SignalInfo ListenSignal(long ReciverObj, long flags);
 
-        void PostSignalTo(SignalInfo signal);
+    void PostSignalTo(SignalInfo signal);
 
-        SignalInfo SendSignal(SignalInfo expert);
+    SignalInfo SendSignal(SignalInfo expert);
 
-        void SubscribeToSignals(long objectId);
+    void SubscribeToSignals(long objectId);
 
-        SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id, long chartId);
+    SignalInfo CreateSignal(SignalFlags flags, long ObjectId, EnumSignals Id, long chartId);
 
-        ConcurrentDictionary<string, Rates> GetRates(bool IsReread);
+    ConcurrentDictionary<string, Rates> GetRates(bool IsReread);
 
-        void UpdateRates(List<RatesInfo> rates);
+    void UpdateRates(List<RatesInfo> rates);
 
-        string GetRatesList();
+    string GetRatesList();
 
-        Tuple<Type, Type> EnumToType(EntitiesEnum entities);
+    Tuple<Type, Type> EnumToType(EntitiesEnum entities);
 
-        Dictionary<EntitiesEnum, Tuple<Type, Type>> GetTypes();
+    Dictionary<EntitiesEnum, Tuple<Type, Type>> GetTypes();
 
-        string Levels4Symbol(string strSymbol);
+    string Levels4Symbol(string strSymbol);
 
-        string SaveLevels4Symbol(string strSymbol, string levels);
+    string SaveLevels4Symbol(string strSymbol, string levels);
 
-        string GetLogContent(string logName, long size);
+    string GetLogContent(string logName, long size);
 
-        object LogList();
-    }
+    object LogList();
 }

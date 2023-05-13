@@ -11,8 +11,8 @@ using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 using Quartz;
 
-namespace BusinessLogic.Jobs
-{
+namespace BusinessLogic.Jobs;
+
     // TerminalMonitoringJob starts and monitors terminals 
     internal class TerminalMonitoringJob : IJob
     {
@@ -34,43 +34,42 @@ namespace BusinessLogic.Jobs
             try
             {
                 thisJobDetail = context.JobDetail;
-                sched = context.Scheduler;
-                if (Utils.IsDebug())
-                    log.Info("TerminalMonitoringJob: ------- Monitor Terminals -------");
+            sched = context.Scheduler;
+            if (Utils.IsDebug())
+                log.Info("TerminalMonitoringJob: ------- Monitor Terminals -------");
 
-                var dataService = MainService.thisGlobal.Container.Resolve<DataService>();
+            var dataService = MainService.thisGlobal.Container.Resolve<DataService>();
 
-                var results = (IEnumerable<object>) dataService.GetObjects(EntitiesEnum.Terminal, false);
+            var results = (IEnumerable<object>) dataService.GetObjects(EntitiesEnum.Terminal, false);
 
-                results = results.Where(x => (x as Terminal).Retired == false &&
-                                             (x as Terminal).Stopped == false);
-                foreach (var resRow in results)
+            results = results.Where(x => (x as Terminal).Retired == false &&
+                                         (x as Terminal).Stopped == false);
+            foreach (var resRow in results)
+            {
+                var oPath = (resRow as Terminal).FullPath;
+                if (oPath != null)
                 {
-                    var oPath = (resRow as Terminal).FullPath;
-                    if (oPath != null)
+                    strPath = oPath;
+                    var appName = Path.GetFileNameWithoutExtension(strPath);
+                    var processlist = Process.GetProcessesByName(appName);
+                    if (processlist == null || processlist.Length == 0)
                     {
-                        strPath = oPath;
-                        var appName = Path.GetFileNameWithoutExtension(strPath);
-                        var processlist = Process.GetProcessesByName(appName);
-                        if (processlist == null || processlist.Length == 0)
-                        {
-                            procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
-                        }
-                        else
-                        {
-                            var procL = processlist.Where(d =>
-                                d.MainModule.FileName.Equals(strPath, StringComparison.InvariantCultureIgnoreCase));
-                            if (Utils.HasAny(procL)) procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
-                        }
+                        procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
+                    }
+                    else
+                    {
+                        var procL = processlist.Where(d =>
+                            d.MainModule.FileName.Equals(strPath, StringComparison.InvariantCultureIgnoreCase));
+                        if (Utils.HasAny(procL)) procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
                     }
                 }
             }
-            catch (Exception ex)
-            {
-                log.Error($"TerminalMonitoringJob Failed: {ex}");
-            }
-
-            await Task.CompletedTask;
         }
+        catch (Exception ex)
+        {
+            log.Error($"TerminalMonitoringJob Failed: {ex}");
+        }
+
+        await Task.CompletedTask;
     }
 }

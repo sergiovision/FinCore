@@ -51,7 +51,7 @@ export class InvestmentsComponent extends BaseComponent implements OnInit  {
     return t;
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 

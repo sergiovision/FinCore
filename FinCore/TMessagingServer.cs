@@ -7,88 +7,85 @@ using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 using log4net;
 using NetCoreServer;
-using Newtonsoft.Json;
 
-namespace FinCore
+namespace FinCore;
+internal class TMessageSession : TcpSession
 {
-    internal class TMessageSession : TcpSession
+    private readonly ISignalHandler handler;
+    private readonly ILog log;
+    private readonly IMessagingServer mServer;
+
+    public TMessageSession(TcpServer server, ILog l, ISignalHandler signalHandler) : base(server)
     {
-        private readonly ISignalHandler handler;
-        private readonly ILog log;
-        private readonly IMessagingServer mServer;
+        log = l;
+        handler = signalHandler;
+        mServer = (IMessagingServer) server;
+    }
 
-        public TMessageSession(TcpServer server, ILog l, ISignalHandler signalHandler) : base(server)
-        {
-            log = l;
-            handler = signalHandler;
-            mServer = (IMessagingServer) server;
-        }
+    protected override void OnConnected()
+    {
+        //log.Info($"TcpSocket sessionId {Id} connected!");
+    }
 
-        protected override void OnConnected()
-        {
-            //log.Info($"TcpSocket sessionId {Id} connected!");
-        }
+    protected override void OnDisconnected()
+    {
+        //log.Info($"TcpSocket sessionId {Id} disconnected!");
+    }
 
-        protected override void OnDisconnected()
+    protected override void OnReceived(byte[] buffer, long offset, long size)
+    {
+        var message = Encoding.UTF8.GetString(buffer, (int) offset, (int) size);
+        try
         {
-            //log.Info($"TcpSocket sessionId {Id} disconnected!");
-        }
-
-        protected override void OnReceived(byte[] buffer, long offset, long size)
-        {
-            var message = Encoding.UTF8.GetString(buffer, (int) offset, (int) size);
-            try
-            {
 #if DEBUG
-                log.Debug("Incoming: " + message);
+            log.Debug("Incoming: " + message);
 #endif
-                var strings = message.Split(new[] {(char) 0x1A});
-                foreach (var str in strings)
-                {
-                    if (string.IsNullOrEmpty(str))
-                        continue;
-                    var signal = SignalInfo.Create(str);
-                    handler.PostSignal(signal, mServer);
-                }
-            }
-            catch (Exception e)
+            var strings = message.Split(new[] {(char) 0x1A});
+            foreach (var str in strings)
             {
-                log.Error($"OnReceived: {message} e={e}");
+                if (string.IsNullOrEmpty(str))
+                    continue;
+                var signal = SignalInfo.Create(str);
+                handler.PostSignal(signal, mServer);
             }
         }
-
-        protected override void OnError(SocketError error)
+        catch (Exception e)
         {
-            log.Info($"TcpSocket session caught an error with code {error}");
+            log.Error($"OnReceived: {message} e={e}");
         }
     }
 
-    public class TMessagingServer : TcpServer, IMessagingServer
+    protected override void OnError(SocketError error)
     {
-        private static readonly ILog log = LogManager.GetLogger(typeof(TMessagingServer));
+        log.Info($"TcpSocket session caught an error with code {error}");
+    }
+}
 
-        public TMessagingServer(IPAddress address, int port) : base(address, port)
-        {
-        }
+public class TMessagingServer : TcpServer, IMessagingServer
+{
+    private static readonly ILog log = LogManager.GetLogger(typeof(TMessagingServer));
 
-        public bool MulticastText(string text)
-        {
-            return Multicast($"{text}{(char) 0x1A}");
-        }
+    public TMessagingServer(IPAddress address, int port) : base(address, port)
+    {
+    }
 
-        protected override TcpSession CreateSession()
-        {
-            if (Program.Container == null)
-                return null;
-            var handler = Program.Container.Resolve<ISignalHandler>();
-            if (handler != null)
-                return new TMessageSession(this, log, handler);
+    public bool MulticastText(string text)
+    {
+        return Multicast($"{text}{(char) 0x1A}");
+    }
+
+    protected override TcpSession CreateSession()
+    {
+        if (Program.Container == null)
             return null;
-        }
+        var handler = Program.Container.Resolve<ISignalHandler>();
+        if (handler != null)
+            return new TMessageSession(this, log, handler);
+        return null;
+    }
 
-        protected override void OnError(SocketError error)
-        {
-            log.Error($"TcpSocket server caught an error with code {error}");
-        }
+    protected override void OnError(SocketError error)
+    {
+        log.Error($"TcpSocket server caught an error with code {error}");
     }
 }

@@ -115,14 +115,14 @@ export class PerformanceComponent extends BaseComponent implements OnInit, OnDes
     this.currentMonth = now.getMonth();
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     const now: Date = new Date();
     this.currentMonth = now.getMonth();
     currMonth = this.currentMonth;
     this.loadData();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.ws.doDisconnect();
     super.ngOnDestroy();
   }

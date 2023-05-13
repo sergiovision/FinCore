@@ -28,7 +28,7 @@ export class PropertiesComponent extends BaseComponent implements OnInit, OnDest
     // this.dataSource = JSON.parse('{"ID":{"type":"integer","name":"ID","group":"System","value":3},"ObjectID":{"type":"integer","name":"ObjectID","group":"System","value":"3"}}');
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     super.ngOnInit();
   }
 
@@ -143,7 +143,7 @@ export class PropertiesComponent extends BaseComponent implements OnInit, OnDest
       // }
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.dataSource = undefined;
     super.ngOnDestroy();
   }

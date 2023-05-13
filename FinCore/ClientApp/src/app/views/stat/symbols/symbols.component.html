@@ -31,4 +31,16 @@
   <dxo-export [enabled]="true"></dxo-export>
 </dx-chart>
 </div>
+<div class="action">
+  <dx-select-box
+  horizontalAlignment="left"
+  id="selectSymbols"
+  [items]="SymbolOptions"
+  [width]="250"
+  [value]="currentOption"
+  valueExpr="id"
+  displayExpr="name"
+  (onValueChanged)="onValueChanged($event)"
+  ></dx-select-box>
+</div>
 

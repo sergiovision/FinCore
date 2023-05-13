@@ -5,15 +5,13 @@
  *  @generated
  */
 
-namespace BusinessObjects.BusinessObjects
+namespace BusinessObjects.BusinessObjects;
+public enum SignalFlags
 {
-    public enum SignalFlags
-    {
-        Auto = 0,
-        Server = 1,
-        Expert = 2,
-        Cluster = 3,
-        Terminal = 4,
-        AllTerminals = 5
-    }
+    Auto = 0,
+    Server = 1,
+    Expert = 2,
+    Cluster = 3,
+    Terminal = 4,
+    AllTerminals = 5
 }

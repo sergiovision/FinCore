@@ -58,11 +58,11 @@ export class CapitalComponent extends BaseComponent implements OnInit, OnDestroy
     this.ws.doConnect(this);
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.ws.doDisconnect();
     super.ngOnDestroy();
   }

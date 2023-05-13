@@ -5,6 +5,7 @@ using BusinessLogic.Repo;
 using BusinessLogic.Repo.Domain;
 using BusinessObjects;
 using BusinessObjects.BusinessObjects;
+using NHibernate.Mapping;
 
 namespace BusinessLogic;
 
@@ -84,7 +85,8 @@ public class MappingProfile : Profile
                     break;
                 case EntitiesEnum.Terminal:
                     CreateMap<DBTerminal, Terminal>(MemberList.None)
-                        .ForMember(dto => dto.Currency, conf => conf.MapFrom(ol => ol.Account.Currency.Name));
+                        .ForMember(dto => dto.Currency, conf => conf.MapFrom(ol => ol.Account.Currency.Name))
+                        .ForMember(dto => dto.Retired, opt => opt.MapFrom(ol => ol.Retired));
                     break;
                 case EntitiesEnum.Jobs:
                     CreateMap<DBJobs, ScheduledJobView>(MemberList.None)
@@ -120,6 +122,11 @@ public class MappingProfile : Profile
                     CreateMap<int, DBAccount>().ConvertUsing<EntityConverter<DBAccount>>();
                     CreateMap<int, DBMetasymbol>().ConvertUsing<EntityConverter<DBMetasymbol>>();
                     break; 
+                case EntitiesEnum.Settings:
+                    CreateMap<DBSettings, Settings>(MemberList.None)
+                        .PreserveReferences()
+                        .ReverseMap();
+                    break;
 
                 default:
                     CreateMap(t.Value.Item1, t.Value.Item2).ReverseMap().PreserveReferences();

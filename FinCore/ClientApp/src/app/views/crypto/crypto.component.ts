@@ -140,7 +140,7 @@ export class CryptoComponent extends BaseComponent implements OnInit, OnDestroy,
     this.ws.doDisconnect();
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.ws.doConnect(this);
   }
 
@@ -151,7 +151,7 @@ export class CryptoComponent extends BaseComponent implements OnInit, OnDestroy,
     return 'Properties';
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     clearInterval(this.timerId);
     this.ws.doDisconnect();
     super.ngOnDestroy();

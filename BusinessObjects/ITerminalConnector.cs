@@ -2,16 +2,15 @@
 using System.Collections.Generic;
 using BusinessObjects.BusinessObjects;
 
-namespace BusinessObjects
+namespace BusinessObjects;
+
+public interface ITerminalConnector : IDisposable
 {
-    public interface ITerminalConnector : IDisposable
-    {
-        bool Connect(Terminal toTerminal);
-        List<PositionInfo> GetActivePositions();
-        void MarketOrder(SignalInfo signal, IExpert adv);
+    bool Connect(Terminal toTerminal);
+    List<PositionInfo> GetActivePositions();
+    void MarketOrder(SignalInfo signal, IExpert adv);
 
-        Dictionary<int, IExpert> GetRunningAdvisers();
+    Dictionary<int, IExpert> GetRunningAdvisers();
 
-        bool IsStopped();
-    }
+    bool IsStopped();
 }

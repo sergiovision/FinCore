@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, Input, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
 import { UserToken, PositionInfo, TodayStat, IWebsocketCallback, WsMessageType, WsMessage } from '../../models/Entities';
 import { DealsService } from '../../services/deals.service';
 import { WebsocketService } from '../../services/websocket.service';
@@ -17,6 +17,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   @ViewChild('positionsContainer') positionsContainer: DxDataGridComponent;
   @ViewChild(PropertiesComponent) propsContainer: PropertiesComponent;
   @ViewChild('dgauge') dgauge: DGaugeComponent;
+  @Input() sidebarId: string = "sidebar1";
 
   dataSource: CustomStore;
   connectionStarted: boolean;
@@ -144,7 +145,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     this.ws.doDisconnect();
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.ws.doConnect(this);
   }
 
@@ -155,7 +156,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     return 'Properties';
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     clearInterval(this.timerId);
     this.ws.doDisconnect();
     super.ngOnDestroy();

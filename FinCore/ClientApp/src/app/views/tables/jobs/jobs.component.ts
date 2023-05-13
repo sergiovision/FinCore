@@ -35,7 +35,7 @@ export class JobsComponent extends BaseComponent implements OnInit {
 
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 

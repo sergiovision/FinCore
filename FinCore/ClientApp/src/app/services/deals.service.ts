@@ -15,7 +15,7 @@ export class DealsService extends BaseService {
     super(http);
   }
 
-  public getAll() {
+  public override getAll() {
     return super.getAll('/api/deals');
   }
 
@@ -27,8 +27,8 @@ export class DealsService extends BaseService {
     return super.getAll('/api/deals/GetTodayStat');
   }
 
-  public getStat(nElements: number) {
-    return super.getAll('/api/deals/MetaSymbolStatistics?count=' + nElements);
+  public getStat(nElements: number, currentOption: number) {
+    return super.getAll('/api/deals/MetaSymbolStatistics?count=' + nElements + '&option=' + currentOption);
   }
 
   public closePosition(account: number, magic: number, ticket: number) {

@@ -5,130 +5,129 @@ using BusinessLogic.Repo.Domain;
 using BusinessObjects;
 using BusinessObjects.BusinessObjects; //using Newtonsoft.Json;
 
-namespace BusinessLogic.Repo
-{
-    public class ExpertsRepository : BaseRepository<DBAdviser>
-    {
-        public List<Adviser> GetAdvisers()
-        {
-            var results = new List<Adviser>();
-            using (var Session = ConnectionHelper.CreateNewSession())
-            {
-                var advisers = Session.Query<DBAdviser>();
-                foreach (var dbadv in advisers)
-                {
-                    var adv = new Adviser();
-                    if (toDTO(dbadv, ref adv))
-                        results.Add(adv);
-                }
-            }
+namespace BusinessLogic.Repo;
 
-            return results;
+public class ExpertsRepository : BaseRepository<DBAdviser>
+{
+    public List<Adviser> GetAdvisers()
+    {
+        var results = new List<Adviser>();
+        using (var Session = ConnectionHelper.CreateNewSession())
+        {
+            var advisers = Session.Query<DBAdviser>();
+            foreach (var dbadv in advisers)
+            {
+                var adv = new Adviser();
+                if (toDTO(dbadv, ref adv))
+                    results.Add(adv);
+            }
         }
 
-        /*
-        public void MigrateAdvisersData()
+        return results;
+    }
+
+    /*
+    public void MigrateAdvisersData()
+    {
+        var ds = MainService.thisGlobal.Container.Resolve<DataService>();
+
+        // List<Adviser> results = new List<Adviser>();
+        using (ISession Session = ConnectionHelper.CreateNewSession())
         {
-            var ds = MainService.thisGlobal.Container.Resolve<DataService>();
-
-            // List<Adviser> results = new List<Adviser>();
-            using (ISession Session = ConnectionHelper.CreateNewSession())
+            var advisers = Session.Query<DBAdviser>();
+            foreach (var dbadv in advisers)
             {
-                var advisers = Session.Query<DBAdviser>();
-                foreach (var dbadv in advisers)
+                //Adviser adv = new Adviser();
+                //if (toDTO(dbadv, ref adv))
+                //    results.Add(adv);
+                try
                 {
-                    //Adviser adv = new Adviser();
-                    //if (toDTO(dbadv, ref adv))
-                    //    results.Add(adv);
-                    try
-                    {
-                        if (String.IsNullOrEmpty(dbadv.State))
-                            continue;
-                        Dictionary<string, object> res = JsonConvert.DeserializeObject<Dictionary<string, object>>(dbadv.State);
+                    if (String.IsNullOrEmpty(dbadv.State))
+                        continue;
+                    Dictionary<string, object> res = JsonConvert.DeserializeObject<Dictionary<string, object>>(dbadv.State);
 
-                        Dictionary<string, TDynamicProperty<object> > result = new Dictionary<string, TDynamicProperty<object> >();
-                        foreach(var prop in res)
+                    Dictionary<string, TDynamicProperty<object> > result = new Dictionary<string, TDynamicProperty<object> >();
+                    foreach(var prop in res)
+                    {
+                        TDynamicProperty<object> p = new TDynamicProperty<object>();
+                        if (prop.Value != null)
                         {
-                            TDynamicProperty<object> p = new TDynamicProperty<object>();
-                            if (prop.Value != null)
+                            p.type = prop.Value.GetType().ToString();
+                            switch (p.type)
                             {
-                                p.type = prop.Value.GetType().ToString();
-                                switch (p.type)
-                                {
-                                    case "System.Int64":
-                                        p.type = "integer";
-                                        break;
-                                    case "System.Double":
-                                        p.type = "double";
-                                        break;
-                                    case "System.Boolean":
-                                        p.type = "boolean";
-                                        break;
-                                    default:
-                                        p.type = "string";
-                                        break;
-                                }
-
+                                case "System.Int64":
+                                    p.type = "integer";
+                                    break;
+                                case "System.Double":
+                                    p.type = "double";
+                                    break;
+                                case "System.Boolean":
+                                    p.type = "boolean";
+                                    break;
+                                default:
+                                    p.type = "string";
+                                    break;
                             }
-                            else p.type = "string";
-                            if (prop.Key.Equals("InfoTextColor"))
-                                p.type = "hexinteger";
 
-                            p.value = prop.Value;
-                            result.Add(prop.Key, p);
                         }
+                        else p.type = "string";
+                        if (prop.Key.Equals("InfoTextColor"))
+                            p.type = "hexinteger";
 
-                        DynamicProperties dp = new DynamicProperties();
-                        dp.entityType = (short)EntitiesEnum.Adviser;
-                        dp.objId = dbadv.Id;
-                        dp.updated = DateTime.UtcNow;
-                        dp.Vals = JsonConvert.SerializeObject(result);
-                        ds.SavePropertiesInstance(dp);
-
-                    } catch (Exception e)
-                    {
-                        log.Info("Failed to migrate: Adviser: " + dbadv.Id.ToString() + ", " + e.ToString());
+                        p.value = prop.Value;
+                        result.Add(prop.Key, p);
                     }
+
+                    DynamicProperties dp = new DynamicProperties();
+                    dp.entityType = (short)EntitiesEnum.Adviser;
+                    dp.objId = dbadv.Id;
+                    dp.updated = DateTime.UtcNow;
+                    dp.Vals = JsonConvert.SerializeObject(result);
+                    ds.SavePropertiesInstance(dp);
+
+                } catch (Exception e)
+                {
+                    log.Info("Failed to migrate: Adviser: " + dbadv.Id.ToString() + ", " + e.ToString());
                 }
             }
-        }*/
+        }
+    }*/
 
 
-        public static bool toDTO(DBAdviser adv, ref Adviser result)
+    public static bool toDTO(DBAdviser adv, ref Adviser result)
+    {
+        try
         {
-            try
+            result.Id = adv.Id;
+            result.Name = adv.Name;
+            result.Running = adv.Running;
+            if (adv.Terminal != null)
             {
-                result.Id = adv.Id;
-                result.Name = adv.Name;
-                result.Running = adv.Running;
-                if (adv.Terminal != null)
-                {
-                    result.TerminalId = adv.Terminal.Id;
-                    result.CodeBase = adv.Terminal.Codebase;
-                    result.Broker = adv.Terminal.Broker;
-                    result.FullPath = adv.Terminal.Fullpath;
-                    if (adv.Terminal.Accountnumber != null)
-                        result.AccountNumber = adv.Terminal.Accountnumber.Value;
-                }
-
-                result.Retired = adv.Retired;
-                if (adv.Symbol != null)
-                {
-                    result.Symbol = adv.Symbol.Name;
-                    result.SymbolId = adv.Symbol.Id;
-                }
-
-                result.MetaSymbolId = adv.Symbol.Metasymbol.Id;
-                result.MetaSymbol = adv.Symbol.Metasymbol.Name;
-
-                result.Timeframe = adv.Timeframe;
-                // result.State = adv.State;
-                return true;
+                result.TerminalId = adv.Terminal.Id;
+                result.CodeBase = adv.Terminal.Codebase;
+                result.Broker = adv.Terminal.Broker;
+                result.FullPath = adv.Terminal.Fullpath;
+                if (adv.Terminal.Accountnumber != null)
+                    result.AccountNumber = adv.Terminal.Accountnumber.Value;
             }
-            catch
+
+            result.Retired = adv.Retired;
+            if (adv.Symbol != null)
             {
-                return false;
+                result.Symbol = adv.Symbol.Name;
+                result.SymbolId = adv.Symbol.Id;
             }
+
+            result.MetaSymbolId = adv.Symbol.Metasymbol.Id;
+            result.MetaSymbol = adv.Symbol.Metasymbol.Name;
+
+            result.Timeframe = adv.Timeframe;
+            // result.State = adv.State;
+            return true;
+        }
+        catch
+        {
+            return false;
         }
     }
 }

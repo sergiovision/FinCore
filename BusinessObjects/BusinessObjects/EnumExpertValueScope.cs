@@ -5,12 +5,11 @@
  *  @generated
  */
 
-namespace BusinessObjects.BusinessObjects
+namespace BusinessObjects.BusinessObjects;
+
+public enum EnumExpertValueScope
 {
-    public enum EnumExpertValueScope
-    {
-        GlobalScope = 0,
-        ExpertScope = 1,
-        OrderScope = 3
-    }
+    GlobalScope = 0,
+    ExpertScope = 1,
+    OrderScope = 3
 }

@@ -67,7 +67,7 @@ export class WalletsComponent extends BaseComponent implements OnInit {
     return this._showProperties;
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData(true);
   }
 

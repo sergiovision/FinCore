@@ -10,143 +10,149 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinCore.Controllers
+namespace FinCore.Controllers;
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[ApiController]
+[Route(xtradeConstants.API_ROUTE_CONTROLLER)]
+public class DealsController : BaseController
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [ApiController]
-    [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
-    public class DealsController : BaseController
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    public IEnumerable<DealInfo> Get()
     {
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        public IEnumerable<DealInfo> Get()
+        try
         {
-            try
-            {
-                return MainService.GetDeals();
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
-
-            return null;
+            return MainService.GetDeals();
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [Route("[action]")]
-        public IEnumerable<DealInfo> GetToday()
-        {
-            try
-            {
-                var ds = MainService.Container.Resolve<ITerminalEvents>();
-                if (ds == null)
-                    return null;
-                return ds.GetTodayDeals();
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
+        return null;
+    }
 
-            return null;
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [Route("[action]")]
+    public IEnumerable<DealInfo> GetToday()
+    {
+        try
+        {
+            var ds = MainService.Container.Resolve<ITerminalEvents>();
+            if (ds == null)
+                return null;
+            return ds.GetTodayDeals();
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [Route("[action]")]
-        public TodayStat GetTodayStat()
-        {
-            try
-            {
-                var ds = MainService.Container.Resolve<ITerminalEvents>();
-                if (ds == null)
-                    return null;
-                return ds.GetTodayStat();
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
+        return null;
+    }
 
-            return null;
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [Route("[action]")]
+    public TodayStat GetTodayStat()
+    {
+        try
+        {
+            var ds = MainService.Container.Resolve<ITerminalEvents>();
+            if (ds == null)
+                return null;
+            return ds.GetTodayStat();
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
+        return null;
+    }
 
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [Route("[action]")]
-        public IEnumerable<MetaSymbolStat> MetaSymbolStatistics([FromQuery] int count)
+
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [Route("[action]")]
+    public IEnumerable<MetaSymbolStat> MetaSymbolStatistics([FromQuery] int count, [FromQuery] int option)
+    {
+        try
         {
-            try
-            {
-                var ds = MainService.Container.Resolve<DataService>();
-                if (ds == null)
-                    return null;
-                return ds.MetaSymbolStatistics(count);
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
-
-            return null;
+            var ds = MainService.Container.Resolve<DataService>();
+            if (ds == null)
+                return null;
+            return ds.MetaSymbolStatistics(count, option);
         }
-
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Route("[action]")]
-        public ActionResult ClosePosition([FromQuery] int account, [FromQuery] int magic, [FromQuery] int Ticket)
+        catch (Exception e)
         {
-            try
+            log.Error(e.ToString());
+        }
+        return null;
+    }
+
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Route("[action]")]
+    public ActionResult ClosePosition([FromQuery] int account, [FromQuery] int magic, [FromQuery] int Ticket)
+    {
+        try
+        {
+            SignalInfo signalPos = null;
+            if (magic > 0)
             {
-                SignalInfo signalPos = null;
-                signalPos = MainService.CreateSignal(SignalFlags.Terminal, account,EnumSignals.SIGNAL_CLOSE_POSITION, 0);
-                signalPos.Value = Ticket;
+                signalPos = MainService.CreateSignal(SignalFlags.Expert, magic, EnumSignals.SIGNAL_CLOSE_POSITION,
+                    0);
                 signalPos.SetData(magic.ToString());
-                MainService.PostSignalTo(signalPos);
-                var terminals = MainService.Container.Resolve<ITerminalEvents>();
-                if (terminals != null)
-                    terminals.DeletePosition(Ticket);
-                return Ok();
             }
-            catch (Exception e)
+            else
             {
-                log.Error(e.ToString());
-                return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
+                signalPos = MainService.CreateSignal(SignalFlags.Terminal, account, EnumSignals.SIGNAL_CLOSE_POSITION, 0);
+                signalPos.SetData("0");
             }
+            signalPos.Value = Ticket;
+            MainService.PostSignalTo(signalPos);
+            var terminals = MainService.Container.Resolve<ITerminalEvents>();
+            if (terminals != null)
+                terminals.DeletePosition(Ticket);
+            return Ok();
         }
-
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        [Route("[action]")]
-        public ActionResult RefreshAll()
+        catch (Exception e)
         {
-            try
-            {
-                var mss = (List<object>) MainService.GetObjects(EntitiesEnum.MetaSymbol, false);
-                foreach (var m in mss)
-                {
-                    var ms = (MetaSymbol) m;
-                    if (ms.Retired)
-                        continue;
-                    var signalC = MainService.CreateSignal(SignalFlags.Cluster, ms.Id, EnumSignals.SIGNAL_ACTIVE_ORDERS,
-                        0);
-                    MainService.PostSignalTo(signalC);
-                }
+            log.Error(e.ToString());
+            return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
+        }
+    }
 
-                return Ok(HttpStatusCode.OK);
-            }
-            catch (Exception e)
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+    [Route("[action]")]
+    public ActionResult RefreshAll()
+    {
+        try
+        {
+            var mss = (List<object>) MainService.GetObjects(EntitiesEnum.MetaSymbol, false);
+            foreach (var m in mss)
             {
-                log.Error(e.ToString());
-                return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
+                var ms = (MetaSymbol) m;
+                if (ms.Retired)
+                    continue;
+                var signalC = MainService.CreateSignal(SignalFlags.Cluster, ms.Id, EnumSignals.SIGNAL_ACTIVE_ORDERS,
+                    0);
+                MainService.PostSignalTo(signalC);
             }
+
+            return Ok(HttpStatusCode.OK);
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
+            return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
         }
     }
 }

@@ -5,20 +5,19 @@ using BusinessLogic.Scheduler;
 using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 
-namespace BusinessLogic
+namespace BusinessLogic;
+
+public class BusinessLogicModule : Module
 {
-    public class BusinessLogicModule : Module
+
+    protected override void Load(ContainerBuilder builder)
     {
-    
-        protected override void Load(ContainerBuilder builder)
-        {
-            builder.RegisterType<XTradeConfig>().AsSelf().SingleInstance();
-            builder.RegisterType<SchedulerService>().AsSelf().SingleInstance();
-            builder.RegisterType<MainService>().As<IMainService>().SingleInstance();
-            builder.RegisterType<DataService>().AsSelf().SingleInstance();
-            builder.RegisterType<RatesService>().AsSelf().SingleInstance();
-            builder.RegisterType<ServerSignalsHandler>().As<ISignalHandler>().SingleInstance();
-            builder.RegisterType<ProcessImpersonation>().AsSelf().SingleInstance();
-        }
+        builder.RegisterType<XTradeConfig>().AsSelf().SingleInstance();
+        builder.RegisterType<SchedulerService>().AsSelf().SingleInstance();
+        builder.RegisterType<MainService>().As<IMainService>().SingleInstance();
+        builder.RegisterType<DataService>().AsSelf().SingleInstance();
+        builder.RegisterType<RatesService>().AsSelf().SingleInstance();
+        builder.RegisterType<ServerSignalsHandler>().As<ISignalHandler>().SingleInstance();
+        builder.RegisterType<ProcessImpersonation>().AsSelf().SingleInstance();
     }
 }

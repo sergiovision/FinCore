@@ -3,136 +3,135 @@ using System.Collections.Generic;
 using System.Linq;
 using Autofac;
 using BusinessLogic.Repo;
-using BusinessObjects;
 using BusinessObjects.BusinessObjects;
+using FinCore.Controllers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
-namespace FinCore.Controllers
+namespace FinCore.Controller;
+
+[Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
+[ApiController]
+[Route(xtradeConstants.API_ROUTE_CONTROLLER)]
+public class WalletsController : BaseController
 {
-    [Authorize(AuthenticationSchemes = JwtBearerDefaults.AuthenticationScheme)]
-    [ApiController]
-    [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
-    public class WalletsController : BaseController
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    public IEnumerable<Wallet> Get([FromQuery]bool showRetired)
     {
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        public IEnumerable<Wallet> Get([FromQuery]bool showRetired)
+        try
         {
-            try
-            {
-                return MainService.GetWalletsState(DateTime.MaxValue, showRetired);
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
-
-            return null;
+            return MainService.GetWalletsState(DateTime.MaxValue, showRetired);
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [Route("[action]/{id}")]
-        public Wallet Get(int id, [FromQuery] bool showRetired)
-        {
-            try
-            {
-                var wb = MainService.GetWalletsState(DateTime.MaxValue, showRetired);
-                return wb.Where(d => d.Id.Equals(id)).FirstOrDefault();
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
+        return null;
+    }
 
-            return null;
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [Route("[action]/{id}")]
+    public Wallet Get(int id, [FromQuery] bool showRetired)
+    {
+        try
+        {
+            var wb = MainService.GetWalletsState(DateTime.MaxValue, showRetired);
+            return wb.Where(d => d.Id.Equals(id)).FirstOrDefault();
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
-        [HttpGet]
-        [Route("[action]")]
-        [AcceptVerbs("GET")]
-        public List<Wallet> GetRange([FromQuery] int id, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
-        {
-            try
-            {
-                var w = MainService.GetWalletBalanceRange(id, fromDate, toDate);
-                return w;
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
+        return null;
+    }
 
-            return null;
+    [HttpGet]
+    [Route("[action]")]
+    [AcceptVerbs("GET")]
+    public List<Wallet> GetRange([FromQuery] int id, [FromQuery] DateTime fromDate, [FromQuery] DateTime toDate)
+    {
+        try
+        {
+            var w = MainService.GetWalletBalanceRange(id, fromDate, toDate);
+            return w;
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
-        // Warning: month is Zero based - January equal 0
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [Route("[action]")]
-        public List<TimeStat> Performance([FromQuery] int month, [FromQuery] int period)
-        {
-            try
-            {
-                var ds = MainService.Container.Resolve<DataService>();
-                if (ds == null)
-                    return null;
-                return ds.Performance(month, (TimePeriod) period);
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
+        return null;
+    }
 
-            return null;
+    // Warning: month is Zero based - January equal 0
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [Route("[action]")]
+    public List<TimeStat> Performance([FromQuery] int month, [FromQuery] int period)
+    {
+        try
+        {
+            var ds = MainService.Container.Resolve<DataService>();
+            if (ds == null)
+                return null;
+            return ds.Performance(month, (TimePeriod) period);
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
-        [HttpGet]
-        [AcceptVerbs("GET")]
-        [Route("[action]")]
-        public List<Asset> AssetsDistribution([FromQuery] int type)
-        {
-            try
-            {
-                List<Asset> result;
-                var ds = MainService.Container.Resolve<DataService>();
-                if (ds == null)
-                    return null;
-                result = ds.AssetsDistribution(type);
-                return result;
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-            }
+        return null;
+    }
 
-            return null;
+    [HttpGet]
+    [AcceptVerbs("GET")]
+    [Route("[action]")]
+    public List<Asset> AssetsDistribution([FromQuery] int type)
+    {
+        try
+        {
+            List<Asset> result;
+            var ds = MainService.Container.Resolve<DataService>();
+            if (ds == null)
+                return null;
+            result = ds.AssetsDistribution(type);
+            return result;
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
         }
 
-        [HttpPut]
-        [AcceptVerbs("PUT")]
-        [Route("[action]")]
-        public ActionResult Put([FromBody] AccountState state)
-        {
-            try
-            {
-                if (state == null)
-                    return Problem("Empty state passed to Put method!", "Error",
-                        StatusCodes.Status500InternalServerError);
+        return null;
+    }
 
-                var bres = MainService.UpdateAccountState(state);
-                if (bres)
-                    return Ok();
-                return Problem("Failed to Update Account State", "Error", StatusCodes.Status417ExpectationFailed);
-            }
-            catch (Exception e)
-            {
-                log.Error(e.ToString());
-                return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
-            }
+    [HttpPut]
+    [AcceptVerbs("PUT")]
+    [Route("[action]")]
+    public ActionResult Put([FromBody] AccountState state)
+    {
+        try
+        {
+            if (state == null)
+                return Problem("Empty state passed to Put method!", "Error",
+                    StatusCodes.Status500InternalServerError);
+
+            var bres = MainService.UpdateAccountState(state);
+            if (bres)
+                return Ok();
+            return Problem("Failed to Update Account State", "Error", StatusCodes.Status417ExpectationFailed);
+        }
+        catch (Exception e)
+        {
+            log.Error(e.ToString());
+            return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
         }
     }
 }

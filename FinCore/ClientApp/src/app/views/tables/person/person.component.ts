@@ -45,7 +45,7 @@ export class PersonComponent extends BaseComponent implements OnInit {
     });
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 

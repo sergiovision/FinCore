@@ -74,7 +74,7 @@ export class DGaugeComponent extends BaseComponent implements OnInit {
       this.loadingVisible = false;
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 

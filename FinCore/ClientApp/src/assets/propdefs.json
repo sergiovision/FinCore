@@ -341,7 +341,7 @@
             "name": "AllowVirtualStops",
             "group": "Limits",
             "control": "GeneralCheckbox",
-            "defaultValue": true,
+            "defaultValue": false,
             "description": "Allow Virtual Stops"
           },
           {
@@ -406,12 +406,13 @@
             "defaultValue": 5,
             "description": "NumBarsToAnalyze"
           },
-          { "type": "boolean",
-            "name": "EnableTrend",
-            "group": "Indicators",
-            "control": "GeneralCheckbox",
-            "defaultValue": false,
-            "description": "Add/Remove PZ Trend"
+          {
+          "type": "boolean",
+          "name": "EnableExtraPivot",
+          "group": "Indicators",
+          "control": "GeneralCheckbox",
+          "defaultValue": false,
+          "description": "Add/Remove ExtraPivot"
           },
           { "type": "boolean",
             "name": "EnableIchimoku",
@@ -515,6 +516,14 @@
             "control": "GeneralCheckbox",
             "defaultValue": false,
             "description": "EnableHarmonic"
+          },
+          {
+            "type": "boolean",
+            "name": "EnableMACD",
+            "group": "Indicators",
+            "control": "GeneralCheckbox",
+            "defaultValue": false,
+            "description": "EnableMACD"
           }
        ]
     },

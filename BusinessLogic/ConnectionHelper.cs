@@ -56,26 +56,4 @@ internal static class ConnectionHelper
             return _sessionFactory.OpenSession();
         }
     }
-
-    private static string GetComputer_InternetIP()
-    {
-        // check IP using DynDNS's service
-        var request = WebRequest.Create("http://checkip.dyndns.org");
-        // IMPORTANT: set Proxy to null, to drastically INCREASE the speed of request
-        request.Proxy = null;
-        var response = request.GetResponse();
-        var stream = new StreamReader(response.GetResponseStream());
-
-
-        // read complete response
-        var html = stream.ReadToEnd();
-
-        // replace everything and keep only IP
-        var ipAddress = html.Replace(
-                "<html><head><title>Current IP Check</title></head><body>Current IP Address: ", string.Empty)
-            .Replace("</body></html>", string.Empty);
-        char[] trim = {'\r', '\n'};
-        ipAddress = ipAddress.TrimEnd(trim);
-        return ipAddress;
-    }
 }

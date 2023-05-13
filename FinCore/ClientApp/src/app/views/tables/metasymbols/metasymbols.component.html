@@ -32,7 +32,7 @@
         <a [href]="this.experts.externChartURL(data.value)" target="_blank">{{ data.value }}</a>
       </div>
     </dxi-column>
-    <dxi-column dataField="Typ" caption="Type" [allowSorting]="true" cellTemplate="cellTemplateT" [hidingPriority]="1">
+    <dxi-column dataField="Typ" caption="Type" [allowSorting]="true" sortOrder="asc" cellTemplate="cellTemplateT" [hidingPriority]="1">
       <div *dxTemplate="let data of 'cellTemplateT'">
         {{ SymbolInfo(data.value) }}
       </div>

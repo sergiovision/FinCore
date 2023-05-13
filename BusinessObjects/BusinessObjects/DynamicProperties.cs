@@ -26,7 +26,8 @@ public enum EntitiesEnum
     Person = 16, //
     Site = 17, //
     Position = 18,
-    Indicators = 19
+    Indicators = 19,
+    TrendLines = 20
 }
 
 public class DynamicProperties

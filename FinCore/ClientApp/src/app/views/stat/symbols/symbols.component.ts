@@ -2,6 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { DealsService } from '../../../services/deals.service';
 import { MetaSymbolStat } from '../../../models/Entities';
 import { BaseComponent } from '../../../base/base.component';
+import { SelectOption} from '../../../models/Entities';
+
+let currOption = 0;
 
 @Component({
   templateUrl: 'symbols.component.html',
@@ -10,10 +13,23 @@ import { BaseComponent } from '../../../base/base.component';
 export class SymbolsComponent extends BaseComponent implements OnInit  {
   dataSource: MetaSymbolStat[];
   loadingVisible: boolean;
+  currentOption: number;
+
+  public SymbolOptions: SelectOption[] = [{
+      id: 0,
+      name: 'All Latest Symbols',
+      value: 0
+    },
+    {
+      id: 1,
+      name: 'Selected Symbols',
+      value: 1
+    }];
 
   constructor(public deals: DealsService) {
     super();
     this.loadingVisible = true;
+    this.currentOption = 1;
   }
 
   loadData() {
@@ -21,7 +37,7 @@ export class SymbolsComponent extends BaseComponent implements OnInit  {
 
     const nElements = 18;
 
-    this.subs.sink = this.deals.getStat(nElements)
+    this.subs.sink = this.deals.getStat(nElements, this.currentOption)
       .subscribe(
           data => {
             this.dataSource = data.slice(0, nElements);
@@ -31,7 +47,7 @@ export class SymbolsComponent extends BaseComponent implements OnInit  {
           error => this.logConsoleError(error));
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     this.loadData();
   }
 
@@ -42,6 +58,8 @@ export class SymbolsComponent extends BaseComponent implements OnInit  {
   }
 
   onValueChanged(data) {
+    this.currentOption = data.value;
+    currOption = this.currentOption;
     this.loadData();
   }
 

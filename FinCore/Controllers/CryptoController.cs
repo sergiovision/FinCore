@@ -8,11 +8,6 @@ using BusinessLogic;
 using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 using CryptoExchange.Net.Authentication;
-using CryptoExchange.Net.CommonObjects;
-using FTX.Net.Clients;
-using FTX.Net.Enums;
-using FTX.Net.Objects;
-using FTX.Net.Objects.Models;
 using Kucoin.Net.Clients;
 using Kucoin.Net.Objects;
 using Kucoin.Net.Objects.Models.Spot;
@@ -43,7 +38,7 @@ public class CryptoController : BaseController
             {
                 ApiCredentials = new KucoinApiCredentials(conf.KuCoinAPIKey, conf.KuCoinAPISecret, conf.KuCoinPassPhrase),
                 LogLevel = LogLevel.Trace,
-                RequestTimeout = TimeSpan.FromSeconds(60),
+                //RequestTimeout = TimeSpan.FromSeconds(60),
                 FuturesApiOptions = new KucoinRestApiClientOptions
                 {
                     ApiCredentials = new KucoinApiCredentials(conf.KuCoinFutureAPIKey, conf.KuCoinFutureAPISecret, conf.KuCoinFuturePassPhrase),
@@ -102,9 +97,19 @@ public class CryptoController : BaseController
 
             List<PositionInfo> result = new List<PositionInfo>();
 
+            //var userTradesResult = await _kucoinClient.FuturesApi.Trading.GetUserTradesAsync();
             var userTradesResult = await _kucoinClient.FuturesApi.Account.GetPositionsAsync();
             if (userTradesResult.Success)
-            { 
+            {
+                /* foreach (var order in userTradesResult.Data.Items)
+                {
+                    var pos = new PositionInfo();
+                    pos.Lots = Convert.ToDouble(order.QuoteQuantity);
+                    pos.Symbol = order.Symbol;
+                    pos.Type = (int)order.Type;
+                    pos.Role = order.TradeType;
+                    result.Add(pos);
+                } */
                 return Ok(userTradesResult.Data);
             }
             return Ok("Fail to get trades!");
@@ -131,7 +136,15 @@ public class CryptoController : BaseController
             var userTradesResult = await _kucoinClient.FuturesApi.Trading.GetOrdersAsync(null, OrderStatus.Active);
             if (userTradesResult.Success)
             {
- 
+                /* foreach (var order in userTradesResult.Data.Items)
+                {
+                    var pos = new PositionInfo();
+                    pos.Lots = Convert.ToDouble(order.QuoteQuantity);
+                    pos.Symbol = order.Symbol;
+                    pos.Type = (int)order.Type;
+                    pos.Role = order.TradeType.ToString();
+                    result.Add(pos);
+                } */
                 return Ok(userTradesResult.Data.Items);
             }
             return Ok("Fail to get orders");
@@ -157,6 +170,15 @@ public class CryptoController : BaseController
             var userTradesResult = await _kucoinClient.FuturesApi.Trading.GetUntriggeredStopOrdersAsync();
             if (userTradesResult.Success)
             {
+                /* foreach (var order in userTradesResult.Data.Items)
+                {
+                    var pos = new PositionInfo();
+                    pos.Lots = Convert.ToDouble(order.QuoteQuantity);
+                    pos.Symbol = order.Symbol;
+                    pos.Type = (int)order.Type;
+                    pos.Role = order.TradeType.ToString();
+                    result.Add(pos);
+                } */
                 return Ok(userTradesResult.Data.Items);
             }
             return Ok("Fail to get orders");
@@ -169,99 +191,6 @@ public class CryptoController : BaseController
 
 
     #endregion
-    
-    #region FTX
-    
-    private FTXClient _ftxClient;
-    private bool initFtx()
-    {
-        if (_ftxClient == null)
-        { 
-            var conf = XTradeConfig.Self();
-            _ftxClient = new FTXClient(new FTXClientOptions()
-            {
-                ApiCredentials = new ApiCredentials(conf.FTXAPIKey, conf.FTXAPISecret),
-                LogLevel = LogLevel.Trace,
-                RequestTimeout = TimeSpan.FromSeconds(60)
-            });
-        }
-        return _ftxClient != null;
-    }
-    
-    [HttpGet]
-    [Route("[action]")]
-    [AcceptVerbs("GET")]
-    public async Task<ActionResult> FTXBalances()
-    {
-        try
-        {
-            if (!initFtx())
-                return Ok("Failed to init FtxClient!");
-
-            List<Account> result = new List<Account>();
-
-            var accountData = await _ftxClient.TradeApi.Account.GetAccountInfoAsync();
-            if (accountData.Success)
-            {
-                FTXAccountInfo fi = accountData.Data;
-                return Ok(fi);
-            }
-            else
-            {
-                return Problem(accountData.Error?.ToString(), "Error", StatusCodes.Status400BadRequest);
-            }
-            
-        }
-        catch (Exception e)
-        {
-            return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
-        }
-    }
-    
-    [HttpGet]
-    [Route("[action]")]
-    [AcceptVerbs("GET")]
-    public ActionResult FTXTrades()
-    {
-        string msg = "";
-        try
-        {
-            var te = MainService.Container.ResolveNamed<ITerminalEvents>("crypto");
-            if (te == null)
-                return null;
-            var result =  te.GetAllPositions();
-            return Ok(result);
-        }
-        catch (Exception e)
-        {
-            msg = e.ToString();
-            log?.Error(msg);
-        }
-        return Problem(msg, "Error", StatusCodes.Status400BadRequest);
-    }
-    
-    [HttpGet]
-    [Route("[action]")]
-    [AcceptVerbs("GET")]
-    public async Task<ActionResult> FTXTradesRaw()
-    {
-        try
-        {
-            if (!initFtx())
-                return Ok("Failed to init FtxClient!");
-
-            var accountData = await _ftxClient.TradeApi.CommonFuturesClient.GetPositionsAsync();
-            if (accountData.Success)
-            {
-                return Ok(accountData.Data);
-            }
-            return Problem(accountData.Error?.ToString(), "Error", StatusCodes.Status400BadRequest);
-        }
-        catch (Exception e)
-        {
-            return Problem(e.ToString(), "Error", StatusCodes.Status500InternalServerError);
-        }
-    }
     
     [HttpGet]
     [AcceptVerbs("GET")]
@@ -282,9 +211,5 @@ public class CryptoController : BaseController
 
         return null;
     }
-
-
-    
-    #endregion
 
 }

@@ -4,65 +4,64 @@ using BusinessLogic.Repo.Domain;
 using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 
-namespace BusinessLogic.Repo
+namespace BusinessLogic.Repo;
+
+public class AuthRepository : BaseRepository<DBPerson>
 {
-    public class AuthRepository : BaseRepository<DBPerson>
+    protected ConcurrentDictionary<string, Person> persons;
+
+    public AuthRepository()
     {
-        protected ConcurrentDictionary<string, Person> persons;
+        persons = new ConcurrentDictionary<string, Person>();
+    }
 
-        public AuthRepository()
+    public DBPerson RegisterUser(Person userModel)
+    {
+        if (persons.ContainsKey(userModel.Mail)) throw new Exception($"User {userModel.Mail} already exists!!!");
+
+        var person = new DBPerson
         {
-            persons = new ConcurrentDictionary<string, Person>();
-        }
+            Mail = userModel.Mail,
+            Credential = userModel.Credential,
+            Regip = userModel.Regip,
+            Activated = userModel.Activated,
+            Uuid = userModel.Uuid,
+            Languageid = userModel.Languageid,
+            Retired = userModel.Retired
+        };
+        persons[userModel.Mail] = userModel;
+        return Insert(person);
+    }
 
-        public DBPerson RegisterUser(Person userModel)
-        {
-            if (persons.ContainsKey(userModel.Mail)) throw new Exception($"User {userModel.Mail} already exists!!!");
+    public Person FindUser(string mail, string password)
+    {
+        var result = GetAll().Find(x =>
+            x.Mail.Equals(mail) && CheckCredential(x.Credential, password) && x.Retired == false);
+        if (result == null)
+            return null;
+        var dto = toDTO(result);
+        persons[result.Mail] = dto;
+        return dto;
+    }
 
-            var person = new DBPerson
-            {
-                Mail = userModel.Mail,
-                Credential = userModel.Credential,
-                Regip = userModel.Regip,
-                Activated = userModel.Activated,
-                Uuid = userModel.Uuid,
-                Languageid = userModel.Languageid,
-                Retired = userModel.Retired
-            };
-            persons[userModel.Mail] = userModel;
-            return Insert(person);
-        }
+    protected bool CheckCredential(string cred, string enteredCred)
+    {
+        return cred.Equals(enteredCred);
+    }
 
-        public Person FindUser(string mail, string password)
-        {
-            var result = GetAll().Find(x =>
-                x.Mail.Equals(mail) && CheckCredential(x.Credential, password) && x.Retired == false);
-            if (result == null)
-                return null;
-            var dto = toDTO(result);
-            persons[result.Mail] = dto;
-            return dto;
-        }
-
-        protected bool CheckCredential(string cred, string enteredCred)
-        {
-            return cred.Equals(enteredCred);
-        }
-
-        private Person toDTO(DBPerson result)
-        {
-            var person = new Person();
-            person.Id = result.Id;
-            person.Languageid = result.Languageid;
-            person.Mail = result.Mail;
-            person.Privilege = result.Privilege;
-            person.Regip = result.Regip;
-            person.Retired = result.Retired;
-            person.Uuid = result.Uuid;
-            person.CountryId = result.Country.Id;
-            person.Credential = result.Credential;
-            person.Activated = result.Activated;
-            return person;
-        }
+    private Person toDTO(DBPerson result)
+    {
+        var person = new Person();
+        person.Id = result.Id;
+        person.Languageid = result.Languageid;
+        person.Mail = result.Mail;
+        person.Privilege = result.Privilege;
+        person.Regip = result.Regip;
+        person.Retired = result.Retired;
+        person.Uuid = result.Uuid;
+        person.CountryId = result.Country.Id;
+        person.Credential = result.Credential;
+        person.Activated = result.Activated;
+        return person;
     }
 }

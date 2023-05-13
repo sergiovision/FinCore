@@ -68,7 +68,7 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
     }
   }
 
-  ngOnInit() {
+  override ngOnInit() {
     super.ngOnInit();
 
     this.subs.sink = this.logS.GetLogList()
@@ -102,7 +102,7 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
     window.location.reload();
   }
 
-  ngOnDestroy(): void {
+  override ngOnDestroy(): void {
     this.ws.doDisconnect();
     super.ngOnDestroy();
   }

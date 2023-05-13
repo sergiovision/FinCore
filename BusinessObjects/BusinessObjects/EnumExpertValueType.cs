@@ -5,19 +5,18 @@
  *  @generated
  */
 
-namespace BusinessObjects.BusinessObjects
+namespace BusinessObjects.BusinessObjects;
+
+/// <summary>
+///     You can define enums, which are just 32 bit integers. Values are optional
+///     and start at 1 if not supplied, C style again.
+/// </summary>
+public enum EnumExpertValueType
 {
-    /// <summary>
-    ///     You can define enums, which are just 32 bit integers. Values are optional
-    ///     and start at 1 if not supplied, C style again.
-    /// </summary>
-    public enum EnumExpertValueType
-    {
-        ValueUndefined = 0,
-        ValueInteger = 1,
-        ValueShort = 2,
-        ValueDouble = 3,
-        ValueString = 4,
-        ValueBool = 5
-    }
+    ValueUndefined = 0,
+    ValueInteger = 1,
+    ValueShort = 2,
+    ValueDouble = 3,
+    ValueString = 4,
+    ValueBool = 5
 }

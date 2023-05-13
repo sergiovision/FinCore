@@ -11,295 +11,294 @@ using BusinessObjects.BusinessObjects;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace BusinessLogic.BusinessObjects
+namespace BusinessLogic.BusinessObjects;
+
+public class ServerSignalsHandler : ISignalHandler
 {
-    public class ServerSignalsHandler : ISignalHandler
+    private readonly IWebLog log;
+
+    private readonly MainService xtrade;
+
+    public ServerSignalsHandler()
     {
-        private readonly IWebLog log;
+        xtrade = MainService.thisGlobal;
+        log = MainService.thisGlobal.Container.Resolve<IWebLog>();
+    }
 
-        private readonly MainService xtrade;
-        //private readonly ITerminalEvents terminals;
+    public SignalInfo ListenSignal(long flags, long objectId)
+    {
+        return xtrade.ListenSignal(flags, objectId);
+    }
 
-        public ServerSignalsHandler()
+    public void PostSignal(SignalInfo signal, IMessagingServer server)
+    {
+        if ((SignalFlags) signal.Flags == SignalFlags.Cluster)
         {
-            xtrade = MainService.thisGlobal;
-            //terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-            log = MainService.thisGlobal.Container.Resolve<IWebLog>();
+            xtrade.PostSignalTo(signal);
+            return;
         }
 
-        public SignalInfo ListenSignal(long flags, long objectId)
+        switch ((EnumSignals) signal.Id)
         {
-            return xtrade.ListenSignal(flags, objectId);
-        }
-
-        public void PostSignal(SignalInfo signal, IMessagingServer server)
-        {
-            if ((SignalFlags) signal.Flags == SignalFlags.Cluster)
+            case EnumSignals.SIGNAL_POST_LOG:
             {
-                xtrade.PostSignalTo(signal);
-                return;
+                if (string.IsNullOrEmpty(signal.Data))
+                    break;
+                MainService.thisGlobal.DoLog(signal);
             }
-
-            switch ((EnumSignals) signal.Id)
+                break;
+            case EnumSignals.SIGNAL_CHECK_HEALTH:
+                if (Utils.IsDebug())
+                    log.Info("CheckHealth: " + signal.Flags);
+                break;
+            case EnumSignals.SIGNAL_DEALS_HISTORY:
             {
-                case EnumSignals.SIGNAL_POST_LOG:
+                List<DealInfo> deals = Utils.ExtractList<DealInfo>(signal.Data);
+                xtrade.SaveDeals(deals);
+            }
+                break;
+            case EnumSignals.SIGNAL_CHECK_BALANCE:
+            {
+                if (signal.Data == null)
+                    break;
+                var jList = Utils.ExtractList<BalanceInfo>(signal.Data);
+                if (Utils.HasAny(jList))
                 {
-                    if (string.IsNullOrEmpty(signal.Data))
-                        break;
-                    MainService.thisGlobal.DoLog(signal);
+                    BalanceInfo info = jList.FirstOrDefault();
+                    xtrade.UpdateBalance((int)info.Account, info.Balance, info.Equity);
                 }
-                    break;
-                case EnumSignals.SIGNAL_CHECK_HEALTH:
-                    if (Utils.IsDebug())
-                        log.Info("CheckHealth: " + signal.Flags);
-                    break;
-                case EnumSignals.SIGNAL_DEALS_HISTORY:
+            } break;
+            case EnumSignals.SIGNAL_UPDATE_RATES:
+            {
+                try
                 {
-                    List<DealInfo> deals = Utils.ExtractList<DealInfo>(signal.Data);
-                    xtrade.SaveDeals(deals);
+                    var jRates = Utils.ExtractList<RatesInfo>(signal.Data);
+                    xtrade.UpdateRates(jRates);
                 }
-                    break;
-                case EnumSignals.SIGNAL_CHECK_BALANCE:
+                catch (Exception e)
                 {
-                    if (signal.Data == null)
-                        break;
-                    var jList = Utils.ExtractList<BalanceInfo>(signal.Data);
-                    if (Utils.HasAny(jList))
-                    {
-                        BalanceInfo info = jList.FirstOrDefault();
-                        xtrade.UpdateBalance((int)info.Account, info.Balance, info.Equity);
-                    }
-                } break;
-                case EnumSignals.SIGNAL_UPDATE_RATES:
-                {
-                    try
-                    {
-                        var jRates = Utils.ExtractList<RatesInfo>(signal.Data);
-                        xtrade.UpdateRates(jRates);
-                    }
-                    catch (Exception e)
-                    {
-                        log.Info(string.Format($"GetBYNUSDRates Error: {0}", e));
-                    }
+                    log.Info(string.Format($"GetBYNUSDRates Error: {0}", e));
                 }
-                    break;
-                case EnumSignals.SIGNAL_ACTIVE_ORDERS:
+            }
+                break;
+            case EnumSignals.SIGNAL_ACTIVE_ORDERS:
+            {
+                List<PositionInfo> positions = Utils.ExtractList<PositionInfo>(signal.Data);
+                var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
+                terminals.UpdatePositions(signal.ObjectId, signal.Value, positions);
+            } break;
+            case EnumSignals.SIGNAL_ADD_ORDERS:
+            {
+                List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
+                if (Utils.HasAny(orders))
                 {
-                    List<PositionInfo> positions = Utils.ExtractList<PositionInfo>(signal.Data);
                     var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-                    terminals.UpdatePositions(signal.ObjectId, signal.Value, positions);
-                } break;
-                case EnumSignals.SIGNAL_ADD_ORDERS:
-                {
-                    List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
-                    if (Utils.HasAny(orders))
-                    {
-                        var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-                        terminals.AddOrders(signal.ObjectId, signal.Value, orders);
-                    }
-                    
-                } break;
-                case EnumSignals.SIGNAL_DELETE_ORDERS:
-                {
-                    List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
-                    if (Utils.HasAny(orders))
-                    {
-                        var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-                        terminals.DeleteOrders(signal.ObjectId, signal.Value, orders);
-                    }
-                } break;
-                case EnumSignals.SIGNAL_UPDATE_ORDERS:
-                {
-                    List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
-                    if (Utils.HasAny(orders))
-                    {
-                        var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-                        terminals.UpdateOrders(signal.ObjectId, signal.Value, orders);
-                    }
-                } break;
-                case EnumSignals.SIGNAL_WARN_NEWS:
-                    break;
-                case EnumSignals.SIGNAL_DEINIT_EXPERT:
-                {
-                    var expert = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data);
-                    xtrade.DeInitExpert(expert);
-                } break;
+                    terminals.AddOrders(signal.ObjectId, signal.Value, orders);
+                }
                 
-                case EnumSignals.SIGNAL_DEINIT_TERMINAL:
-                {
-                    var expert = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data);
-                    xtrade.DeInitTerminal(expert);
-                }
-                    break;
-                case EnumSignals.SIGNAL_LEVELS4SYMBOL:
-                {
-                    var symbol = signal.Sym;
-                    var levelsString = xtrade.Levels4Symbol(symbol);
-                    var result = xtrade.CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id,
-                        signal.ChartId);
-                    result.Sym = symbol;
-                    result.SetData(levelsString);
-                    var send = JsonConvert.SerializeObject(result);
-                    if (server != null)
-                        server.MulticastText(send);
-                }
-                    break;
-                case EnumSignals.SIGNAL_SAVELEVELS4SYMBOL:
-                {
-                    var levels = signal.Data;
-                    xtrade.SaveLevels4Symbol(signal.Sym, levels);
-                    log.Info($"Levels Saved For Symbol {signal.Sym}: {levels}");
-                }
-                    break;
-                case EnumSignals.SIGNAL_SAVE_OBJECT:
-                {
-                    var ds = MainService.thisGlobal.Container.Resolve<DataService>();
-                    EntitiesEnum entityType = (EntitiesEnum)(short)signal.Value;
-                    DynamicProperties props = ds.GetPropertiesInstance((short) entityType, (int)signal.ObjectId);
-                    if (props == null)
-                    {
-                        props = new DynamicProperties()
-                        {
-                            objId = (int) signal.ObjectId,
-                            entityType = (short) entityType,
-                            Vals = signal.Data
-                        };
-                    }
-                    else
-                    {
-                        props.Vals = signal.Data;
-                    }
-                    bool res = ds.SavePropertiesInstance(props);
-                    log.Info($"SaveObject: {signal.Sym}, Entity: {entityType.ToString()}, Obj:{props.objId} success: {res}");
-                }
-                    break;
-                default:
-                    if (server != null)
-                    {
-                        var result = xtrade.SendSignal(signal);
-                        if (result != null)
-                        {
-                            var send = JsonConvert.SerializeObject(result);
-                            server.MulticastText(send);
-                        }
-                    }
-
-                    break;
-            }
-        }
-        
-        public void ProcessMessage(WsMessage wsMessage, IMessagingServer server)
-        {
-            switch (wsMessage.Type)
+            } break;
+            case EnumSignals.SIGNAL_DELETE_ORDERS:
             {
-                case WsMessageType.GetAllText:
+                List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
+                if (Utils.HasAny(orders))
                 {
-                    wsMessage.Message = log.GetAllText();
-                    wsMessage.Type = WsMessageType.GetAllText;
-                    var send = JsonConvert.SerializeObject(wsMessage);
-                    server.MulticastText(send);
-                }
-                    break;
-                case WsMessageType.ClearLog:
-                {
-                    log.ClearLog();
-                }
-                    break;
-                case WsMessageType.WriteLog:
-                {
-                    log.Info(wsMessage.Message);
-                }
-                    break;
-                case WsMessageType.GetAllPositions:
-                {
-                    var message = new WsMessage();
-                    message.From = wsMessage.From;
-                    message.Type = WsMessageType.GetAllPositions;
                     var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-                    message.Message = JsonConvert.SerializeObject(terminals.GetAllPositions());
-                    var send = JsonConvert.SerializeObject(message);
-                    server.MulticastText(send);
+                    terminals.DeleteOrders(signal.ObjectId, signal.Value, orders);
                 }
-                    break;
-                case WsMessageType.GetCryptoPositions:
+            } break;
+            case EnumSignals.SIGNAL_UPDATE_ORDERS:
+            {
+                List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
+                if (Utils.HasAny(orders))
                 {
-                    var message = new WsMessage();
-                    message.From = wsMessage.From;
-                    message.Type = WsMessageType.GetCryptoPositions;
-                    var te = MainService.thisGlobal.Container.ResolveNamed<ITerminalEvents>("crypto");
-                    message.Message = JsonConvert.SerializeObject(te.GetAllPositions());
-                    var send = JsonConvert.SerializeObject(message);
-                    server.MulticastText(send);
+                    var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
+                    terminals.UpdateOrders(signal.ObjectId, signal.Value, orders);
                 }
-                    break;
-
-                case WsMessageType.GetAllPerformance:
-                {
-                    var message = new WsMessage();
-                    message.From = wsMessage.From;
-                    message.Type = WsMessageType.GetAllPerformance;
-                    message.Message = "[]";
-                    var ds = MainService.thisGlobal.Container.Resolve<DataService>();
-                    var month = int.Parse(wsMessage.Message);
-                    ds.StartPerf(month);
-                    var send = JsonConvert.SerializeObject(message);
-                    server.MulticastText(send);
-                }
-                    break;
-                case WsMessageType.GetAllCapital:
-                {
-                    var message = new WsMessage();
-                    message.From = wsMessage.From;
-                    message.Type = WsMessageType.GetAllCapital;
-                    message.Message = "[]";
-                    var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(wsMessage.Message);
-                    var wallet = int.Parse(result["WalletId"]);
-                    var dateTimeFrom = DateTime.Parse(result["from"]);
-                    var dateTimeTo = DateTime.Parse(result["to"]);
-                    xtrade.GetWalletBalanceRangeAsync(wallet, dateTimeFrom, dateTimeTo);
-                    var send = JsonConvert.SerializeObject(message);
-                    server.MulticastText(send);
-                }
-                    break;
-                case WsMessageType.UpdatePosition:
-                {
-                    var result = JsonConvert.DeserializeObject<PositionInfo>(wsMessage.Message);
-                    if (result != null)
-                    {
-                        var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
-                        terminals.UpdatePositionFromClient(result);
-                    }
-                }
-                    break;
-                case WsMessageType.UpdateCryptoPosition:
-                {
-                    var result = JsonConvert.DeserializeObject<PositionInfo>(wsMessage.Message);
-                    if (result != null)
-                    {
-                        var te = MainService.thisGlobal.Container.ResolveNamed<ITerminalEvents>("crypto");
-                        te.UpdatePositionFromClient(result);
-                    }
-                }
-                    break;
-                case WsMessageType.GetLevels:
-                {
-                    wsMessage.From = "Server";
-                    wsMessage.Message = xtrade.Levels4Symbol(wsMessage.Message);
-                    wsMessage.Type = WsMessageType.GetLevels;
-                    var send = JsonConvert.SerializeObject(wsMessage);
-                    server.MulticastText(send);
-                }
-                    break;
-
-
-                default:
-                {
-                    log.Info("Undefined Message");
-                    // Multicast message to all connected sessions
-                    // ((WsServer)Server).MulticastText(message);
-                }
-                    break;
+            } break;
+            case EnumSignals.SIGNAL_WARN_NEWS:
+                break;
+            case EnumSignals.SIGNAL_DEINIT_EXPERT:
+            {
+                var expert = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data);
+                xtrade.DeInitExpert(expert);
+            } break;
+            
+            case EnumSignals.SIGNAL_DEINIT_TERMINAL:
+            {
+                var expert = JsonConvert.DeserializeObject<ExpertInfo>(signal.Data);
+                xtrade.DeInitTerminal(expert);
             }
+                break;
+            case EnumSignals.SIGNAL_LEVELS4SYMBOL:
+            {
+                var symbol = signal.Sym;
+                var levelsString = xtrade.Levels4Symbol(symbol);
+                var result = xtrade.CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id,
+                    signal.ChartId);
+                result.Sym = symbol;
+                result.SetData(levelsString);
+                var send = JsonConvert.SerializeObject(result);
+                if (server != null)
+                    server.MulticastText(send);
+            }
+                break;
+            case EnumSignals.SIGNAL_SAVELEVELS4SYMBOL:
+            {
+                var levels = signal.Data;
+                xtrade.SaveLevels4Symbol(signal.Sym, levels);
+                log.Info($"Levels Saved For Symbol {signal.Sym}: {levels}");
+            }
+                break;
+            case EnumSignals.SIGNAL_SAVE_OBJECT:
+            {
+                var ds = MainService.thisGlobal.Container.Resolve<DataService>();
+                EntitiesEnum entityType = (EntitiesEnum)(short)signal.Value;
+                if (signal.ObjectId == 0)
+                    signal.ObjectId = MainService.thisGlobal.GetObjectIdIfNotProvided(ds, signal);
+                DynamicProperties props = ds.GetPropertiesInstance((short) entityType, (int)signal.ObjectId);
+                if (props == null)
+                {
+                    props = new DynamicProperties()
+                    {
+                        objId = (int) signal.ObjectId,
+                        entityType = (short) entityType,
+                        Vals = signal.Data
+                    };
+                }
+                else
+                {
+                    props.Vals = signal.Data;
+                }
+                bool res = ds.SavePropertiesInstance(props);
+                log.Info($"SaveObject: {signal.Sym}, Entity: {entityType.ToString()}, Obj:{props.objId} success: {res}");
+            }
+                break;
+            default:
+                if (server != null)
+                {
+                    var result = xtrade.SendSignal(signal);
+                    if (result != null)
+                    {
+                        var send = JsonConvert.SerializeObject(result);
+                        server.MulticastText(send);
+                    }
+                }
+
+                break;
+        }
+    }
+    
+    public void ProcessMessage(WsMessage wsMessage, IMessagingServer server)
+    {
+        switch (wsMessage.Type)
+        {
+            case WsMessageType.GetAllText:
+            {
+                wsMessage.Message = log.GetAllText();
+                wsMessage.Type = WsMessageType.GetAllText;
+                var send = JsonConvert.SerializeObject(wsMessage);
+                server.MulticastText(send);
+            }
+                break;
+            case WsMessageType.ClearLog:
+            {
+                log.ClearLog();
+            }
+                break;
+            case WsMessageType.WriteLog:
+            {
+                log.Info(wsMessage.Message);
+            }
+                break;
+            case WsMessageType.GetAllPositions:
+            {
+                var message = new WsMessage();
+                message.From = wsMessage.From;
+                message.Type = WsMessageType.GetAllPositions;
+                var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
+                message.Message = JsonConvert.SerializeObject(terminals.GetAllPositions());
+                var send = JsonConvert.SerializeObject(message);
+                server.MulticastText(send);
+            }
+                break;
+            case WsMessageType.GetCryptoPositions:
+            {
+                var message = new WsMessage();
+                message.From = wsMessage.From;
+                message.Type = WsMessageType.GetCryptoPositions;
+                var te = MainService.thisGlobal.Container.ResolveNamed<ITerminalEvents>("crypto");
+                message.Message = JsonConvert.SerializeObject(te.GetAllPositions());
+                var send = JsonConvert.SerializeObject(message);
+                server.MulticastText(send);
+            }
+                break;
+
+            case WsMessageType.GetAllPerformance:
+            {
+                var message = new WsMessage();
+                message.From = wsMessage.From;
+                message.Type = WsMessageType.GetAllPerformance;
+                message.Message = "[]";
+                var ds = MainService.thisGlobal.Container.Resolve<DataService>();
+                var month = int.Parse(wsMessage.Message);
+                ds.StartPerf(month);
+                var send = JsonConvert.SerializeObject(message);
+                server.MulticastText(send);
+            }
+                break;
+            case WsMessageType.GetAllCapital:
+            {
+                var message = new WsMessage();
+                message.From = wsMessage.From;
+                message.Type = WsMessageType.GetAllCapital;
+                message.Message = "[]";
+                var result = JsonConvert.DeserializeObject<Dictionary<string, string>>(wsMessage.Message);
+                var wallet = int.Parse(result["WalletId"]);
+                var dateTimeFrom = DateTime.Parse(result["from"]);
+                var dateTimeTo = DateTime.Parse(result["to"]);
+                xtrade.GetWalletBalanceRangeAsync(wallet, dateTimeFrom, dateTimeTo);
+                var send = JsonConvert.SerializeObject(message);
+                server.MulticastText(send);
+            }
+                break;
+            case WsMessageType.UpdatePosition:
+            {
+                var result = JsonConvert.DeserializeObject<PositionInfo>(wsMessage.Message);
+                if (result != null)
+                {
+                    var terminals = MainService.thisGlobal.Container.Resolve<ITerminalEvents>();
+                    terminals.UpdatePositionFromClient(result);
+                }
+            }
+                break;
+            case WsMessageType.UpdateCryptoPosition:
+            {
+                var result = JsonConvert.DeserializeObject<PositionInfo>(wsMessage.Message);
+                if (result != null)
+                {
+                    var te = MainService.thisGlobal.Container.ResolveNamed<ITerminalEvents>("crypto");
+                    te.UpdatePositionFromClient(result);
+                }
+            }
+                break;
+            case WsMessageType.GetLevels:
+            {
+                wsMessage.From = "Server";
+                wsMessage.Message = xtrade.Levels4Symbol(wsMessage.Message);
+                wsMessage.Type = WsMessageType.GetLevels;
+                var send = JsonConvert.SerializeObject(wsMessage);
+                server.MulticastText(send);
+            }
+                break;
+
+
+            default:
+            {
+                log.Info("Undefined Message");
+                // Multicast message to all connected sessions
+                // ((WsServer)Server).MulticastText(message);
+            }
+                break;
         }
     }
 }

@@ -6,7 +6,7 @@ import { UserToken } from '../models/Entities';
 @Injectable()
 export class PersonService extends BaseService {
 
-    constructor(protected http: HttpClient) { super(http); }
+    constructor(protected override http: HttpClient) { super(http); }
 
     create(user: UserToken) {
         return this.http.post(this.baseURL +'/api/persons', user);

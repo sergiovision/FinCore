@@ -9,10 +9,6 @@ using BusinessLogic;
 using BusinessLogic.BusinessObjects;
 using BusinessObjects;
 using BusinessObjects.BusinessObjects;
-using CryptoExchange.Net.Authentication;
-using FTX.Net.Clients;
-using FTX.Net.Enums;
-using FTX.Net.Objects;
 using Kucoin.Net.Clients;
 using Kucoin.Net.Objects;
 using Kucoin.Net.Objects.Models.Futures;
@@ -33,7 +29,6 @@ public class CryptoPosManager : ITerminalEvents
     private readonly RatesService rates;
     private readonly TodayStat todayStat;
     private static IWebLog log;
-    private static Account ftxAccount;
     private static Account kucoinAccount;
     
     public CryptoPosManager()
@@ -58,17 +53,6 @@ public class CryptoPosManager : ITerminalEvents
         foreach (var item in acc)
         {
             Account account = (Account) item;
-            if (account != null && account.Description.Contains("FTX"))
-            {
-                ftxAccount = account;
-                break;
-            }
-
-        }
-
-        foreach (var item in acc)
-        {
-            Account account = (Account) item;
             if (account != null && account.Description.Contains("KuCoin"))
             {
                 kucoinAccount = account;
@@ -90,7 +74,6 @@ public class CryptoPosManager : ITerminalEvents
     protected void LoadPositions()
     {
         positions = new ConcurrentDictionary<long, PositionInfo>();
-        LoadPositionsFtx().GetAwaiter().GetResult();
         LoadPositionsKuCoin().GetAwaiter().GetResult();
     }
     
@@ -105,114 +88,6 @@ public class CryptoPosManager : ITerminalEvents
         return result;
     }
 
-    #region FTXAPI
-
-    private FTXClient _ftxClient;
-    private bool initFtx()
-    {
-        if (_ftxClient == null)
-        { 
-            var conf = XTradeConfig.Self();
-            _ftxClient = new FTXClient(new FTXClientOptions()
-            {
-                ApiCredentials = new ApiCredentials(conf.FTXAPIKey, conf.FTXAPISecret),
-                LogLevel = LogLevel.Trace,
-                RequestTimeout = TimeSpan.FromSeconds(60)
-            });
-        }
-        return _ftxClient != null;
-    }
-    
-    private async Task<bool> LoadPositionsFtx()
-    {
-        try
-        {
-            if (!initFtx())
-                return false;
-            long id = 0;
-
-            var accountDataWP = await _ftxClient.TradeApi.Account.GetPositionsAsync(false);
-            if (accountDataWP.Success)
-            {     
-                foreach (var p in accountDataWP.Data)
-                {
-                    if (!p.EntryPrice.HasValue)
-                    {
-                        continue;
-                    }
-                    var pos = new PositionInfo();
-                    pos.Lots = Convert.ToDouble(p.Quantity);
-                    pos.Symbol = p.Future;
-                    pos.Type = (int) p.Side; 
-                    pos.Ticket = id++;
-                    pos.Profit =  Convert.ToDouble(p.RecentPnl);
-                    pos.Openprice = Convert.ToDouble(p.EntryPrice);
-                    pos.Role = "RegularTrail";
-                    AssignAccountAndAdd(ftxAccount, pos);
-                }
-            }
-            
-            var accountData = await _ftxClient.TradeApi.Trading.GetOpenOrdersAsync();
-            if (accountData.Success)
-            {
-                foreach (var p in accountData.Data)
-                {
-                    var pos = new PositionInfo();
-                    pos.Lots = Convert.ToDouble(p.Quantity);
-                    pos.Symbol = p.Future;
-                    pos.Type = (int) p.Side; 
-                    pos.Ticket = p.Id;
-                    
-                    if (p.Type == OrderType.Limit)
-                        pos.Role = "PendingLimit";
-                    else
-                        pos.Role = "RegularTrail";
-                    pos.Openprice = Convert.ToDouble(p.Price);
-
-                    AssignAccountAndAdd(ftxAccount, pos);
-                }
-            }
-            
-            var accountDataP = await _ftxClient.TradeApi.Trading.GetTriggerOrdersAsync();
-            if (accountDataP.Success)
-            {     
-                foreach (var p in accountDataP.Data)
-                {
-                    if (p.Status != TriggerOrderStatus.Open)
-                    {
-                        continue;
-                    }
-                    var pos = new PositionInfo();
-                    pos.Lots = Convert.ToDouble(p.Quantity);
-                    pos.Symbol = p.Future;
-                    pos.Type = (int) p.Side; 
-                    pos.Ticket = p.Id;
-                    
-                    if (p.Type == OrderType.Limit)
-                        pos.Role = "PendingLimit";
-                    else
-                        pos.Role = "RegularTrail";
-
-                    if (p.TriggerType == TriggerOrderType.Stop)
-                        pos.Role = "PendingStopMarket";
-                    if (p.TriggerType == TriggerOrderType.TakeProfit)
-                        pos.Role = "PendingStopMarket";
-                    
-                    pos.Openprice = Convert.ToDouble(p.TriggerPrice);
-                    AssignAccountAndAdd(ftxAccount, pos);
-                }
-            }
-
-            return true;
-        }
-        catch (Exception e)
-        {
-            log?.Error(e.ToString());
-            return false;
-        }
-    }
-
-    #endregion
     
     // KuCoin
     #region KuCoinAPI 
@@ -227,8 +102,8 @@ public class CryptoPosManager : ITerminalEvents
             _kucoinClient = new KucoinClient(new KucoinClientOptions()
             {
                 ApiCredentials = new KucoinApiCredentials(conf.KuCoinAPIKey, conf.KuCoinAPISecret, conf.KuCoinPassPhrase),
-                LogLevel = LogLevel.Trace,
-                RequestTimeout = TimeSpan.FromSeconds(60),
+                LogLevel = LogLevel.Trace, 
+                //RequestTimeout = TimeSpan.FromSeconds(60),
                 FuturesApiOptions = new KucoinRestApiClientOptions
                 {
                     ApiCredentials = new KucoinApiCredentials(conf.KuCoinFutureAPIKey, conf.KuCoinFutureAPISecret, conf.KuCoinFuturePassPhrase),
@@ -541,7 +416,38 @@ public class CryptoPosManager : ITerminalEvents
 
     public TodayStat GetTodayStat()
     {
+        /* todayStat.Deals = GetTodayDeals();
+        // reset profits
+        todayStat.Accounts.ForEach(c =>
+        {
+            c.DailyProfit = 0;
+            c.DailyMaxGain = 0;
+            c.StopTrading = false;
+        });
+        double sumReal = 0;
+        double sumDemo = 0;
+        foreach (var deal in todayDeals.OrderBy(c => c.Value.CloseTime))
+        {
+            var IsDemo = terminals[deal.Value.Account].Demo;
+            if (IsDemo)
+                sumDemo += deal.Value.Profit;
+            else
+                sumReal += deal.Value.Profit;
+            var acc = todayStat.Accounts.Find(c => c.Number == deal.Value.Account);
+            if (acc != null)
+            {
+                acc.DailyProfit += new decimal(deal.Value.Profit);
+                if (acc.DailyProfit > 0)
+                    acc.DailyMaxGain = Math.Max(acc.DailyMaxGain, acc.DailyProfit);
+            }
+        }
 
+        foreach (var deal in todayDeals)
+            deal.Value.AccountName = AccountRiskInfo(deal.Value.Account, terminals[deal.Value.Account].Broker);
+        todayStat.TodayGainDemo = decimal.Round((decimal) sumDemo, 2);
+        todayStat.TodayGainReal = decimal.Round((decimal) sumReal, 2);
+        // UpdateRiskManager();
+        */
         return todayStat;
     }
 
@@ -552,12 +458,25 @@ public class CryptoPosManager : ITerminalEvents
 
     public void UpdateBalance(int AccountNumber, decimal Balance, decimal Equity)
     {
-   
+        /*
+        var acc = todayStat.Accounts.Find(c => c.Number == AccountNumber);
+        if (acc != null)
+        {
+            acc.Balance = Balance;
+            acc.Equity = Equity;
+        } 
+        */
     }
     
     public void DeletePosition(long Ticket)
     {
-   
+        /* lock (lockObject)
+        {
+            PositionInfo todel = null;
+            if (positions.TryRemove(Ticket, out todel))
+                RemovePosition(Ticket);
+        }
+        */
     }
     
 
