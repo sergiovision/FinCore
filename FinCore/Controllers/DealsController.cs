@@ -55,14 +55,16 @@ public class DealsController : BaseController
     [HttpGet]
     [AcceptVerbs("GET")]
     [Route("[action]")]
-    public TodayStat GetTodayStat()
+    public TodayStat GetTodayStat(bool isCrypto = false)
     {
         try
         {
-            var ds = MainService.Container.Resolve<ITerminalEvents>();
-            if (ds == null)
-                return null;
-            return ds.GetTodayStat();
+            ITerminalEvents te = null;
+            if (isCrypto)
+                te = MainService.Container.ResolveNamed<ITerminalEvents>("crypto");
+            else 
+                te = MainService.Container.Resolve<ITerminalEvents>();
+            return te.GetTodayStat();
         }
         catch (Exception e)
         {

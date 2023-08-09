@@ -1,5 +1,13 @@
 import { Component, Input, OnInit, ViewChild, OnDestroy, AfterViewInit } from '@angular/core';
-import { UserToken, PositionInfo, TodayStat, IWebsocketCallback, WsMessageType, WsMessage } from '../../models/Entities';
+import {
+  UserToken,
+  PositionInfo,
+  TodayStat,
+  IWebsocketCallback,
+  WsMessageType,
+  WsMessage,
+  BalanceInfo
+} from '../../models/Entities';
 import { DealsService } from '../../services/deals.service';
 import { WebsocketService } from '../../services/websocket.service';
 import CustomStore from 'devextreme/data/custom_store';
@@ -25,6 +33,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   currentUser: UserToken;
   users: UserToken[] = [];
   stat: TodayStat;
+  balances: string;
   currentObject: any;
   private timerId: any;
 
@@ -43,6 +52,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
     this.connectionStarted = false;
     this.stat = new TodayStat();
+    this.fillBalancesString();
   }
 
   public onOpen(evt: MessageEvent) {
@@ -73,24 +83,38 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     return true;
   }
 
+  public fillBalancesString() {
+    if (this.stat.Accounts) {
+      this.balances = '';
+      this.stat.Accounts.forEach(element => {
+          if (element.Balance > 0) {
+              this.balances += element.Number + '=' + element.Balance + ':';
+          }
+      });
+    }
+  }
+
+
   public onMessage(msg: WsMessage) {
     if (msg) {
       switch (msg.Type) {
         case WsMessageType.GetAllPositions:
           {
             // console.log('Insert ' + msg.Message);
-            const data = JSON.parse(msg.Message);
+            const data = JSON.parse(msg.Message) as PositionInfo[];
+            if (data) {
+              this.dgauge.updateData(data);
+              this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
+            }
             this.dataSource = new CustomStore({
               load: () => data,
               key: 'Ticket'
             });
-            this.dgauge.updateData(data);
-            this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
           }
           break;
         case WsMessageType.UpdatePosition:
           {
-            const data = JSON.parse(msg.Message);
+            const data = JSON.parse(msg.Message) as PositionInfo;
             // console.log('Update ' + msg.Message);
             if (this.dataSource) {
               this.dataSource.push([
@@ -103,9 +127,24 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
             }
           }
           break;
+          case WsMessageType.UpdateBalance:
+          {
+              const balance = JSON.parse(msg.Message) as BalanceInfo;
+              if (balance && this.stat.Accounts) {
+                this.stat.Accounts.forEach(element => {
+                  if (balance.Account === element.Number && balance.Balance > 0) {
+                    // console.log('Updated balance for account=' + balance.Account + 'to ' + balance.Balance);
+                    element.Balance = balance.Balance;
+                    element.Equity = balance.Equity;
+                  }
+                });
+                this.fillBalancesString();
+              }
+          }
+          break;
         case WsMessageType.InsertPosition:
           {
-            const data = JSON.parse(msg.Message);
+            const data = JSON.parse(msg.Message) as PositionInfo;
             console.log('Insert ' + data);
             if (this.dataSource) {
               this.dataSource.push([
@@ -163,7 +202,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   }
 
   public UpdateDeals() {
-    this.subs.sink = this.deals.getTodayStat().subscribe(
+    this.subs.sink = this.deals.getTodayStat(false).subscribe(
       data => {
         this.stat = data;
       },

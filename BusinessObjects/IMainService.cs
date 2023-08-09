@@ -38,7 +38,9 @@ public interface IMainService : IDataService
     void PauseScheduler();
 
     void ResumeScheduler();
-
+    
+    void ClearCaches();
+    
     TimeZoneInfo GetBrokerTimeZone();
     
     ExpertInfo InitExpert(ExpertInfo expert);

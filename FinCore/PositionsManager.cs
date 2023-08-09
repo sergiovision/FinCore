@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 
 namespace FinCore;
+
 public class PositionsManager : ITerminalEvents
 {
     private static readonly object lockObject = new object();
@@ -138,14 +139,29 @@ public class PositionsManager : ITerminalEvents
             var doSave = false;
             var positionsToAdd = new Dictionary<long, PositionInfo>();
             var positionsToDelete = new List<long>();
+            Terminal terminal = terminals[AccountNumber];
             foreach (var notcontains in posMagic)
                 if (!positionsToAdd.ContainsKey(notcontains.Ticket))
                 {
-                    notcontains.AccountName = terminals[AccountNumber].Broker;
+                    notcontains.AccountName = terminal.Broker;
+                    notcontains.cur = terminal.Currency;
+
                     notcontains.Profit = (double) rates.ConvertToUSD(new decimal(notcontains.Profit),
-                        terminals[AccountNumber].Currency);
-                    notcontains.Value = (double) rates.ConvertToUSD(new decimal(notcontains.calculateValue()),
-                        notcontains.cur); // + notcontains.Profit;
+                        notcontains.cur);
+
+                    var acc = todayStat.Accounts.Find(c => c.Number == AccountNumber);
+                    if (acc != null && acc.Balance > 0)
+                    {
+                        double balanceUsd = Convert.ToDouble(rates.ConvertToUSD(acc.Balance, notcontains.cur));
+                        notcontains.Value = notcontains.Profit / balanceUsd * 100.0;
+                    }
+                    else
+                        notcontains.Value = notcontains.Profit;
+
+                    
+                    // notcontains.Value = (double) rates.ConvertToUSD(new decimal(notcontains.calculateValue()),
+                    //    notcontains.cur);
+                    
                     positionsToAdd.Add(notcontains.Ticket, notcontains);
                 }
 
@@ -156,8 +172,8 @@ public class PositionsManager : ITerminalEvents
                 {
                     positionsToAdd.Remove(pos.Key);
                     var newvalue = contains.FirstOrDefault();
-                    //newvalue.ProfitStopsPercent = pos.Value.ProfitStopsPercent;
-                    newvalue.AccountName = terminals[AccountNumber].Broker;
+                    // newvalue.ProfitStopsPercent = pos.Value.ProfitStopsPercent;
+                    newvalue.AccountName = terminal.Broker;
                     if (!newvalue.Role.Equals(pos.Value.Role))
                     {
                         newvalue.Role = pos.Value.Role;
@@ -168,7 +184,7 @@ public class PositionsManager : ITerminalEvents
                 }
                 else
                 {
-                    //if (pos.Value.Account == AccountNumber)  (pos.Value.Account == AccountNumber) && (pos.Value.Ticket > 0)
+                    // if (pos.Value.Account == AccountNumber)  (pos.Value.Account == AccountNumber) && (pos.Value.Ticket > 0)
                     if (pos.Value.Account == AccountNumber && pos.Value.Ticket > 0)
                         positionsToDelete.Add(pos.Key);
                 }
@@ -193,7 +209,7 @@ public class PositionsManager : ITerminalEvents
 
             foreach (var toadd in positionsToAdd)
             {
-                toadd.Value.AccountName = terminals[AccountNumber].Broker;
+                toadd.Value.AccountName = terminal.Broker;
                 if (positions.TryAdd(toadd.Key, toadd.Value))
                 {
                     InsertPosition(toadd.Value);

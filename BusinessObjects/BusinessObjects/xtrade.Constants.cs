@@ -2,7 +2,7 @@ namespace BusinessObjects.BusinessObjects;
 
 public static class xtradeConstants
 {
-    public const string FINCORE_VERSION = "0.9.15";
+    public const string FINCORE_VERSION = "0.9.16";
     public const double GAP_VALUE = -125;
     public const string MTDATETIMEFORMAT = "yyyy.MM.dd HH:mm";
     public const string MYSQLDATETIMEFORMAT = "yyyy-MM-dd HH:mm:ss";
@@ -44,7 +44,8 @@ public static class xtradeConstants
     // Max Amount in % you may loose daily
     public const string SETTINGS_PROPERTY_RISK_PER_DAY = "RISK.PERDAY"; // 0.02
 
-    public const string SETTINGS_METASYMBOLS_STATISTICS = "MetaSymbolsStatistics"; 
+    public const string SETTINGS_METASYMBOLS_STATISTICS = "MetaSymbolsStatistics";
+    public const string SETTINGS_METASYMBOLS_DAYS_BACK = "StatisticsDaysBack";
 
     // Mini daily gain that taken into account to do checks losses after gains
     public const string SETTINGS_PROPERTY_RISK_DAILY_MIN_GAIN = "RISK.DAILY_MIN_GAIN"; // 0.0065

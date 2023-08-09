@@ -87,7 +87,6 @@ public class CryptoPosManager : ITerminalEvents
         }
         return result;
     }
-
     
     // KuCoin
     #region KuCoinAPI 
@@ -416,7 +415,53 @@ public class CryptoPosManager : ITerminalEvents
 
     public TodayStat GetTodayStat()
     {
-        /* todayStat.Deals = GetTodayDeals();
+        decimal totalValueInUSD24H = 0;
+        decimal totalValueInUSD = 0;
+
+        var accountsAsync = _kucoinClient.SpotApi.CommonSpotClient.GetBalancesAsync().GetAwaiter().GetResult();
+        if (accountsAsync.Success)
+        {
+            foreach (var p in accountsAsync.Data)
+            {
+                decimal minValue = new decimal(0.001);
+                if (p.Total.HasValue && p.Total.Value > minValue)
+                {
+                    if (p.Asset.Equals("USDT"))
+                    {
+                        totalValueInUSD += p.Total.Value;
+                        totalValueInUSD24H += p.Total.Value;
+                    }
+                    else
+                    {
+                        string fullName = p.Asset + "-USDT";
+                        var pricesToday = _kucoinClient.SpotApi.CommonSpotClient.GetTickerAsync(fullName).GetAwaiter()
+                            .GetResult();
+                        if (pricesToday.Success)
+                        {
+                            if (pricesToday.Data.LastPrice.HasValue)
+                            {
+                                totalValueInUSD += (pricesToday.Data.LastPrice.Value * p.Total.Value);
+                                
+                                if (pricesToday.Data.Price24H.HasValue)
+                                    totalValueInUSD24H += (pricesToday.Data.Price24H.Value * p.Total.Value);
+                                else 
+                                    totalValueInUSD24H += (pricesToday.Data.LastPrice.Value * p.Total.Value);
+                            }
+                            else
+                            {
+                                
+                            }
+                        }
+                    }
+                }
+                
+            }
+            todayStat.TodayGainReal = (int)(totalValueInUSD - totalValueInUSD24H);
+            todayStat.TodayBalanceReal = (int)totalValueInUSD;
+        }
+
+        /*
+        todayStat.Deals = GetTodayDeals();
         // reset profits
         todayStat.Accounts.ForEach(c =>
         {

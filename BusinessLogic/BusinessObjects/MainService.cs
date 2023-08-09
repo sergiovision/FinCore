@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
@@ -190,6 +190,12 @@ public class MainService : IMainService
         return _gSchedulerService.Initialize();
     }
 
+    public void ClearCaches()
+    {
+        cache?.Clear();
+        data?.ClearCaches();
+    }
+
     public TimeZoneInfo GetBrokerTimeZone()
     {
         if (BrokerTimeZoneInfo == null)
@@ -275,22 +281,16 @@ public class MainService : IMainService
         task.Start();
     }
 
-    public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime toDate)
+public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime toDate)
     {
         var result = new List<Wallet>();
         try
         {
-            var dt = fromDate;
-            var dateIteration = 3;
-            var to = toDate;
-            while (dt <= to)
+            for (var dt = fromDate; dt <= toDate; dt = dt.AddDays(3))
             {
                 var res = CalculateBalanceForDate(WID, dt);
                 result.Add(res);
-                dt = dt.AddDays(dateIteration);
             }
-
-            result.Add(CalculateBalanceForDate(WID, toDate));
         }
         catch (Exception e)
         {
@@ -299,7 +299,6 @@ public class MainService : IMainService
 
         return result;
     }
-
     public bool UpdateAccountState(AccountState accState)
     {
         var result = false;
@@ -352,25 +351,22 @@ public class MainService : IMainService
         SetGlobalProp("VERSION", "{\"version\": \"" + xtradeConstants.FINCORE_VERSION + " " + date + "\" }");
     }
 
-    private void DoWalletRangeAsync(int WID, DateTime fromDate, DateTime toDate)
+    private async Task DoWalletRangeAsync(int WID, DateTime fromDate, DateTime toDate)
     {
+        const int dateIteration = 3;
         var service = thisGlobal.Container.Resolve<IMessagingService>();
         try
         {
             var dt = fromDate;
-            var dateIteration = 3;
-            var to = toDate;
-            Wallet res = null;
-            while (dt <= to)
+            while (dt < toDate)
             {
-                res = CalculateBalanceForDate(WID, dt);
-                // result.Add(res);
+                var res = CalculateBalanceForDate(WID, dt);
                 service.SendMessage(WsMessageType.ChartValue, res);
                 dt = dt.AddDays(dateIteration);
             }
 
-            res = CalculateBalanceForDate(WID, toDate);
-            service.SendMessage(WsMessageType.ChartValue, res);
+            var endBalance = CalculateBalanceForDate(WID, toDate);
+            service.SendMessage(WsMessageType.ChartValue, endBalance);
         }
         catch (Exception e)
         {
@@ -379,7 +375,7 @@ public class MainService : IMainService
 
         service.SendMessage(WsMessageType.ChartDone, "");
     }
-
+    
     /*
     private void RegisterContainer()
     {
@@ -398,30 +394,35 @@ public class MainService : IMainService
         return null;
     }
 
-    public Wallet CalculateBalanceForDate(int walletId, DateTime dt)
+    private static ConcurrentDictionary<string, Wallet> cache = new ConcurrentDictionary<string, Wallet>();
+
+    private Wallet CalculateBalanceForDate(int walletId, DateTime dt)
     {
-        IList<Wallet> result = data.GetWalletsState(dt, false);
-        var count = result.Count;
-        if (count > 0)
+        DateTime today = DateTime.Today;
+        string key = $"{walletId.ToString()}_{dt.DayOfYear}_{dt.Year}";
+        if (cache.ContainsKey(key) && (dt.DayOfYear != today.DayOfYear))
         {
-            if (walletId != 0) return result.Where(x => x.Id == walletId).FirstOrDefault();
-
-            var wb = new Wallet();
-            wb.Id = walletId;
-            if (dt.Equals(DateTime.MaxValue))
-                wb.Date = DateTime.UtcNow;
-            else
-                wb.Date = dt;
-            foreach (var row in result)
-                wb.Balance += row.Balance; // for total
-            //wb.PersonId = row.PersonId;
-            //wb.Retired = row.Retired;
-            //wb.Name = row.Name;
-
-            return wb;
+            return cache[key];
         }
+        else
+        {
+            IList<Wallet> result = data.GetWalletsState(dt, false);
+            if (result.Count > 0)
+            {
+                if (walletId != 0) return result.FirstOrDefault(x => x.Id == walletId);
 
-        return null;
+                var wb = new Wallet
+                {
+                    Id = walletId,
+                    Date = dt.Equals(DateTime.MaxValue) ? DateTime.UtcNow : dt,
+                    Balance = result.Sum(x => x.Balance)
+                };
+                if (wb.Date.DayOfYear != today.DayOfYear)
+                    cache[key] = wb;
+                return wb;
+            }
+            return null;
+        }
     }
 
     public IEnumerable<DBAdviser> GetAdvisersByTerminal(long terminalId)
@@ -523,7 +524,7 @@ public class MainService : IMainService
             {
                 var msg = "";
                 var accNumber = long.Parse(expert.Account);
-                var terminal = data.getTerminalByNumber(Session, accNumber);
+                var terminal = data.GetDBTerminalByNumber(Session, accNumber);
                 if (terminal == null)
                 {
                     msg = $"Unknown AccountNumber {expert.Account}. Please Register Account in DB.";
@@ -536,7 +537,7 @@ public class MainService : IMainService
                 var strSymbol = expert.Symbol;
                 if (strSymbol.Contains("_i"))
                     strSymbol = strSymbol.Substring(0, strSymbol.Length - 2);
-                var symbol = data.getSymbolByName(strSymbol);
+                var symbol = data.GetSymbolByName(strSymbol);
                 if (symbol == null)
                 {
                     msg = $"Unknown Symbol {strSymbol}. Please register Symbol in DB.";
@@ -602,7 +603,7 @@ public class MainService : IMainService
             using (var Session = ConnectionHelper.CreateNewSession())
             {
                 var accNumber = long.Parse(expert.Account);
-                var terminal = data.getTerminalByNumber(Session, accNumber);
+                var terminal = data.GetTerminalByNumber(Session, accNumber);
                 if (terminal == null)
                 {
                     var msg = $"Unknown AccountNumber {expert.Account} ERROR";
@@ -631,7 +632,7 @@ public class MainService : IMainService
     {
         if (signal.ObjectId == 0 && signal.Value == (int)EntitiesEnum.TrendLines)
         {
-            var dbSymbol = ds.getSymbolByName(signal.Sym);
+            var dbSymbol = ds.GetSymbolByName(signal.Sym);
             if (dbSymbol != null)
             {
                 var metaSymbol = dbSymbol.Metasymbol;
@@ -769,7 +770,7 @@ public class MainService : IMainService
         {
             using (var Session = ConnectionHelper.CreateNewSession())
             {
-                var dbSymbol = data.getSymbolByName(strSymbol);
+                var dbSymbol = data.GetSymbolByName(strSymbol);
                 if (dbSymbol == null)
                 {
                     log.Error("ERROR. Unknown Symbol: " + strSymbol + " .");
@@ -806,7 +807,7 @@ public class MainService : IMainService
         {
             using (var Session = ConnectionHelper.CreateNewSession())
             {
-                var dbSymbol = data.getSymbolByName(strSymbol);
+                var dbSymbol = data.GetSymbolByName(strSymbol);
                 if (dbSymbol == null)
                 {
                     log.Error("ERROR. Unknown Symbol: " + strSymbol + " .");
@@ -864,7 +865,7 @@ public class MainService : IMainService
             using (var Session = ConnectionHelper.CreateNewSession())
             {
                 var magicNumber = (int) expert.Magic;
-                var adviser = data.getAdviserByMagicNumber(Session, magicNumber);
+                var adviser = data.GetAdviserByMagicNumber(Session, magicNumber);
                 if (adviser == null)
                 {
                     log.Error("Expert with MagicNumber=" + magicNumber + " doesn't exist");
@@ -898,14 +899,14 @@ public class MainService : IMainService
                     continue;
                 var sourceDir = new DirectoryInfo(sourceFolder);
                 var fileName = $@"deployto_{terminal.AccountNumber}.bat";
-                var SW = new StreamWriter(fileName);
+                var SW = new StreamWriter(fileName); 
                 SW.Write(ProcessFolder("", terminal, sourceFolder, Utils.CopyFile));
                 SW.Write(ProcessFolder("", terminal, sourceFolder, CompileFile));
                 SW.Flush();
                 SW.Close();
                 SW.Dispose();
                 SW = null;
-                //Process.Start("deploy.bat");
+                // Process.Start("deploy.bat");
             }
         }
         catch (Exception e)

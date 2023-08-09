@@ -38,7 +38,7 @@ public class CryptoController : BaseController
             {
                 ApiCredentials = new KucoinApiCredentials(conf.KuCoinAPIKey, conf.KuCoinAPISecret, conf.KuCoinPassPhrase),
                 LogLevel = LogLevel.Trace,
-                //RequestTimeout = TimeSpan.FromSeconds(60),
+                // RequestTimeout = TimeSpan.FromSeconds(60),
                 FuturesApiOptions = new KucoinRestApiClientOptions
                 {
                     ApiCredentials = new KucoinApiCredentials(conf.KuCoinFutureAPIKey, conf.KuCoinFutureAPISecret, conf.KuCoinFuturePassPhrase),

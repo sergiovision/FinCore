@@ -118,3 +118,13 @@ BusinessLogic/bin/Release/net6.0/BusinessObjects.pdb
 BusinessObjects/bin/Release/net6.0/BusinessObjects.dll
 BusinessObjects/bin/Release/net6.0/BusinessObjects.deps.json
 BusinessObjects/bin/Release/net6.0/BusinessObjects.pdb
+BusinessLogic/bin/Debug/net7.0/BusinessLogic.dll
+BusinessLogic/bin/Debug/net7.0/BusinessLogic.pdb
+BusinessLogic/bin/Debug/net7.0/BusinessObjects.dll
+BusinessLogic/bin/Debug/net7.0/BusinessObjects.pdb
+BusinessLogic/bin/Debug/net7.0/BusinessLogic.deps.json
+BusinessLogic/obj/rider.project.model.nuget.info
+BusinessObjects/bin/Debug/net7.0/BusinessObjects.pdb
+BusinessObjects/bin/Debug/net7.0/BusinessObjects.dll
+BusinessObjects/bin/Debug/net7.0/BusinessObjects.deps.json
+BusinessObjects/bin/Release/net7.0/BusinessObjects.deps.json

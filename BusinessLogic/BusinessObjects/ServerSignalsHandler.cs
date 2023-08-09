@@ -66,6 +66,13 @@ public class ServerSignalsHandler : ISignalHandler
                 {
                     BalanceInfo info = jList.FirstOrDefault();
                     xtrade.UpdateBalance((int)info.Account, info.Balance, info.Equity);
+                    var message = new WsMessage();
+                    message.From = "Server";
+                    message.Type = WsMessageType.UpdateBalance;
+                    message.Message = JsonConvert.SerializeObject(info);
+                    var service = MainService.thisGlobal.Container.Resolve<IMessagingService>();
+                    if (service != null)
+                        service.SendMessage(message);
                 }
             } break;
             case EnumSignals.SIGNAL_UPDATE_RATES:

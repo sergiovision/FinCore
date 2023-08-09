@@ -24,7 +24,6 @@ internal class MessagingService : IMessagingService
     public MessagingService(IConfiguration config)
     {
         configuration = config;
-        //Init();
     }
 
     public IMessagingServer Server => _serv;

@@ -158,14 +158,12 @@ export class CryptoComponent extends BaseComponent implements OnInit, OnDestroy,
   }
 
   public UpdateDeals() {
-    /*
-    this.subs.sink = this.deals.getTodayStat().subscribe(
+    this.subs.sink = this.deals.getTodayStat(true).subscribe(
       data => {
         this.stat = data;
       },
       error => this.logConsoleError(error)
     );
-    */
   }
 
   public onClickCell(e) {

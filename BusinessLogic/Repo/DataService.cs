@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,6 +11,7 @@ using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 using Newtonsoft.Json;
 using NHibernate;
+using NHibernate.Linq;
 using NHibernate.Type;
 
 namespace BusinessLogic.Repo;
@@ -18,7 +19,6 @@ namespace BusinessLogic.Repo;
 public class DataService : IDataService
 {
     private static IWebLog log;
-    private static readonly object lockDeals = new object();
     private readonly IRepository<DBAccountstate> accstates;
     private readonly IRepository<DBCurrency> currencies;
     private readonly ExpertsRepository experts;
@@ -32,11 +32,11 @@ public class DataService : IDataService
     private IRepository<DBDeals> deals;
     private readonly IMapper mapper;
     private RatesService rates;
-
+    private static ConcurrentDictionary<DateTime, TimeStat> cache;
+    
     public DataService(IWebLog l)
     {
         symbols = new BaseRepository<DBSymbol>();
-        
         currencies = new BaseRepository<DBCurrency>();
         settings = new BaseRepository<DBSettings>();
         jobs = new BaseRepository<DBJobs>();
@@ -53,7 +53,12 @@ public class DataService : IDataService
 #if DEBUG
         mapper.ConfigurationProvider.AssertConfigurationIsValid();
 #endif
-        
+        cache = new ConcurrentDictionary<DateTime, TimeStat>();
+    }
+    
+    public void ClearCaches()
+    {
+        cache?.Clear();
     }
 
     public List<CurrencyInfo> GetCurrencies()
@@ -82,10 +87,9 @@ public class DataService : IDataService
     {
         try
         {
-            var gvars = settings.GetAll().Where(x => x.Propertyname.Equals(name));
-            if (gvars.Count() > 0)
+            var gvar = settings.GetAll().SingleOrDefault(x => x.Propertyname.Equals(name));
+            if (gvar != null)
             {
-                var gvar = gvars.First();
                 return gvar.Value;
             }
         }
@@ -96,26 +100,23 @@ public class DataService : IDataService
 
         return "";
     }
-
     public void SetGlobalProp(string name, string value)
     {
-        var gvars = settings.GetAll().Where(x => x.Propertyname == name);
-        if (gvars.Count() > 0)
+        var gvar = settings.GetAll().SingleOrDefault(x => x.Propertyname == name);
+        if (gvar != null)
         {
-            var gvar = gvars.First();
             gvar.Value = value;
             settings.Update(gvar);
         }
         else
         {
-            var gvar = new DBSettings();
+            gvar = new DBSettings();
             gvar.Propertyname = name;
             gvar.Value = value;
             settings.Insert(gvar);
         }
-    }
-
-
+    }    
+    
     public List<DealInfo> TodayDeals()
     {
         var result = new List<DealInfo>();
@@ -124,7 +125,7 @@ public class DataService : IDataService
             var now = DateTime.Now;
             using (var Session = ConnectionHelper.CreateNewSession())
             {
-                var deals = Session.Query<DBDeals>().OrderByDescending(x => x.Closetime);
+                var deals = Session.QueryOver<DBDeals>().OrderBy(x => x.Closetime).Desc.List();
                 foreach (var dbd in deals)
                     if (Utils.IsSameDay(dbd.Closetime.Value, now))
                         result.Add(toDTO(dbd));
@@ -137,76 +138,50 @@ public class DataService : IDataService
 
         return result;
     }
-
-    public void UpdateBalance(int AccountNumber, decimal Balance, decimal Equity)
+    public void UpdateBalance(int accountNumber, decimal balance, decimal equity)
     {
-        using (var Session = ConnectionHelper.CreateNewSession())
+        using (var session = ConnectionHelper.CreateNewSession())
         {
-            var terms = Session.Query<DBTerminal>().Where(x => x.Accountnumber == AccountNumber);
-            if (!Utils.HasAny(terms))
+            var terminal = session.Query<DBTerminal>().FirstOrDefault(x => x.Accountnumber == accountNumber);
+            if (terminal == null || terminal.Account == null)
                 return;
-            var terminal = terms.FirstOrDefault();
-            if (terminal == null)
-                return;
-            if (terminal.Account == null)
-                return;
-            using (var Transaction = Session.BeginTransaction())
-            {
-                terminal.Account.Balance = Balance;
-                terminal.Account.Equity = Equity;
-                terminal.Account.Lastupdate = DateTime.UtcNow;
-                Session.Update(terminal);
-                Transaction.Commit();
-            }
 
-            var acc = Session.Query<DBAccountstate>().Where(x => x.Account.Id == terminal.Account.Id)
-                .OrderByDescending(x => x.Date);
-            using (var Transaction = Session.BeginTransaction())
+            terminal.Account.Balance = balance;
+            terminal.Account.Equity = equity;
+            terminal.Account.Lastupdate = DateTime.UtcNow;
+
+            using (var transaction = session.BeginTransaction())
             {
-                if (acc.Any())
+                session.Update(terminal);
+
+                var latestAccountState = session.Query<DBAccountstate>()
+                    .Where(x => x.Account.Id == terminal.Account.Id)
+                    .OrderByDescending(x => x.Date)
+                    .FirstOrDefault();
+
+                if (latestAccountState == null || latestAccountState.Date.DayOfYear != DateTime.UtcNow.DayOfYear)
                 {
-                    DBAccountstate state = null;
-                    state = acc.FirstOrDefault();
-                    if (state == null || state.Date.DayOfYear != DateTime.Today.DayOfYear)
+                    var newAccountState = new DBAccountstate
                     {
-                        var newstate = new DBAccountstate();
-                        if (state == null)
-                            newstate.Account = terminal.Account;
-                        else
-                            newstate.Account = state.Account;
-                        newstate.Balance = Balance;
-                        newstate.Comment = "Autoupdate";
-                        newstate.Date = DateTime.UtcNow;
-                        Session.Save(newstate);
-                    }
-                    else
-                    {
-                        state.Balance = Balance;
-                        state.Comment = "Autoupdate";
-                        state.Date = DateTime.UtcNow;
-                        Session.Update(state);
-                    }
-
-                    Transaction.Commit();
+                        Account = terminal.Account,
+                        Balance = balance,
+                        Comment = "Autoupdate",
+                        Date = DateTime.UtcNow
+                    };
+                    session.Save(newAccountState);
                 }
+                else
+                {
+                    latestAccountState.Balance = balance;
+                    latestAccountState.Comment = "Autoupdate";
+                    latestAccountState.Date = DateTime.UtcNow;
+                    session.Update(latestAccountState);
+                }
+
+                transaction.Commit();
             }
         }
     }
-
-    /*
-    public void MigrateAdvisers()
-    {
-        try
-        {
-            experts.MigrateAdvisersData();
-        }
-        catch (Exception e)
-        {
-            log.Error("Error: MigrateAdvisers: " + e);
-        }
-
-    }*/
-
 
     public List<Wallet> GetWalletsState(DateTime date, bool showRetired)
     {
@@ -229,60 +204,50 @@ public class DataService : IDataService
             return;
         try
         {
-            lock (lockDeals)
+            using (var Session = ConnectionHelper.CreateNewSession())
             {
-                var i = 0;
-                using (var Session = ConnectionHelper.CreateNewSession())
+                foreach (var deal in deals.OrderBy(x => x.CloseTime))
                 {
-                    foreach (var deal in deals.OrderBy(x => x.CloseTime))
+                    var sym = GetSymbolByName(deal.Symbol);
+                    if (sym == null)
+                        continue;
+                    var dbDeal = Session.Get<DBDeals>((int)deal.Ticket);
+                    if (dbDeal == null)
                     {
-                        var sym = getSymbolByName(deal.Symbol);
-                        if (sym == null)
+                        if (GetDealById(Session, deal.Ticket) != null)
                             continue;
-                        var dbDeal = Session.Get<DBDeals>((int) deal.Ticket);
-                        if (dbDeal == null)
+                        try
                         {
-                            if (getDealById(Session, deal.Ticket) != null)
-                                continue;
-                            try
+                            using (var Transaction = Session.BeginTransaction())
                             {
-                                using (var Transaction = Session.BeginTransaction())
-                                {
-                                    dbDeal = new DBDeals();
-                                    dbDeal.Dealid = (int) deal.Ticket;
-                                    dbDeal.Symbol = getSymbolByName(deal.Symbol);
-                                    dbDeal.Terminal = getBDTerminalByNumber(Session, deal.Account);
-                                    dbDeal.Id = (int) deal.Ticket;
-                                    DateTime closeTime;
-                                    if (DateTime.TryParse(deal.CloseTime, out closeTime))
-                                        dbDeal.Closetime = DateTime.Parse(deal.CloseTime);
-                                    dbDeal.Comment = deal.Comment;
-                                    dbDeal.Commission = (decimal) deal.Commission;
-                                    DateTime openTime;
-                                    if (DateTime.TryParse(deal.OpenTime, out openTime))
-                                        dbDeal.Opentime = DateTime.Parse(deal.OpenTime);
-                                    dbDeal.Orderid = (int) deal.OrderId;
-                                    dbDeal.Profit = (decimal) deal.Profit;
-                                    dbDeal.Price = (decimal) deal.ClosePrice;
-                                    dbDeal.Swap = (decimal) deal.Swap;
-                                    dbDeal.Typ = deal.Type;
-                                    dbDeal.Volume = (decimal) deal.Lots;
-                                    Session.Save(dbDeal);
-                                    Transaction.Commit();
-                                    i++;
-                                }
-                            }
-                            catch (Exception)
-                            {
-                                log.Log($"Deal {deal.Ticket}:{deal.Symbol} failed to be saved in database");
+                                dbDeal = new DBDeals();
+                                dbDeal.Dealid = (int)deal.Ticket;
+                                dbDeal.Symbol = GetSymbolByName(deal.Symbol);
+                                dbDeal.Terminal = GetDBTerminalByNumber(Session, deal.Account);
+                                dbDeal.Id = (int)deal.Ticket;
+                                DateTime closeTime;
+                                if (DateTime.TryParse(deal.CloseTime, out closeTime))
+                                    dbDeal.Closetime = DateTime.Parse(deal.CloseTime);
+                                dbDeal.Comment = deal.Comment;
+                                dbDeal.Commission = (decimal)deal.Commission;
+                                DateTime openTime;
+                                if (DateTime.TryParse(deal.OpenTime, out openTime))
+                                    dbDeal.Opentime = DateTime.Parse(deal.OpenTime);
+                                dbDeal.Orderid = (int)deal.OrderId;
+                                dbDeal.Profit = (decimal)deal.Profit;
+                                dbDeal.Price = (decimal)deal.ClosePrice;
+                                dbDeal.Swap = (decimal)deal.Swap;
+                                dbDeal.Typ = deal.Type;
+                                dbDeal.Volume = (decimal)deal.Lots;
+                                Session.Save(dbDeal);
+                                Transaction.Commit();
                             }
                         }
+                        catch (Exception)
+                        {
+                            log.Log($"Deal {deal.Ticket}:{deal.Symbol} failed to be saved in database");
+                        }
                     }
-                }
-
-                if (i > 0)
-                {
-                    log.Log($"Saved {i} history deals in database");
                 }
             }
         }
@@ -293,7 +258,7 @@ public class DataService : IDataService
             log.Log(message);
         }
     }
-    
+        
     public List<Asset> AssetsDistribution(int type)
     {
         return wallets.AssetsDistribution(type);
@@ -312,9 +277,12 @@ public class DataService : IDataService
                 else if (option == 1)
                 {
                     string listSymbolsString = GetGlobalProp(xtradeConstants.SETTINGS_METASYMBOLS_STATISTICS);
-                    string[] listMetaSymbols = new List<string>(listSymbolsString.Split(',')).ToArray();
+                    string[] listMetaSymbols = listSymbolsString.Split(',');
                     symbols = Session.Query<DBMetasymbol>().Where(x => x.Retired == false && listMetaSymbols.Contains(x.Name)).ToList();
                 }
+                string daysBackString = GetGlobalProp(xtradeConstants.SETTINGS_METASYMBOLS_DAYS_BACK);
+                int periodDaysBack = int.TryParse(daysBackString, out periodDaysBack) ? periodDaysBack : 365;
+                DateTime fromDate = DateTime.Now.AddDays(-periodDaysBack);
                 foreach (var sym in symbols)
                 {
                     var deals = Session.Query<DBDeals>().Where(x => x.Symbol.Metasymbol.Id == sym.Id);
@@ -323,22 +291,17 @@ public class DataService : IDataService
                     DateTime tradeDate = DateTime.MinValue;
                     foreach (var deal in deals)
                     {
+                        if (deal.Closetime.HasValue)
+                            tradeDate = deal.Closetime.Value;
+                        else
+                            tradeDate = deal.Opentime;
+                        if (tradeDate.Date < fromDate)
+                            continue;
                         string currency = "USD";
-                        if (deal.Terminal != null)
-                            if ( deal.Terminal.Account != null)
-                                currency = deal.Terminal.Account.Currency.Name;
+                        if (deal.Terminal != null && deal.Terminal.Account != null)
+                            currency = deal.Terminal.Account.Currency.Name;
                         sumProfit += rates.ConvertToUSD(deal.Profit, currency);
                         countTrades++;
-                        if (deal.Closetime.HasValue)
-                        {
-                            if (tradeDate < deal.Closetime.Value)
-                                tradeDate = deal.Closetime.Value;
-                        }
-                        else
-                        {
-                            if (tradeDate < deal.Opentime)
-                                tradeDate = deal.Opentime;
-                        }
                     }
                     if (countTrades <= 10)
                         continue;
@@ -358,28 +321,23 @@ public class DataService : IDataService
         {
             log.Error("Error in MetaSymbolStat : " + e);
         }
-        var moreResult = result.OrderByDescending(x => x.Date).ThenByDescending(y=>y.ProfitPerTrade);
-        if (count > 1)
-        {
-            return moreResult.Take(count).OrderByDescending(x => x.TotalProfit);
-        }
-        return moreResult;
+        return result.OrderByDescending(x => x.Date).ThenByDescending(y=>y.ProfitPerTrade).Take(count).OrderByDescending(x => x.TotalProfit);
     }
-
     public void StartPerf(int month)
     {
-        var task = new Task(() => PerfAsync(month));
+        var task = new Task(async () => await PerfAsync(month));
         task.Start();
     }
-
-    private void PerfAsync(int month)
+    
+    private async Task PerfAsync(int month)
     {
         var service = MainService.thisGlobal.Container.Resolve<IMessagingService>();
+
         try
         {
             using (var Session = ConnectionHelper.CreateNewSession())
             {
-                var rateList = Session.Query<DBRates>().Where(x => x.Retired == false).ToList();
+                var rateList = await Session.Query<DBRates>().Where(x => x.Retired == false).ToListAsync();
                 var now = DateTime.Now;
                 var dayFrom = 1;
                 var year = now.Year;
@@ -388,39 +346,45 @@ public class DataService : IDataService
                 var from = new DateTime(year, month + 1, dayFrom);
                 var dayTo = now.Month == month + 1 ? now.Day : DateTime.DaysInMonth(year, month + 1);
                 var to = new DateTime(year, month + 1, dayTo);
-                var Accounts = Session.Query<DBAccount>(); 
+                var Accounts = await Session.Query<DBAccount>().ToListAsync();
+
                 for (var i = dayFrom; i <= dayTo; i++)
                 {
                     var forDate = new DateTime(year, month + 1, i);
                     var forDateEnd = new DateTime(year, month + 1, i, 23, 50, 0);
+
+                    // Check if TimeStat object for the current date already exists in the cache
+                    if (cache.ContainsKey(forDate) && (forDate.DayOfYear != now.DayOfYear))
+                    {
+                        var tsCached = cache[forDate];
+                        service.SendMessage(WsMessageType.ChartValue, tsCached);
+                        continue;
+                    }
+
+                    // Create a new TimeStat object and cache it
                     var ts = new TimeStat();
                     ts.X = i;
                     ts.Date = forDate;
                     ts.Period = TimePeriod.Daily;
                     ts.Gains = 0;
                     ts.Losses = 0;
+
                     foreach (var acc in Accounts)
                     {
-                        var accStateAll = Session.Query<DBAccountstate>().Where(x => x.Account.Id == acc.Id);
-                        var accResultsStart = accStateAll.Where(x => x.Date <= forDate)
-                            .OrderByDescending(x => x.Date);
-                        var accResultsEnd = accStateAll.Where(x => x.Date <= forDateEnd)
-                            .OrderByDescending(x => x.Date);
+                        var accStateAll = await Session.Query<DBAccountstate>().Where(x => x.Account.Id == acc.Id).ToListAsync();
+                        var accResultsStart = accStateAll.Where(x => x.Date <= forDate).OrderByDescending(x => x.Date);
+                        var accResultsEnd = accStateAll.Where(x => x.Date <= forDateEnd).OrderByDescending(x => x.Date);
 
-                        if (accResultsEnd == null || accResultsEnd.Count() == 0)
-                            continue;
-                        if (accResultsStart == null || accResultsStart.Count() == 0)
-                            continue;
+                        if (!accResultsEnd.Any() || !accResultsStart.Any()) continue;
 
                         var accStateEnd = accResultsEnd.FirstOrDefault();
                         var balanceStart = new decimal(0);
                         var balanceEnd = new decimal(0);
+
                         if (accStateEnd != null)
                         {
                             balanceEnd = rates.ConvertToUSD(accStateEnd.Balance, acc.Currency.Name);
-                            if (acc.Typ > 0)
-                                ts.InvestingValue += balanceEnd;
-
+                            if (acc.Typ > 0) ts.InvestingValue += balanceEnd;
                             ts.CheckingValue += balanceEnd;
                         }
 
@@ -428,19 +392,16 @@ public class DataService : IDataService
                         if (accStateStart != null)
                         {
                             balanceStart = rates.ConvertToUSD(accStateStart.Balance, acc.Currency.Name);
-                            if (acc.Typ > 0)
-                                ts.InvestingChange += balanceStart;
-
+                            if (acc.Typ > 0) ts.InvestingChange += balanceStart;
                             ts.CheckingChange += balanceStart;
                         }
                     }
 
                     ts.CheckingChange = ts.CheckingValue - ts.CheckingChange;
                     ts.InvestingChange = ts.InvestingValue - ts.InvestingChange;
-                    if (ts.CheckingChange > 0)
-                        ts.Gains = ts.CheckingChange;
-                    else
-                        ts.Losses = Math.Abs(ts.CheckingChange);
+
+                    if (ts.CheckingChange > 0) ts.Gains = ts.CheckingChange;
+                    else ts.Losses = Math.Abs(ts.CheckingChange);
 
                     ts.CheckingChange = Math.Round(ts.CheckingChange, 2);
                     ts.InvestingChange = Math.Round(ts.InvestingChange, 2);
@@ -449,6 +410,8 @@ public class DataService : IDataService
                     ts.Losses = Math.Round(ts.Losses, 2);
                     ts.Gains = Math.Round(ts.Gains, 2);
 
+                    if (forDate.DayOfYear != now.DayOfYear)
+                        cache.TryAdd(forDate, ts);
                     service.SendMessage(WsMessageType.ChartValue, ts);
                 }
             }
@@ -477,76 +440,43 @@ public class DataService : IDataService
                 var from = new DateTime(year, month + 1, dayFrom);
                 var dayTo = now.Month == month + 1 ? now.Day : DateTime.DaysInMonth(year, month + 1);
                 var to = new DateTime(year, month + 1, dayTo);
-                var Accounts = Session.Query<DBAccount>(); // .Where(x => (x.Retired == false));
-                for (var i = dayFrom; i <= dayTo; i++)
+                var Accounts = Session.Query<DBAccount>(); 
+                foreach (var acc in Accounts)
                 {
-                    var forDate = new DateTime(year, month + 1, i);
-                    var forDateEnd = new DateTime(year, month + 1, i, 23, 50, 0);
+                    var accStateAll = Session.Query<DBAccountstate>().Where(x => x.Account.Id == acc.Id);
+                    var accResultsStart = accStateAll.Where(x => x.Date <= from)
+                        .OrderByDescending(x => x.Date).FirstOrDefault();
+                    var accResultsEnd = accStateAll.Where(x => x.Date <= to)
+                        .OrderByDescending(x => x.Date).FirstOrDefault();
+
+                    if (accResultsEnd == null || accResultsStart == null)
+                        continue;
+
+                    var balanceStart = rates.ConvertToUSD(accResultsStart.Balance, acc.Currency.Name);
+                    var balanceEnd = rates.ConvertToUSD(accResultsEnd.Balance, acc.Currency.Name);
                     var ts = new TimeStat();
-                    ts.X = i;
-                    ts.Date = forDate;
+                    ts.X = dayTo;
+                    ts.Date = to;
                     ts.Period = period;
                     ts.Gains = 0;
                     ts.Losses = 0;
-                    foreach (var acc in Accounts)
+                    if (acc.Typ > 0)
                     {
-                        var accStateAll = Session.Query<DBAccountstate>().Where(x => x.Account.Id == acc.Id);
-                        var accResultsStart = accStateAll.Where(x => x.Date <= forDate)
-                            .OrderByDescending(x => x.Date);
-                        var accResultsEnd = accStateAll.Where(x => x.Date <= forDateEnd)
-                            .OrderByDescending(x => x.Date);
-
-                        if (accResultsEnd == null || accResultsEnd.Count() == 0)
-                            continue;
-                        if (accResultsStart == null || accResultsStart.Count() == 0)
-                            continue;
-
-                        var accStateEnd = accResultsEnd.FirstOrDefault();
-                        var balanceStart = new decimal(0);
-                        var balanceEnd = new decimal(0);
-                        if (accStateEnd != null)
-                        {
-                            balanceEnd = rates.ConvertToUSD(accStateEnd.Balance, acc.Currency.Name);
-                            if (acc.Typ > 0)
-                                ts.InvestingValue += balanceEnd;
-
-                            ts.CheckingValue += balanceEnd;
-                        }
-
-                        var accStateStart = accResultsStart.FirstOrDefault();
-                        if (accStateStart != null)
-                        {
-                            balanceStart = rates.ConvertToUSD(accStateStart.Balance, acc.Currency.Name);
-                            if (acc.Typ > 0)
-                                ts.InvestingChange += balanceStart;
-
-                            ts.CheckingChange += balanceStart;
-                        }
-
-                        /*if (balanceStart > balanceEnd)
-                        {
-                            ts.Losses += (balanceStart - balanceEnd);
-                        }
-                        if (balanceEnd > balanceStart)
-                        {
-                            ts.Gains += (balanceEnd - balanceStart);
-                        }*/
+                        ts.InvestingValue = balanceEnd;
+                        ts.InvestingChange = balanceStart;
                     }
-
-                    ts.CheckingChange = ts.CheckingValue - ts.CheckingChange;
-                    ts.InvestingChange = ts.InvestingValue - ts.InvestingChange;
+                    ts.CheckingValue = balanceEnd;
+                    ts.CheckingChange = balanceStart;
+                    ts.CheckingChange = Math.Round(ts.CheckingValue - ts.CheckingChange, 2);
+                    ts.InvestingChange = Math.Round(ts.InvestingValue - ts.InvestingChange, 2);
+                    ts.CheckingValue = Math.Round(ts.CheckingValue, 2);
+                    ts.InvestingValue = Math.Round(ts.InvestingValue, 2);
                     if (ts.CheckingChange > 0)
                         ts.Gains = ts.CheckingChange;
                     else
                         ts.Losses = Math.Abs(ts.CheckingChange);
-
-                    ts.CheckingChange = Math.Round(ts.CheckingChange, 2);
-                    ts.InvestingChange = Math.Round(ts.InvestingChange, 2);
-                    ts.CheckingValue = Math.Round(ts.CheckingValue, 2);
-                    ts.InvestingValue = Math.Round(ts.InvestingValue, 2);
                     ts.Losses = Math.Round(ts.Losses, 2);
                     ts.Gains = Math.Round(ts.Gains, 2);
-
                     result.Add(ts);
                 }
             }
@@ -558,7 +488,6 @@ public class DataService : IDataService
 
         return result;
     }
-
     public List<DealInfo> GetDeals()
     {
         var result = new List<DealInfo>();
@@ -677,28 +606,40 @@ public class DataService : IDataService
 
     public IEnumerable<DynamicProperties> GetAllProperties()
     {
+        var results = new List<DynamicProperties>();
+        var dbProperties = props.GetAll();
+        dbProperties.ForEach(dbProp =>
+        {
+            var dynProps = new DynamicProperties();
+            if (ToDTO(dbProp, ref dynProps))
+                results.Add(dynProps);
+        });
+        return results;
+    }
+    
+    public static bool ToDTO<T, U>(T source, ref U target)
+    {
         try
         {
-            var results = new List<DynamicProperties>();
-            var result = props.GetAll();
-            if (!result.Any())
-                return results;
-            result.ForEach(x =>
+            var sourceProps = typeof(T).GetProperties().Where(x => x.CanRead);
+            var targetProps = typeof(U).GetProperties().Where(x => x.CanWrite);
+            foreach (var sourceProp in sourceProps)
             {
-                var dynProps = new DynamicProperties();
-                if (toPropsDTO(x, ref dynProps))
-                    results.Add(dynProps);
-            });
-            return results;
+                var targetProp = targetProps.FirstOrDefault(x => x.Name == sourceProp.Name);
+                if (targetProp != null)
+                {
+                    var value = sourceProp.GetValue(source, null);
+                    targetProp.SetValue(target, value, null);
+                }
+            }
+            return true;
         }
-        catch (Exception e)
+        catch
         {
-            log.Error("Error: GetAllProperties: " + e);
+            return false;
         }
-
-        return null;
     }
-
+    
     public DynamicProperties GetPropertiesInstance(short entityType, int objId)
     {
         try
@@ -740,73 +681,45 @@ public class DataService : IDataService
     {
         try
         {
-            using (var Session = ConnectionHelper.CreateNewSession())
+            using (var session = ConnectionHelper.CreateNewSession())
             {
-                using (var Transaction = Session.BeginTransaction())
+                using (var transaction = session.BeginTransaction())
                 {
-                    var result = Session.Get<DBProperties>(newdP.ID);
+                    var result = session.Get<DBProperties>(newdP.ID);
                     if (result != null)
                     {
-                        result.entityType = newdP.entityType;
-                        result.objId = newdP.objId;
-                        result.Vals = newdP.Vals;
+                        ToDTO(newdP, ref result);
                         result.updated = DateTime.UtcNow;
-                        Session.Update(result);
+                        session.Update(result);
                     }
                     else
                     {
-                        var gvar = new DBProperties();
-                        // gvar.ID = newdP.ID; // ID should be Autogenerated by DB
-                        gvar.entityType = newdP.entityType;
-                        gvar.objId = newdP.objId;
-                        gvar.Vals = newdP.Vals;
-                        gvar.updated = DateTime.UtcNow;
-                        Session.Save(gvar);
+                        var dbProp = new DBProperties();
+                        ToDTO(newdP, ref dbProp);
+                        dbProp.updated = DateTime.UtcNow;
+                        session.Save(dbProp);
                     }
-
-                    Transaction.Commit();
+                    transaction.Commit();
                     return true;
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception)
         {
-            log.Error("Error: UpdateProperties: " + e);
+            return false;
         }
-
-        return false;
     }
-
+    
     public IEnumerable<DBJobs> GetDBActiveJobsList()
     {
-        try
-        {
-            var result = jobs.GetAll().Where(x => x.Disabled == false);
-            return result;
-        }
-        catch (Exception e)
-        {
-            log.Error("Error: GetDBActiveJobsList: " + e);
-        }
-
-        return null;
+        return jobs.GetAll().Where(x => !x.Disabled);
     }
-
-    public DBAdviser getAdviserByMagicNumber(ISession Session, long magicNumber)
+    
+    public DBAdviser GetAdviserByMagicNumber(ISession session, long magicNumber)
     {
-        try
-        {
-            var adviser = Session.Get<DBAdviser>((int) magicNumber);
-            return adviser;
-        }
-        catch (Exception e)
-        {
-            log.Error("Error: getAdviserByMagicNumber: " + e);
-        }
-
-        return null;
+        return session.Get<DBAdviser>((int)magicNumber);
     }
-
+    
     public DBCurrency getCurrencyID(string currencyStr)
     {
         try
@@ -823,74 +736,33 @@ public class DataService : IDataService
         return null;
     }
 
-    public Terminal getTerminalByNumber(ISession Session, long AccountNumber)
+    public Terminal GetTerminalByNumber(ISession session, long accountNumber)
     {
-        try
+        var terminal = session.Query<DBTerminal>().FirstOrDefault(x => x.Accountnumber == (int)accountNumber);
+        if (terminal != null)
         {
-            var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int) AccountNumber);
-            if (result.Any())
-            {
-                var term = result.FirstOrDefault();
-                var terminal = new Terminal();
-                if (term != null && toDTO(term, ref terminal))
-                    return terminal;
-            }
+            var result = new Terminal();
+            if (ToDTO(terminal, ref result))
+                return result;
         }
-        catch (Exception e)
-        {
-            log.Error("Error: getTerminalByNumber: " + e);
-        }
-
         return null;
     }
-
-    public DBTerminal getBDTerminalByNumber(ISession Session, long AccountNumber)
+    
+    public DBTerminal GetDBTerminalByNumber(ISession session, long accountNumber)
     {
-        try
-        {
-            var result = Session.Query<DBTerminal>().Where(x => x.Accountnumber == (int) AccountNumber);
-            if (result.Any()) return result.FirstOrDefault();
-        }
-        catch (Exception e)
-        {
-            log.Error("Error: getTerminalByNumber: " + e);
-        }
-
-        return null;
+        return session.Query<DBTerminal>().FirstOrDefault(x => x.Accountnumber == (int)accountNumber);
+    }
+    
+    public DBDeals GetDealById(ISession session, long dealId)
+    {
+        return session.Query<DBDeals>().FirstOrDefault(x => x.Dealid == (int)dealId);
     }
 
-    public DBDeals getDealById(ISession Session, long DealId)
+    public DBSymbol GetSymbolByName(string symbolStr)
     {
-        try
-        {
-            var result = Session.Query<DBDeals>().Where(x => x.Dealid == (int) DealId);
-            if (result.Any()) return result.FirstOrDefault();
-        }
-        catch (Exception e)
-        {
-            log.Error("Error: getDealById: " + e);
-        }
-
-        return null;
+        return symbols.GetAll().FirstOrDefault(x => x.Name.Equals(symbolStr));
     }
-
-
-    public DBSymbol getSymbolByName(string SymbolStr)
-    {
-        try
-        {
-            var result = symbols.GetAll().Where(x => x.Name.Equals(SymbolStr));
-            if (result.Any())
-                return result.First();
-        }
-        catch (Exception e)
-        {
-            log.Error("Error: getSymbolByName: " + e);
-        }
-
-        return null;
-    }
-
+    
     public DBAdviser getAdviser(ISession Session, int term_id, int sym_id, string ea)
     {
         try
@@ -907,6 +779,7 @@ public class DataService : IDataService
 
         return null;
     }
+    
 
     public void SaveInsertAdviser(ISession Session, DBAdviser toAdd)
     {

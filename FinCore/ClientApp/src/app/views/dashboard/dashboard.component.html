@@ -52,11 +52,54 @@
     </dxi-column>
 
     <!-- <dxi-column dataField="Lots" [allowSorting]="true" [hidingPriority]="2"></dxi-column> -->
-    <dxi-column dataField="ProfitStopsPercent" caption="%" format="#0.##'%'" [allowSorting]="true"
-      cellTemplate="priceCellTemplate" [hidingPriority]="3">
-      <dxo-format type="fixedPoint" [precision]="2"></dxo-format>
+    <dxi-column dataField="ProfitStopsPercent" caption="SL/TP" format="#0" [allowSorting]="true"
+      cellTemplate="SlTpCellTemplate" [hidingPriority]="3">
+      <dxo-format type="fixedPoint" [precision]="0"></dxo-format>
+      <div *dxTemplate="let cell of 'SlTpCellTemplate'" [class.inc]="cell.data.Profit > 0"
+        [class.dec]="cell.data.Profit < 0">
+
+        <ng-container *ngIf="cell.data.ProfitStopsPercent === 0">
+          <span class="current-value">{{cell.data.Profit | number: '1.2-2' }}$</span>
+        </ng-container>
+
+        <ng-container *ngIf="cell.data.Profit > 0">
+          <dx-linear-gauge id="cPos" [value]="cell.data.ProfitStopsPercent">
+            <dxo-animation easing="linear" [duration]="0">
+            </dxo-animation>
+            <dxo-value-indicator [baseValue]="0" type="textCloud" color="#225614"></dxo-value-indicator>
+            <dxo-range-container [palette]="['#caff45', '#88ff21', '#00ff00', '#00db4d']">
+              <dxi-range [startValue]="0" [endValue]="25" ></dxi-range>
+              <dxi-range [startValue]="25" [endValue]="50" ></dxi-range>
+              <dxi-range [startValue]="50" [endValue]="75" ></dxi-range>
+              <dxi-range [startValue]="75" [endValue]="100" ></dxi-range>
+            </dxo-range-container>
+            <dxo-geometry orientation="horizontal"></dxo-geometry>
+            <dxo-scale [startValue]="0" [endValue]="100" [tickInterval]="25" [visible]="false">
+            </dxo-scale>
+          </dx-linear-gauge>
+        </ng-container>
+
+        <ng-container *ngIf="cell.data.Profit < 0">
+          <dx-linear-gauge id="cNeg" [value]="cell.data.ProfitStopsPercent" >
+            <dxo-animation easing="linear" [duration]="0">
+            </dxo-animation>
+            <dxo-value-indicator [baseValue]="0" type="textCloud" color="#5c1c1c"></dxo-value-indicator>
+            <dxo-range-container [palette]="['#8e3535','#9e2218', '#ff0000', '#ff7070']">
+              <dxi-range [startValue]="-100" [endValue]="-75" ></dxi-range>
+              <dxi-range [startValue]="-75" [endValue]="-50" ></dxi-range>
+              <dxi-range [startValue]="-50" [endValue]="-25" ></dxi-range>
+              <dxi-range [startValue]="-25" [endValue]="0" ></dxi-range>
+            </dxo-range-container>
+            <dxo-geometry orientation="horizontal"></dxo-geometry>
+            <dxo-scale [startValue]="-100" [endValue]="0" [tickInterval]="25" [visible]="false">
+            </dxo-scale>
+          </dx-linear-gauge>
+        </ng-container>
+
+
+      </div>
     </dxi-column>
-    <dxi-column [width]="75" dataField="Profit" caption="$" format="#0.##" [allowSorting]="true" cellTemplate="priceCellTemplate">
+    <dxi-column [width]="75" dataField="Value" caption="%" format="#0.##" [allowSorting]="true" cellTemplate="priceCellTemplate">
       <dxo-format type="fixedPoint" [precision]="2"></dxo-format>
       <div *dxTemplate="let cell of 'priceCellTemplate'" [class.inc]="cell.data.Profit > 0"
         [class.dec]="cell.data.Profit < 0">
@@ -75,7 +118,7 @@
     <div *dxTemplate="let data of 'totalStat'">
       <div>
         <span [class.inc]="this.stat.TodayGainReal > 0" [class.dec]="this.stat.TodayGainReal < 0">PnL:
-          ${{this.stat.TodayGainReal}} </span>
+          ${{this.stat.TodayGainReal}} {{this.balances}} </span>
       </div>
     </div>
   </dx-data-grid>

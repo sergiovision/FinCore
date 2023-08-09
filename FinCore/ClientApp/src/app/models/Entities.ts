@@ -341,7 +341,8 @@ export enum WsMessageType {
     GetAllCapital = 10,
     GetLevels = 11,
     GetCryptoPositions = 12,
-    UpdateCryptoPosition = 13
+    UpdateCryptoPosition = 13,
+    UpdateBalance = 14
 }
 
 export class WsMessage {
@@ -349,6 +350,7 @@ export class WsMessage {
     From: string;
     Message: string;
 }
+
 
 export interface IWebsocketCallback {
     onOpen(evt: MessageEvent): void;
@@ -486,3 +488,9 @@ export class LogItem {
   Path: string;
 }
 
+export class BalanceInfo
+{
+    Balance: number;
+    Equity: number;
+    Account: number;
+}

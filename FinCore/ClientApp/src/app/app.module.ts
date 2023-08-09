@@ -63,6 +63,8 @@ import { TablesModule } from './views/tables/tables.module';
 import { PropsService } from './services/props.service';
 import { DocComponent } from './views/doc/doc.component';
 import { DGaugeComponent } from './views/dgauge/dgauge.component';
+import { DxLinearGaugeModule } from 'devextreme-angular';
+
 // import { PropertiesComponent } from './views/tables/properties/properties.component';
 
 @NgModule({
@@ -93,6 +95,7 @@ import { DGaugeComponent } from './views/dgauge/dgauge.component';
     DxTemplateModule,
     TablesModule,
     DxBarGaugeModule,
+    DxLinearGaugeModule,
     DxBoxModule
   ],
   declarations: [

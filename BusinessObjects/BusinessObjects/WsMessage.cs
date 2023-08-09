@@ -15,7 +15,8 @@ public enum WsMessageType
     GetAllCapital = 10,
     GetLevels = 11,
     GetCryptoPositions = 12,
-    UpdateCryptoPosition = 13
+    UpdateCryptoPosition = 13,
+    UpdateBalance = 14
 }
 
 public class WsMessage

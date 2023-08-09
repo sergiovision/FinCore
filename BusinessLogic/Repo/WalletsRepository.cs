@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BusinessLogic.BusinessObjects;
@@ -44,12 +44,26 @@ public class WalletsRepository : BaseRepository<DBAccount>
         return results;
     }
 
+    /*
+    GetWalletsState function gives state of the wallets.
+
+    Parameters
+    ----------
+    forDate : DateTime
+        Date for which state is required.
+    showRetired : bool
+        Show retired or not.
+
+    Returns
+    -------
+    List<Wallet>
+        List of wallets state.
+    */
     public List<Wallet> GetWalletsState(DateTime forDate, bool showRetired)
     {
         var results = new List<Wallet>();
         using (var Session = ConnectionHelper.CreateNewSession())
         {
-            // var rateList = Session.Query<DBRates>().Where(x => x.Retired == false).ToList();
             IQueryable<DBWallet> wallets = null;
             if (forDate == DateTime.MaxValue)
             {
@@ -98,26 +112,24 @@ public class WalletsRepository : BaseRepository<DBAccount>
                         DBAccountstate accState = null;
                         IQueryable<DBAccountstate> accResults = null;
                         if (forDate.Equals(DateTime.MaxValue))
-                            accResults = Session.Query<DBAccountstate>()
+                            accState = Session.Query<DBAccountstate>()
                                 .Where(x => x.Account.Id == acc.Id)
-                                .OrderByDescending(x => x.Date);
+                                .OrderByDescending(x => x.Date)
+                                .FirstOrDefault();
                         else
-                            accResults = Session.Query<DBAccountstate>()
+                            accState = Session.Query<DBAccountstate>()
                                 .Where(x => x.Account.Id == acc.Id && x.Date <= forDate)
-                                .OrderByDescending(x => x.Date);
+                                .OrderByDescending(x => x.Date)
+                                .FirstOrDefault();
 
-                        if (accResults == null || accResults.Count() == 0)
+                        if (accState == null)
                             continue;
                         // acc.Currency.Id
-                        accState = accResults.FirstOrDefault();
-                        if (accState != null)
-                        {
-                            account.Balance = accState.Balance;
-                            var value = account.Balance;
-                            if (acc.Currency != null)
-                                value = rates.ConvertToUSD(account.Balance, acc.Currency.Name);
-                            balance += value;
-                        }
+                        account.Balance = accState.Balance;
+                        var value = account.Balance;
+                        if (acc.Currency != null)
+                            value = rates.ConvertToUSD(account.Balance, acc.Currency.Name);
+                        balance += value;
 
                         wallet.Accounts.Add(account);
                     }

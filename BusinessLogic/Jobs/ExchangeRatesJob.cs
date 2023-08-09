@@ -2,7 +2,6 @@
 using System.Threading.Tasks;
 using BusinessLogic.BusinessObjects;
 using BusinessLogic.Scheduler;
-using BusinessObjects;
 using BusinessObjects.BusinessObjects;
 using Quartz;
 
@@ -27,6 +26,8 @@ internal class ExchangeRatesJob : GenericJob
         {
             thisJobDetail = context.JobDetail;
             sched = context.Scheduler;
+            
+            MainService.thisGlobal.ClearCaches();
 
             var signal_UpdateRates =
                 MainService.thisGlobal.CreateSignal(SignalFlags.AllTerminals, 0, EnumSignals.SIGNAL_UPDATE_RATES,
@@ -34,6 +35,7 @@ internal class ExchangeRatesJob : GenericJob
             
             signal_UpdateRates.SetData(MainService.thisGlobal.GetRatesList());
             MainService.thisGlobal.PostSignalTo(signal_UpdateRates);
+            
 
             SetMessage("ExcahngeRatesJob Finished.");
         }

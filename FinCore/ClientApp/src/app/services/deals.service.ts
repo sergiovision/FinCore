@@ -23,8 +23,8 @@ export class DealsService extends BaseService {
     return super.getAll('/api/deals/GetToday');
   }
 
-  public getTodayStat() {
-    return super.getAll('/api/deals/GetTodayStat');
+  public getTodayStat(isCrypto:boolean) {
+    return super.getAll('/api/deals/GetTodayStat?isCrypto=' + isCrypto);
   }
 
   public getStat(nElements: number, currentOption: number) {
