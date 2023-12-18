@@ -37,7 +37,7 @@ public class PositionsTester : ITerminalEvents
         return _positions;
     }
 
-    public List<PositionInfo> GetPositions4Adviser(long adviserId)
+    public List<PositionInfo> GetPositions4Adviser(long adviserId, string symbol, long account)
     {
         throw new NotImplementedException();
     }

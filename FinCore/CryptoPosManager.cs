@@ -212,7 +212,7 @@ public class CryptoPosManager : ITerminalEvents
     
     #endregion // KuCoin
 
-    public List<PositionInfo> GetPositions4Adviser(long adviserId)
+    public List<PositionInfo> GetPositions4Adviser(long adviserId, string symbol, long account)
     {
         throw new NotImplementedException();
     }

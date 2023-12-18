@@ -6,7 +6,8 @@ import {
   IWebsocketCallback,
   WsMessageType,
   WsMessage,
-  BalanceInfo
+  BalanceInfo,
+  ENUM_ORDERROLE
 } from '../../models/Entities';
 import { DealsService } from '../../services/deals.service';
 import { WebsocketService } from '../../services/websocket.service';
@@ -47,6 +48,32 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     return this._showProperties;
   }
 
+
+  RoleString(role: any): string {
+    switch (role) {
+      case ENUM_ORDERROLE.RegularTrail:
+      case '0':
+          return 'RegularTrail';
+      case ENUM_ORDERROLE.PendingSmartOrder:
+      case '9':
+        return 'PendingSmartOrder';
+      case '3':
+      case ENUM_ORDERROLE.PendingLimit:
+        return 'PendingLimit';
+      case '4':
+      case ENUM_ORDERROLE.PendingStop:
+          return 'PendingStop';
+      case ENUM_ORDERROLE.RegularSmartOrder:
+            case '10':
+              return 'RegularSmartOrder';
+      case ENUM_ORDERROLE.PendingPriceAlert:
+      case '11':
+        return 'PendingPriceAlert';
+      default:
+          return role.toString();
+    }
+  }
+
   constructor(public deals: DealsService, public ws: WebsocketService) {
     super();
     this.currentUser = JSON.parse(localStorage.getItem('currentUser'));
@@ -80,17 +107,22 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
         return false;
       }
     }
+    if (typeof data === 'number') {
+      var d = data as ENUM_ORDERROLE;
+      if (d === ENUM_ORDERROLE.LongInvestment || data === ENUM_ORDERROLE.ShortInvestment) {
+        return false;
+      }
+    }
+
     return true;
   }
 
   public fillBalancesString() {
     if (this.stat.Accounts) {
-      this.balances = '';
-      this.stat.Accounts.forEach(element => {
-          if (element.Balance > 0) {
-              this.balances += element.Number + '=' + element.Balance + ':';
-          }
-      });
+        this.balances = this.stat.Accounts
+            .filter(element => element.Balance > 0)
+            .map(element => `${element.Number}=${element.Balance}`)
+            .join(':');
     }
   }
 
@@ -102,6 +134,9 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
           {
             // console.log('Insert ' + msg.Message);
             const data = JSON.parse(msg.Message) as PositionInfo[];
+            data.forEach(info => {
+               info.RoleString = this.RoleString(info.Role);
+            });
             if (data) {
               this.dgauge.updateData(data);
               this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
@@ -115,6 +150,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
         case WsMessageType.UpdatePosition:
           {
             const data = JSON.parse(msg.Message) as PositionInfo;
+            data.RoleString = this.RoleString(data.Role);
             // console.log('Update ' + msg.Message);
             if (this.dataSource) {
               this.dataSource.push([
@@ -145,6 +181,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
         case WsMessageType.InsertPosition:
           {
             const data = JSON.parse(msg.Message) as PositionInfo;
+            data.RoleString = this.RoleString(data.Role);
             console.log('Insert ' + data);
             if (this.dataSource) {
               this.dataSource.push([

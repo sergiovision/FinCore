@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { DealsService } from '../../../services/deals.service';
-import { PositionInfo } from '../../../models/Entities';
+import { PositionInfo, ENUM_ORDERROLE } from '../../../models/Entities';
 import { BaseComponent } from '../../../base/base.component';
 import { element } from 'protractor';
 import { ExpertsService } from '../../../services/experts.service';
@@ -32,7 +32,7 @@ export class InvestmentsComponent extends BaseComponent implements OnInit  {
             Object.entries(data).forEach(item => {
               const pos: any = item[1];
               const val: PositionInfo = pos;
-              if (val.Role === 'LongInvestment' || val.Role === 'ShortInvestment') {
+              if (val.Role === ENUM_ORDERROLE.LongInvestment || val.Role === ENUM_ORDERROLE.ShortInvestment) {
                 // val.Value = val.Lots * val.Openprice * val.contractSize + val.Profit;
                 this.totalSum += val.Value;
                 this.dataSource.push(pos);

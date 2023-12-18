@@ -578,7 +578,7 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
                     var state = DefaultProperties.transformProperties(res);
                     expert.Data = JsonConvert.SerializeObject(state);
                 }
-                LoadSavedOrders(adviser, ref expert);
+                LoadSavedOrders(adviser, ref expert, accNumber);
                 expert.Magic = adviser.Id;
                 SubscribeToSignals(adviser.Id);
 
@@ -850,10 +850,10 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
         return result;
     }
     
-    private void LoadSavedOrders(DBAdviser adviser, ref ExpertInfo expert)
+    private void LoadSavedOrders(DBAdviser adviser, ref ExpertInfo expert, long Account)
     {
         var terminals = Container.Resolve<ITerminalEvents>();
-        List<PositionInfo> positions = terminals.GetPositions4Adviser(adviser.Id);
+        List<PositionInfo> positions = terminals.GetPositions4Adviser(adviser.Id, expert.Symbol, Account);
         if (Utils.HasAny(positions))
             expert.Orders = JsonConvert.SerializeObject(positions);
     }

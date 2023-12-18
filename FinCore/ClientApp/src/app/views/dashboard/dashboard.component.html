@@ -39,7 +39,7 @@
       </div>
     </dxi-column>
 
-    <dxi-column dataField="Role" caption="Role" [allowSorting]="true" groupIndex="0" sortOrder="desc"></dxi-column>
+    <dxi-column dataField="RoleString" caption="Role" [allowSorting]="true" groupIndex="0" sortOrder="desc"></dxi-column>
 
     <dxi-column dataField="Symbol" [allowSorting]="true" cellTemplate="symbolCellTemplate" sortOrder="asc">
       <div *dxTemplate="let cell of 'symbolCellTemplate'" [class.inc]="cell.data.Type === 0" [class.dec]="cell.data.Type === 1">
@@ -57,6 +57,8 @@
       <dxo-format type="fixedPoint" [precision]="0"></dxo-format>
       <div *dxTemplate="let cell of 'SlTpCellTemplate'" [class.inc]="cell.data.Profit > 0"
         [class.dec]="cell.data.Profit < 0">
+
+        <!-- TODO: add alert to show alert rise price -->
 
         <ng-container *ngIf="cell.data.ProfitStopsPercent === 0">
           <span class="current-value">{{cell.data.Profit | number: '1.2-2' }}$</span>

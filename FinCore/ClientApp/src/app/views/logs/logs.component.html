@@ -22,8 +22,9 @@
     </div>
   </dxi-item>
 </dx-tab-panel>
-
-<ngx-monaco-editor class="code-editor" [style.height.px]="[this.editorHeight]" [options]="this.options" [(ngModel)]="this.code" (onInit)="onInit($event)"></ngx-monaco-editor>
-
+<div #targetElem>
+  <!-- [style.height.px]="[this.editorHeight]" -->
+<ngx-monaco-editor class="code-editor"  [options]="this.options" [(ngModel)]="this.code" (onInit)="onInit($event)"></ngx-monaco-editor>
+</div>
 
 

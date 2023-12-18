@@ -7,6 +7,8 @@ import { WebsocketService } from '../../services/websocket.service';
 import { EditorComponent, NgxEditorModel } from 'ngx-monaco-editor';
 import { fromEvent } from "rxjs";
 import { debounceTime, throttleTime } from "rxjs/operators";
+import { ElementRef, Renderer2 } from "@angular/core";
+
 
 import { DxBoxComponent, DxTabPanelComponent } from 'devextreme-angular';
 
@@ -19,9 +21,9 @@ import { DxBoxComponent, DxTabPanelComponent } from 'devextreme-angular';
 export class LogsComponent extends BaseComponent implements AfterViewInit, OnInit, OnDestroy, IWebsocketCallback {
   @ViewChild('tabPanel0') tabPanel0: DxTabPanelComponent;
   @ViewChild('boxitem') boxitem: DxBoxComponent;
-  // @ViewChildren('editor') editorElement: any; // viewChildren: QueryList<EditorComponent>;
+  @ViewChild('targetElem') targetElement: ElementRef;
   public element: HTMLElement = document.body;
-  public editorHeight:number = 880;
+  //public editorHeight:number = 600;
   public editor: any;
 
   code: string = '';
@@ -44,7 +46,7 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
 
   public logz: LogItem[];
 
-  constructor(public logS: LogsService, public ws: WebsocketService) {
+  constructor(public logS: LogsService, public ws: WebsocketService, private renderer: Renderer2) {
     super();
 
     fromEvent(window, "resize")
@@ -59,13 +61,17 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
   }
 
   ngAfterViewInit() {
+    // Target element's parent's height
+    const parentHeight = this.targetElement.nativeElement.parentElement.offsetHeight;
+    // Applying height to target element
+    this.renderer.setStyle(this.targetElement.nativeElement, 'height', `${parentHeight}px`);
   }
 
   private setHeight() {
-    if (this.element.offsetHeight > 0) {
-      this.editorHeight = this.element.offsetHeight - 200;
-      console.log('setHeight---' + this.editorHeight);
-    }
+    //if (this.element.offsetHeight > 0) {
+      //this.editorHeight = this.element.offsetHeight - 200;
+      //console.log('setHeight---' + this.editorHeight);
+    //}
   }
 
   override ngOnInit() {
@@ -172,9 +178,7 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
     if (msg) {
        switch (msg.Type) {
         case WsMessageType.WriteLog: {
-          // tslint:disable-next-line: no-shadowed-variable
           let str = msg.Message;
-          // const str = msg.Message.replace(/^"(.+(?="$))"$/, '$1');
           if (str.charAt(0) === '"' && str.charAt(str.length - 1) === '"') {
             str  = str.substr(1, str.length - 2);
           }

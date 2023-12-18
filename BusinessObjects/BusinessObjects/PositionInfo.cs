@@ -11,6 +11,7 @@ public class PositionInfo
     public long Magic { get; set; }
     public long Ticket { get; set; }
     public double Lots { get; set; }
+    public int    numberRisks { get; set; }
     public string Symbol { get; set; }
     public string MetaSymbol { get; set; }
     public double ProfitStopsPercent { get; set; }
@@ -27,8 +28,10 @@ public class PositionInfo
     public double Vtp { get; set; }
     public double Realtp { get; set; }
     public double Swap { get; set; }
+    public double be { get; set; } 
     public double Commission { get; set; }
     public string Expiration { get; set; } 
+    public string Comment { get; set; } 
     
     public void Update()
     {

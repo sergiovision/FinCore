@@ -5,6 +5,8 @@ import { map, catchError } from 'rxjs/operators';
 import notify from 'devextreme/ui/notify';
 import { UserToken } from '../models/Entities';
 import { BaseService } from './base.service';
+import { Router } from '@angular/router';
+import { first } from 'rxjs/operators';
 
 
 @Injectable({ providedIn: 'root' })
@@ -12,7 +14,7 @@ export class AuthenticationService extends BaseService {
     private currentUserSubject: BehaviorSubject<UserToken>;
     public currentUser: Observable<UserToken>;
 
-    constructor(http: HttpClient) {
+    constructor(http: HttpClient, private router: Router) {
         super(http);
         this.currentUserSubject = new BehaviorSubject<UserToken>(JSON.parse(localStorage.getItem('currentUser')));
         this.currentUser = this.currentUserSubject.asObservable();
@@ -61,5 +63,10 @@ export class AuthenticationService extends BaseService {
         // remove user from local storage to log user out
         localStorage.removeItem('currentUser');
         this.currentUserSubject.next(null);
+    }
+
+    async loginAndRedirect(username: string, password: string, redirect: string): Promise<void> {
+      await this.login(username, password).pipe(first()).toPromise();
+      this.router.navigate([redirect]);
     }
 }

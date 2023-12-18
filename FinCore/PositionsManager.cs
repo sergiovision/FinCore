@@ -58,13 +58,19 @@ public class PositionsManager : ITerminalEvents
         return result;
     }
     
-    public List<PositionInfo> GetPositions4Adviser(long adviserId)
+    public List<PositionInfo> GetPositions4Adviser(long adviserId, string symbol, long account)
     {
         var result = new List<PositionInfo>();
         lock (lockObject)
         {
+            loadPositions();
             foreach (var posTerm in positions) 
             {
+                if (posTerm.Value.Magic == 0)
+                {
+                    if (posTerm.Value.Symbol.Equals(symbol) && posTerm.Value.Account == account)
+                        result.Add(posTerm.Value);
+                }
                 if (posTerm.Value.Magic == adviserId)
                     result.Add(posTerm.Value);
             }
@@ -174,12 +180,17 @@ public class PositionsManager : ITerminalEvents
                     var newvalue = contains.FirstOrDefault();
                     // newvalue.ProfitStopsPercent = pos.Value.ProfitStopsPercent;
                     newvalue.AccountName = terminal.Broker;
+                    
+                    // here is the list of properties that should NOT be overwritten
                     if (!newvalue.Role.Equals(pos.Value.Role))
                     {
                         newvalue.Role = pos.Value.Role;
                         doSave = true;
                     }
-
+                    if (!newvalue.be.Equals(pos.Value.be)) // do not overwrite BE here
+                    {
+                        newvalue.be = pos.Value.be;
+                    }
                     if (positions.TryUpdate(pos.Key, newvalue, pos.Value)) UpdatePosition(newvalue);
                 }
                 else

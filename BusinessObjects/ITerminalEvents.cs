@@ -16,7 +16,7 @@ public interface ITerminalEvents
 
     // methods and functions
     List<PositionInfo> GetAllPositions();
-    List<PositionInfo> GetPositions4Adviser(long adviserId);
+    List<PositionInfo> GetPositions4Adviser(long adviserId, string symbol, long account);
     PositionInfo getPosition(long ticket);
     void DeletePosition(long ticket);
     List<DealInfo> GetTodayDeals();

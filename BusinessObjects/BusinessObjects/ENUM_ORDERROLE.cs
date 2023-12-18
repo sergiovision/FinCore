@@ -10,5 +10,8 @@ public enum ENUM_ORDERROLE
     LongInvestment,
     ShortInvestment,
     RealPendingLimit,
-    RealPendingStop
+    RealPendingStop,
+    PendingSmartOrder,
+    RegularSmartOrder,
+    PendingPriceAlert
 }

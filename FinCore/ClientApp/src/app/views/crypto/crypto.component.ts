@@ -242,6 +242,7 @@ export class CryptoComponent extends BaseComponent implements OnInit, OnDestroy,
     );
   }
 
+  /*
   toDBObj(key: number): any {
     if (this.currentObject) {
       const entries = new Map<string, any>();
@@ -251,6 +252,17 @@ export class CryptoComponent extends BaseComponent implements OnInit, OnDestroy,
       entries.set('Id', key);
       this.currentObject = Object.fromEntries(entries);
       // console.log(this.currentObject);
+    }
+    return this.currentObject;
+  }
+  */
+
+  toDBObj(key: number): any {
+    if (this.currentObject) {
+      const entries = Object.entries(this.currentObject)
+      .map(([key, value]) => ([key, this.propsContainer.dataSource[key].value]));
+      entries.push(['Id', key]);
+      this.currentObject = Object.fromEntries(entries);
     }
     return this.currentObject;
   }

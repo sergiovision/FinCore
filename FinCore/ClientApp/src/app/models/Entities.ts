@@ -19,8 +19,23 @@ export enum EntitiesEnum {
   Site = 17,
   Position = 18,
   Indicators = 19,
-
   TrendLine = 20
+}
+
+export enum ENUM_ORDERROLE
+{
+    RegularTrail,
+    ShouldBeClosed,
+    History,
+    PendingLimit,
+    PendingStop,
+    LongInvestment,
+    ShortInvestment,
+    RealPendingLimit,
+    RealPendingStop,
+    PendingSmartOrder,
+    RegularSmartOrder,
+    PendingPriceAlert
 }
 
 export interface DynamicProperty<T> {
@@ -159,12 +174,13 @@ export class Terminal {
     AccountName: string;
     Type: number;
     Lots: number;
+    numberRisks: number;
     Symbol: string;
     MetaSymbol: string;
     ProfitStopsPercent: number;
     ProfitBricks: number;
     Profit: number;
-    Role: string;
+    Role: ENUM_ORDERROLE;
     Openprice: number;
     contractSize: number;
     cur: string;
@@ -175,10 +191,10 @@ export class Terminal {
     Realtp: number;
     Swap: number;
     Commission: number;
+    Comment: string;
     Expiration: Date;
-    // calcValue(): number {
-    //   return this.Lots * this.contractSize * this.Openprice + this.Profit;
-    // }
+    RoleString: string;
+    be: number;
   }
 
   export class MetaSymbolStat {

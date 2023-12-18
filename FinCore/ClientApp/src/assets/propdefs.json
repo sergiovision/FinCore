@@ -859,7 +859,8 @@
           "items": [ {"ID":"RegularTrail", "name": "RegularTrail"},
             {"ID": "ShouldBeClosed","name": "ShouldBeClosed" }, {"ID": "History","name": "History" }, {"ID": "PendingLimit","name": "PendingLimit" },
             {"ID": "PendingStop","name": "PendingStop" }, {"ID": "LongInvestment","name": "LongInvestment" }, {"ID": "ShortInvestment","name": "ShortInvestment" },
-            {"ID": "RealPendingLimit","name": "RealPendingLimit" }, {"ID": "RealPendingStop","name": "RealPendingStop" }
+            {"ID": "RealPendingLimit","name": "RealPendingLimit" }, {"ID": "RealPendingStop","name": "RealPendingStop"}, { "ID":"PendingSmartOrder", "name": "PendingSmartOrder"},
+            { "ID":"RegularSmartOrder", "name": "RegularSmartOrder"}
           ],
           "description": "Account type"
         },
@@ -950,8 +951,15 @@
           "control": "LabelText",
           "defaultValue": "0",
           "description": "Commission"
+        },
+        {
+          "type": "double",
+          "name": "Comment",
+          "group": "System",
+          "control": "LabelText",
+          "defaultValue": "",
+          "description": "Comment"
         }
-
       ]
     }
 

@@ -317,21 +317,23 @@ internal class SchedulerService
                 jobview.Group = detail.Key.Group;
                 if (runninglist.ContainsKey(jobview.Group + jobview.Name))
                     jobview.IsRunning = true;
-                var strMessage = detail.JobDataMap.GetString("log");
-                jobview.Log = strMessage;
+                if (detail.JobDataMap.ContainsKey("log"))
+                {
+                    var strMessage = detail.JobDataMap.GetString("log");
+                    jobview.Log = strMessage;
+                }
                 var trigs = sched.GetTriggersOfJob(detail.Key).Result;
-                if (trigs != null)
-                    foreach (var trigger in trigs)
-                    {
-                        var prev = trigger.GetPreviousFireTimeUtc();
-                        if (prev.HasValue)
-                            jobview.PrevTime = prev.Value.DateTime.ToBinary();
-                        var next = trigger.GetNextFireTimeUtc();
-                        if (next.HasValue)
-                            jobview.NextTime = next.Value.DateTime.ToBinary();
-                        var crontrig = trigger as ICronTrigger;
-                        if (crontrig != null) jobview.Schedule = crontrig.CronExpressionString;
-                    }
+                foreach (var trigger in trigs)
+                {
+                    var prev = trigger.GetPreviousFireTimeUtc();
+                    if (prev.HasValue)
+                        jobview.PrevTime = prev.Value.DateTime.ToBinary();
+                    var next = trigger.GetNextFireTimeUtc();
+                    if (next.HasValue)
+                        jobview.NextTime = next.Value.DateTime.ToBinary();
+                    var crontrig = trigger as ICronTrigger;
+                    if (crontrig != null) jobview.Schedule = crontrig.CronExpressionString;
+                }
 
                 list.Add(jobview);
             }
