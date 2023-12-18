@@ -31,10 +31,6 @@ Program fits for anybody. <br>
 1. Clone this repository
 2. Build Client 
 
-
-
-
-
 App. 
   Go to FinCore/ClientApp folder 
   Run: `npm install`
