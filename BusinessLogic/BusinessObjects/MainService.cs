@@ -562,10 +562,14 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
                 {
                     expert.IsMaster = adviser.IsMaster;
                 }
-
                 adviser.Running = true;
                 if (adviser.Id <= 0)
                     data.SaveInsertAdviser(Session, adviser);
+                else
+                {
+                    // Clear signals cache for this Adviser
+                    SignalsCache.Instance.DeleteSignalBySymbol(expert.Symbol);
+                }
 
                 var dynProps = data.GetPropertiesInstance((short) EntitiesEnum.Adviser, adviser.Id);
                 if (dynProps == null || Utils.HasAny(dynProps.Vals) == false)
@@ -758,6 +762,55 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
                 result.SetData(levelsString);
             }
                 break;
+            
+            case EnumSignals.SIGNAL_GET_SIGNAL_FROMCACHE:
+            {
+                result = SignalsCache.Instance.Get(signal.Key);
+                if (result != null)
+                {
+                    if (!result.Handled)
+                    {
+                        // result = CreateSignal(SignalFlags.Expert, signal.ObjectId, (EnumSignals) signal.Id, signal.ChartId);
+                        result.Handled = true;
+                        return result;
+                        //if (result != null)
+                        //{
+                        //    SignalsCache.Instance.DeleteSignal(signal.Key);
+                        //}
+                    }
+                    else
+                    {
+                        log.Info($"Signal {signal.Key} already handled!!");
+                        return null;
+                    }
+                }
+            }
+                break;
+            case EnumSignals.SIGNAL_MARKET_EXPERT_ORDER:
+            {
+                if (string.IsNullOrEmpty(signal.Key))
+                    break;
+                // just cache this signal
+                //if (signal.ObjectId == 0 || xtradeConstants.FAKE_MAGIC_NUMBER == signal.ObjectId)
+                //    break;
+                if (!SignalsCache.Instance.Contains(signal.Key))
+                {
+                    SignalsCache.Instance.AddSignal(signal.Key, signal);
+                    //signal.Flags = (long)SignalFlags.Expert;
+                    //xtrade.PostSignalTo(signal);
+                    //if (result == null)
+                    //    SignalsCache.Instance.DeleteSignal(signal.Key);
+                    //else 
+                    //log.Info($"Signal {signal.Key} received and cached in FinCore");
+                }
+                else
+                {
+                    return null;
+                }
+                result = signal;
+            }
+                break;
+            
         }
 
         return result;

@@ -6,7 +6,6 @@
     </a>
   </c-nav-item>
 </c-header-nav>
-
 -->
 
 <div>
@@ -16,8 +15,6 @@
     </li>
   </ul>
 </div>
-
-
 
 <div>
   <app-dgauge #dgauge id="dgauge">
@@ -105,7 +102,7 @@
       <dxo-format type="fixedPoint" [precision]="2"></dxo-format>
       <div *dxTemplate="let cell of 'priceCellTemplate'" [class.inc]="cell.data.Profit > 0"
         [class.dec]="cell.data.Profit < 0">
-        <span class="current-value">{{cell.text}}</span>
+        <span class="current-value">{{cell.text}}%</span>
       </div>
     </dxi-column>
 
@@ -119,8 +116,7 @@
 
     <div *dxTemplate="let data of 'totalStat'">
       <div>
-        <span [class.inc]="this.stat.TodayGainReal > 0" [class.dec]="this.stat.TodayGainReal < 0">PnL:
-          ${{this.stat.TodayGainReal}} {{this.balances}} </span>
+        <span [class.inc]="this.stat.TodayGainReal > 0" [class.dec]="this.stat.TodayGainReal < 0">PnL: {{this.balances}}</span>
       </div>
     </div>
   </dx-data-grid>

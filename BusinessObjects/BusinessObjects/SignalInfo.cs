@@ -15,7 +15,7 @@ public class SignalInfo
 
     [JsonIgnore]
     public SignalFlags Flag => (SignalFlags) Flags;
-
+    
     public long Flags { get; set; }
 
     public long ObjectId { get; set; }
@@ -25,7 +25,11 @@ public class SignalInfo
     public string Sym { get; set; }
 
     public int Value { get; set; }
-
+    
+    public string Key  { get; set; }
+    
+    public bool Handled  { get; set; }
+    
     public string Data { get; private set; }
 
     public void SetData(string strData)
@@ -73,6 +77,11 @@ public class SignalInfo
                     case "Sym":
                     {
                         sig.Sym = prop.Value.ToString();
+                    }
+                        break;
+                    case "Key":
+                    {
+                        sig.Key = prop.Value.ToString();
                     }
                         break;
                     case "Value":

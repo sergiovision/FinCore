@@ -45,6 +45,8 @@ internal class TestJob : GenericJob
             //var log = MainService.thisGlobal.Container.Resolve<IWebLog>();
             //log.Log("Hello world");
             await CleanMemory();
+            
+            SignalsCache.Instance.Clear();
 
             // MainService.thisGlobal.ClearPositions();
             //PositionInfo position = new PositionInfo();

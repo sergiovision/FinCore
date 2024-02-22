@@ -286,6 +286,7 @@ export class Account {
     Retired: boolean;
     Typ: number;
     DailyProfit: number;
+    DailyProfitPercent: number;
     DailyMaxGain: number;
     StopTrading: boolean;
     StopReason: string;
@@ -304,6 +305,7 @@ export class Account {
       this.Retired = false;
       this.Typ = 0;
       this.DailyProfit = 0;
+      this.DailyProfitPercent = 0;
       this.DailyMaxGain = 0;
       this.StopTrading = false;
       return this;

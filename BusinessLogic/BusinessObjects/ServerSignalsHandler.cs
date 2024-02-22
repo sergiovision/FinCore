@@ -18,7 +18,7 @@ public class ServerSignalsHandler : ISignalHandler
     private readonly IWebLog log;
 
     private readonly MainService xtrade;
-
+    
     public ServerSignalsHandler()
     {
         xtrade = MainService.thisGlobal;
@@ -149,6 +149,7 @@ public class ServerSignalsHandler : ISignalHandler
                     server.MulticastText(send);
             }
                 break;
+            
             case EnumSignals.SIGNAL_SAVELEVELS4SYMBOL:
             {
                 var levels = signal.Data;
@@ -190,7 +191,6 @@ public class ServerSignalsHandler : ISignalHandler
                         server.MulticastText(send);
                     }
                 }
-
                 break;
         }
     }
@@ -297,15 +297,15 @@ public class ServerSignalsHandler : ISignalHandler
                 server.MulticastText(send);
             }
                 break;
-
-
+            
+                
+            
             default:
             {
                 log.Info("Undefined Message");
                 // Multicast message to all connected sessions
                 // ((WsServer)Server).MulticastText(message);
-            }
-                break;
+            } break;
         }
     }
 }

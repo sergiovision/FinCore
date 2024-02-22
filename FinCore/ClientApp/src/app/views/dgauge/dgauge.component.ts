@@ -52,26 +52,25 @@ export class DGaugeComponent extends BaseComponent implements OnInit {
       this.sumLoose = 0;
       Object.entries(data).forEach(item => {
         const pos: any = item[1];
-        if (pos.Profit > 0) {
+        if (pos.Value > 0) {
           gainers.push(pos);
-          this.maxGain = Math.max(this.maxGain, pos.Profit);
-          //this.sumGain += pos.Profit;
+          this.maxGain = Math.max(this.maxGain, pos.Value);
           this.sumGain += pos.Value; // use total percent
         }
-        if (pos.Profit < 0) {
+        if (pos.Value < 0) {
           loosers.push(pos);
-          this.maxLoose = Math.min(this.maxLoose, pos.Profit);
-          // this.sumLoose += pos.Profit;
+          this.maxLoose = Math.min(this.maxLoose, pos.Value);
           this.sumLoose += pos.Value; // use total percent
         }
       });
-      gainers = gainers.sort((a, b) =>  (a.Profit > b.Profit ? 1 : -1));
-      loosers = loosers.sort((a, b) =>  (a.Profit > b.Profit ? -1 : 1));
+      gainers = gainers.sort((a, b) =>  (a.Value > b.Value ? 1 : -1));
+      loosers = loosers.sort((a, b) =>  (a.Value > b.Value ? -1 : 1));
       gainers.forEach(item => {
-          this.GainersProfits.push(item.Profit);
+          this.GainersProfits.push(item.Value); //// 'Value' Uses percent value
       });
       loosers.forEach(item => {
-        this.LoosersProfits.push(item.Profit);
+        // this.LoosersProfits.push(item.Profit);
+        this.LoosersProfits.push(item.Value); // 'Value' Uses percent value
       });
       this.loadingVisible = false;
   }
@@ -94,7 +93,7 @@ export class DGaugeComponent extends BaseComponent implements OnInit {
     if (gainers) {
       if (gainers[arg.index]) {
         const sym: string = gainers[arg.index].Symbol;
-        return sym + ' ' + arg.value.toFixed(1) + '$';
+        return sym + ' ' + arg.value.toFixed(1) + '%';
       }
     }
     return arg.valueText;
@@ -106,7 +105,7 @@ export class DGaugeComponent extends BaseComponent implements OnInit {
     if (loosers) {
       if (loosers[arg.index]) {
         const sym: string = loosers[arg.index].Symbol;
-        return sym + ' ' + arg.value.toFixed(1) + '$';
+        return sym + ' ' + arg.value.toFixed(1) + '%';
       }
     }
     return arg.valueText;

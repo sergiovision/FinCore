@@ -42,7 +42,7 @@ public class PositionsManager : ITerminalEvents
             terminals.Add(term.AccountNumber, term);
             if (term.Retired == false)
             {
-                var acc = new Account {Number = term.AccountNumber, TerminalId = term.Id};
+                var acc = new Account {Number = term.AccountNumber, TerminalId = term.Id, Description = term.Broker};
                 todayStat.Accounts.Add(acc);
             }
         }
@@ -332,6 +332,10 @@ public class PositionsManager : ITerminalEvents
             c.StopTrading = false;
         });
         double sumReal = 0;
+        
+        foreach (var acc in todayStat.Accounts)
+            acc.Retired = true;
+
         foreach (var deal in todayDeals.OrderBy(c => c.Value.CloseTime))
         {
             sumReal += deal.Value.Profit;
@@ -339,8 +343,11 @@ public class PositionsManager : ITerminalEvents
             if (acc != null)
             {
                 acc.DailyProfit += new decimal(deal.Value.Profit);
-                if (acc.DailyProfit > 0)
+                if (acc.DailyProfit > 0) 
                     acc.DailyMaxGain = Math.Max(acc.DailyMaxGain, acc.DailyProfit);
+                if (acc.Balance > 0)
+                   acc.DailyProfitPercent = acc.DailyProfit / acc.Balance * new decimal(100.0);
+                acc.Retired = false;
             }
         }
 

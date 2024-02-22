@@ -80,6 +80,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     this.connectionStarted = false;
     this.stat = new TodayStat();
     this.fillBalancesString();
+    this.balances = ' loading...';
   }
 
   public onOpen(evt: MessageEvent) {
@@ -92,7 +93,19 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   loadData() {
     if (this.currentUser) {
       this.ws.doSend({ Type: WsMessageType.GetAllPositions, From: this.currentUser.userName, Message: '' });
-    }
+      this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
+        data => {
+          window.location.reload();
+        },
+        error => this.logNotifyError(error)
+      );
+  }
+  }
+
+  titleGainsPercent(): string {
+    if (this.stat.TodayGainRealPercent)
+       return this.stat.TodayGainRealPercent.toFixed(2) + '%';
+    return ' loading...';
   }
 
   public onClose() {
@@ -120,8 +133,8 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   public fillBalancesString() {
     if (this.stat.Accounts) {
         this.balances = this.stat.Accounts
-            .filter(element => element.Balance > 0)
-            .map(element => `${element.Number}=${element.Balance}`)
+            .filter(element => !element.Retired)
+            .map(element => `${element.DailyProfitPercent.toFixed(2)}%=${element.Description}`)
             .join(':');
     }
   }
@@ -167,13 +180,17 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
           {
               const balance = JSON.parse(msg.Message) as BalanceInfo;
               if (balance && this.stat.Accounts) {
+                var totalBalance = 0;
                 this.stat.Accounts.forEach(element => {
                   if (balance.Account === element.Number && balance.Balance > 0) {
                     // console.log('Updated balance for account=' + balance.Account + 'to ' + balance.Balance);
                     element.Balance = balance.Balance;
                     element.Equity = balance.Equity;
                   }
+                  if (element.Balance > 0)
+                  totalBalance+=element.Balance;
                 });
+                this.stat.TodayGainRealPercent = this.stat.TodayGainReal/totalBalance*100.0;
                 this.fillBalancesString();
               }
           }
@@ -283,12 +300,12 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
 
   public syncAll(e) {
     this.loadData();
-    this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
-      data => {
-        window.location.reload();
-      },
-      error => this.logNotifyError(error)
-    );
+    //this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
+    //  data => {
+    //    window.location.reload();
+    //  },
+    //  error => this.logNotifyError(error)
+    //);
   }
 
   onToolbarPreparing(e) {

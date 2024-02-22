@@ -29,10 +29,12 @@ public class Account : Idable
     public virtual bool Retired { get; set; }
     public AccountType Typ { get; set; }
     public decimal DailyProfit { get; set; }
+    public decimal DailyProfitPercent { get; set; }
     public decimal DailyMaxGain { get; set; }
     public bool StopTrading { get; set; }
     public string StopReason { get; set; }
     public int Id { get; set; }
+    
 }
 
 public class BalanceInfo

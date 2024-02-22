@@ -193,7 +193,7 @@
            "group": "System",
            "control": "GeneralCheckbox",
            "defaultValue": false,
-           "description": "Retired"
+           "description": "Running"
         },
         {
           "type": "string",
@@ -202,6 +202,14 @@
           "control": "TextArea",
           "defaultValue": "",
           "description": "Comments"
+        },
+        {
+          "type": "boolean",
+           "name": "Autotrade",
+           "group": "System",
+           "control": "GeneralCheckbox",
+           "defaultValue": false,
+           "description": "Allow Autotrade Expert orders opening!!!"
         }
       ],
       "Volume":[
@@ -405,6 +413,22 @@
             "control": "GeneralInteger",
             "defaultValue": 5,
             "description": "NumBarsToAnalyze"
+          },
+          {
+            "type": "integer",
+            "name": "MinSquarePoints",
+            "group": "Indicators",
+            "control": "GeneralInteger",
+            "defaultValue": 5,
+            "description": "MinSquarePoints for filtering RMs"
+          },
+          {
+            "type": "integer",
+            "name": "PendingExpiration",
+            "group": "Indicators",
+            "control": "GeneralInteger",
+            "defaultValue": 13,
+            "description": "Pending Orders in hours"
           },
           {
           "type": "boolean",
