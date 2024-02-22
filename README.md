@@ -55,6 +55,9 @@ Applications need to be installed to run server properly:
 
 1. Metatrader 5 Terminal
 2. Optionally MySQL Server version 5 or later.
+3. .NET Core 8
+4. Framework 4.8 (for dlls in Metatrader5) should be installed
+  
 
 SQLite database located in `/DB` folder. By default SQLite DB file used, but MySQL also supported, you can switch to MySQL in `/FinCore/appSettings.json` file.
 
@@ -130,7 +133,6 @@ FinCore folders structure:
   Generally application should be installed on your Virtual Private Server (VPS). Where your trading/investment terminals run.
   FinCore application is completely crossplatform.
   You can biuld it for Windows, MacOS, Linux/Docker and run it there. <br>
-  Requirements: .NET Core 8 and Framework 4.8 (for dlls in Metatrader5) should be installed to run all features of FinCore
   There are 3 options to run FinCore application:<br>
   
   1. As a Windows Service
