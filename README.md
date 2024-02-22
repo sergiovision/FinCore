@@ -3,7 +3,7 @@
 # About FinCore
 <p id="doc_about">
 </p>
-  New version 0.9.17 released. 
+  New version 0.9.18 released. 
   FinCore is a cool and free cross-platform personal finances manager written in .NET 8 with Angular 14 frontend. <br>
 
   <p>   This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.</p>
@@ -130,6 +130,7 @@ FinCore folders structure:
   Generally application should be installed on your Virtual Private Server (VPS). Where your trading/investment terminals run.
   FinCore application is completely crossplatform.
   You can biuld it for Windows, MacOS, Linux/Docker and run it there. <br>
+  Requirements: .NET Core 8 and Framework 4.8 (for dlls in Metatrader5) should be installed to run all features of FinCore
   There are 3 options to run FinCore application:<br>
   
   1. As a Windows Service
