@@ -388,12 +388,12 @@
             "description": "MoreTriesOpenOrder"
           },
           {
-            "type": "boolean",
-            "name": "AllowMarketOrders",
+            "type": "double",
+            "name": "PendingIndentCoef",
             "group": "Limits",
-            "control": "GeneralCheckbox",
-            "defaultValue": false,
-            "description": "MoreTriesOpenOrder"
+            "control": "GeneralDouble",
+            "defaultValue": 0.2,
+            "description": "from 0.0 to 1.0 choose between Pending and Market order"
           },
           { "type": "integer",
             "name": "Slippage",
