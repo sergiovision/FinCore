@@ -23,9 +23,9 @@ public class PositionInfo
     public string cur { get; set; }
     public double Value { get; set; }
     
-    public double Vsl { get; set; }
+    //public double Vsl { get; set; }
     public double Realsl { get; set; }
-    public double Vtp { get; set; }
+    //public double Vtp { get; set; }
     public double Realtp { get; set; }
     public double Swap { get; set; }
     public double be { get; set; } 

@@ -31,8 +31,8 @@ export class DealsService extends BaseService {
     return super.getAll('/api/deals/MetaSymbolStatistics?count=' + nElements + '&option=' + currentOption);
   }
 
-  public closePosition(account: number, magic: number, ticket: number) {
-    const uri: string = '/api/deals/ClosePosition?account=' + account + '&magic=' + magic + '&ticket=' + ticket;
+  public closePosition(account: number, magic: number, ticket: number, symbol: string) {
+    const uri: string = '/api/deals/ClosePosition?account=' + account + '&magic=' + magic + '&ticket=' + ticket + '&symbol=' + symbol ;
     return super.getAll(uri);
   }
 

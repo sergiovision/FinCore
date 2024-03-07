@@ -185,9 +185,7 @@ export class Terminal {
     contractSize: number;
     cur: string;
     Value: number;
-    Vsl: number;
     Realsl: number;
-    Vtp: number;
     Realtp: number;
     Swap: number;
     Commission: number;

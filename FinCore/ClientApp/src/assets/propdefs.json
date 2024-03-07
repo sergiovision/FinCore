@@ -196,20 +196,20 @@
            "description": "Running"
         },
         {
-          "type": "string",
-          "name": "Comments",
-          "group": "System",
-          "control": "TextArea",
-          "defaultValue": "",
-          "description": "Comments"
-        },
-        {
           "type": "boolean",
            "name": "Autotrade",
            "group": "System",
            "control": "GeneralCheckbox",
            "defaultValue": false,
            "description": "Allow Autotrade Expert orders opening!!!"
+        },
+        {
+          "type": "string",
+          "name": "Comments",
+          "group": "System",
+          "control": "TextArea",
+          "defaultValue": "",
+          "description": "Comments"
         }
       ],
       "Volume":[
@@ -345,12 +345,39 @@
             "description": "Allow SELL"
           },
           {
+            "type": "integer",
+            "name": "Session1Allow",
+            "group": "Limits",
+            "control": "GenericEnum",
+            "defaultValue": 0,
+            "items": [ {"ID":0, "name": "BuyAndSell"}, {"ID": 1,"name": "BuyOnly" }, {"ID":2, "name": "SellOnly"}, {"ID":3, "name": "NotAllowed"}],
+            "description": "Session1Allow orders"
+          },
+          {
+            "type": "integer",
+            "name": "Session2Allow",
+            "group": "Limits",
+            "control": "GenericEnum",
+            "defaultValue": 0,
+            "items": [ {"ID":0, "name": "BuyAndSell"}, {"ID": 1,"name": "BuyOnly" }, {"ID":2, "name": "SellOnly"}, {"ID":3, "name": "NotAllowed"}],
+            "description": "Session2Allow orders"
+          },
+          {
+            "type": "integer",
+            "name": "Session3Allow",
+            "group": "Limits",
+            "control": "GenericEnum",
+            "defaultValue": 0,
+            "items": [ {"ID":0, "name": "BuyAndSell"}, {"ID": 1,"name": "BuyOnly" }, {"ID":2, "name": "SellOnly"}, {"ID":3, "name": "NotAllowed"}],
+            "description": "Session3Allow orders"
+          },
+          {
             "type": "boolean",
-            "name": "AllowVirtualStops",
+            "name": "SN5Signals",
             "group": "Limits",
             "control": "GeneralCheckbox",
             "defaultValue": false,
-            "description": "Allow Virtual Stops"
+            "description": "Allow SN5Signals"
           },
           {
             "type": "boolean",
@@ -930,27 +957,11 @@
         },
         {
           "type": "double",
-          "name": "Vsl",
-          "group": "System",
-          "control": "GeneralDouble",
-          "defaultValue": "0",
-          "description": "Virtual StopLoss"
-        },
-        {
-          "type": "double",
           "name": "Realsl",
           "group": "System",
           "control": "GeneralDouble",
           "defaultValue": "0",
           "description": "Real StopLoss"
-        },
-        {
-          "type": "double",
-          "name": "Vtp",
-          "group": "System",
-          "control": "GeneralDouble",
-          "defaultValue": "0",
-          "description": "Virtual TakProfit"
         },
         {
           "type": "double",

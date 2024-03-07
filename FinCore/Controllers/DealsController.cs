@@ -99,7 +99,7 @@ public class DealsController : BaseController
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]
     [Route("[action]")]
-    public ActionResult ClosePosition([FromQuery] int account, [FromQuery] int magic, [FromQuery] int Ticket)
+    public ActionResult ClosePosition([FromQuery] int account, [FromQuery] int magic, [FromQuery] int Ticket, [FromQuery] string symbol)
     {
         try
         {
@@ -108,11 +108,13 @@ public class DealsController : BaseController
             {
                 signalPos = MainService.CreateSignal(SignalFlags.Expert, magic, EnumSignals.SIGNAL_CLOSE_POSITION,
                     0);
+                signalPos.Sym = symbol;
                 signalPos.SetData(magic.ToString());
             }
             else
             {
                 signalPos = MainService.CreateSignal(SignalFlags.Terminal, account, EnumSignals.SIGNAL_CLOSE_POSITION, 0);
+                signalPos.Sym = symbol;
                 signalPos.SetData("0");
             }
             signalPos.Value = Ticket;

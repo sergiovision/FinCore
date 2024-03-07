@@ -278,7 +278,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
     if (id === 5) {
       const pos: PositionInfo = e.data;
       if (this.allowClosePositions(pos.Role)) {
-        this.subs.sink = this.deals.closePosition(pos.Account, pos.Magic, pos.Ticket).subscribe(
+        this.subs.sink = this.deals.closePosition(pos.Account, pos.Magic, pos.Ticket, pos.Symbol).subscribe(
           data => {
             console.log('Position close request sent ticket=' + pos.Ticket);
           },
