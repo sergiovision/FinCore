@@ -676,6 +676,26 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
                 result = signal;
             }
                 break;
+            case EnumSignals.SIGNAL_ADD_ORDERS:
+            {
+                List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
+                if (Utils.HasAny(orders))
+                {
+                    var terminals = Container.Resolve<ITerminalEvents>();
+                    terminals.AddOrders(signal.ObjectId, signal.Value, orders);
+                }
+                result = signal;
+            } break;
+            case EnumSignals.SIGNAL_DELETE_ORDERS:
+            {
+                List<PositionInfo> orders = Utils.ExtractList<PositionInfo>(signal.Data);
+                if (Utils.HasAny(orders))
+                {
+                    var terminals = Container.Resolve<ITerminalEvents>();
+                    terminals.DeleteOrders(signal.ObjectId, signal.Value, orders);
+                }
+                result = signal;
+            } break;
             case EnumSignals.SIGNAL_INIT_EXPERT:
                 if (signal.Data != null)
                 {
