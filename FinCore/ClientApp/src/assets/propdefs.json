@@ -296,10 +296,10 @@
             "control": "GenericEnum",
             "defaultValue": 1,
             "items": [ {"ID":0, "name": "TrailingDefault"}, {"ID": 1,"name": "TrailingManual" }, {"ID":2, "name": "TrailingStairs"},
-              {"ID":3, "name": "TrailingFilter"}, {"ID":4, "name": "TrailingSignal"},{"ID":5, "name": "TrailingByFractals"},
-              {"ID":6, "name": "TrailingByShadows"},{"ID":7, "name": "TrailingByATR"},{"ID":8, "name": "TrailingUdavka"},
-              {"ID":9, "name": "TrailingByTime"},{"ID":10, "name": "TrailingByPriceChannel"},
-              {"ID":11, "name": "TrailingFiftyFifty"},{"ID":12, "name": "TrailEachNewBar"} ],
+              {"ID":3, "name": "TrailingByFractals"}, {"ID":4, "name": "TrailingByShadows"},{"ID":5, "name": "TrailingByATR"},
+              {"ID":6, "name": "TrailingUdavka"},{"ID":7, "name": "TrailingByTime"},{"ID":8, "name": "TrailingByPriceChannel"},
+              {"ID":9, "name": "TrailingFiftyFifty"},{"ID":10, "name": "TrailEachNewBar"},
+              {"ID":11, "name": "TrailingFilter"},{"ID":12, "name": "TrailingSignal"} ],
             "description": "Trailing Type"
           },
           {
@@ -421,7 +421,7 @@
             "defaultValue": 0,
             "items": [ {"ID":0, "name": "NoIndicator"}, {"ID": 1,"name": "CandleIndicator" }, {"ID":2, "name": "IshimokuIndicator"},
               {"ID":3, "name": "IchimokuRenkoIndicator"}, {"ID":4, "name": "OsMAIndicator"}, {"ID":5, "name": "DefaultIndicator"},
-              {"ID":7, "name": "DivergenceIndicator"} ],
+              {"ID":7, "name": "NRTRIndicator"} ],
             "description": "Signal Indicator"
           },
           {
@@ -494,11 +494,11 @@
             "description": "Add/Remove Exponential Moving Average"
           },
           { "type": "boolean",
-            "name": "EnableDivergence",
+            "name": "EnableNRTR",
             "group": "Indicators",
             "control": "GeneralCheckbox",
             "defaultValue": false,
-            "description": "Add/Remove PZ Divergence indicator"
+            "description": "Add/Remove NRTR Channel indicator"
           },
           { "type": "boolean",
             "name": "EnableBBands",
