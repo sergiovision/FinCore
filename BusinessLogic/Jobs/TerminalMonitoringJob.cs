@@ -60,7 +60,7 @@ namespace BusinessLogic.Jobs;
                     {
                         var procL = processlist.Where(d =>
                             d.MainModule.FileName.Equals(strPath, StringComparison.InvariantCultureIgnoreCase));
-                        if (Utils.HasAny(procL)) procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
+                        if (!Utils.HasAny(procL)) procUtil.ExecuteAppAsLoggedOnUser(strPath, "");
                     }
                 }
             }

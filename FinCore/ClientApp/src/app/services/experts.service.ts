@@ -5,7 +5,7 @@ import notify from 'devextreme/ui/notify';
 import { Adviser } from '../models/Entities';
 import { Observable } from 'rxjs';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class ExpertsService extends BaseService {
     constructor(http: HttpClient) { super(http); }
 

@@ -67,3 +67,6 @@ Thumbs.db
 /BusinessObjects/bin/Debug/netcoreapp3.1
 /BusinessLogic/bin/Release/netcoreapp3.1
 /BusinessObjects/bin/Release/netcoreapp3.1
+
+# not needed inside the image
+.git

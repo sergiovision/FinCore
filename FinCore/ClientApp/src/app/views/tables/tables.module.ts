@@ -26,8 +26,7 @@ import { DealsService} from '../../services/deals.service';
 import { WalletsComponent } from './wallets/wallets.component';
 import { DealsComponent } from './deals/deals.component';
 import { PropsService } from '../../services/props.service';
-import { AuthenticationService } from '../../services/authentication.service';
-import { PropertiesComponent } from './properties/properties.component';
+import { PropertiesModule } from './properties/properties.module';
 import { DxFormModule } from 'devextreme-angular';
 import { MetasymbolComponent } from './metasymbols/metasymbols.component';
 import { RatesComponent } from './rates/rates.component';
@@ -54,13 +53,13 @@ import { PersonComponent } from './person/person.component';
     FormsModule,
     DxColorBoxModule,
     DxFormModule,
-    DxPieChartModule
+    DxPieChartModule,
+    PropertiesModule
   ],
   declarations: [
     JobsComponent,
     WalletsComponent,
     DealsComponent,
-    PropertiesComponent,
     MetasymbolComponent,
     RatesComponent,
     SettingsComponent,
@@ -70,9 +69,7 @@ import { PersonComponent } from './person/person.component';
     WalletsService,
     DealsService,
     ExpertsService,
-    PropsService,
-    AuthenticationService
-  ],
-  exports: [PropertiesComponent]
+    PropsService
+  ]
 })
 export class TablesModule { }

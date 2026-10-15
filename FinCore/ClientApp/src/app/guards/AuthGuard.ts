@@ -10,10 +10,13 @@ export class AuthGuard implements CanActivate {
     ) {}
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
-        const currentUser = this.authenticationService.currentUserValue;
-        if (currentUser) {
-            // authorised so return true
+        if (this.authenticationService.isAuthenticated) {
             return true;
+        }
+
+        // token missing or expired - clear the stale session
+        if (this.authenticationService.currentUserValue) {
+            this.authenticationService.logout();
         }
 
         // not logged n so redirect to login page with the return url

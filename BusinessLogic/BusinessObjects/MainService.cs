@@ -457,7 +457,7 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
             {
                 var adv = Session.Query<DBAdviser>()
                     .Where(x => x.Symbol.Metasymbol.Id == (int) masterId);
-                if (adv == null || advisers.Count() == 0)
+                if (adv == null)
                     return advisers; // it is not master expert
                 foreach (var adviser in adv)
                 {
@@ -750,7 +750,7 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
             case EnumSignals.SIGNAL_CHECK_TRADEALLOWED:
             {
                 var ds = Container.Resolve<ITerminalEvents>();
-                if (ds == null && signal.Data == null)
+                if (ds == null || signal.Data == null)
                     break;
                 var info = Utils.ExtractList<BalanceInfo>(signal.Data);
                 if (Utils.HasAny(info))
@@ -1153,9 +1153,10 @@ public List<Wallet> GetWalletBalanceRange(int WID, DateTime fromDate, DateTime t
             if (Utils.HasAny(advisers))
                 foreach (var adv in advisers)
                 {
-                    signal.Flags = (long) SignalFlags.Expert;
-                    signal.ObjectId = adv.Id;
-                    PostSignal(signal);
+                    var advSignal = signal.Clone();
+                    advSignal.Flags = (long) SignalFlags.Expert;
+                    advSignal.ObjectId = adv.Id;
+                    PostSignal(advSignal);
                 }
         }
     }

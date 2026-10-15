@@ -65,7 +65,6 @@ public class BaseController : ControllerBase
         }
     }
 
-    [AllowAnonymous]
     [HttpGet]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status500InternalServerError)]

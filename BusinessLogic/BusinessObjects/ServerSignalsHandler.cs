@@ -27,7 +27,7 @@ public class ServerSignalsHandler : ISignalHandler
 
     public SignalInfo ListenSignal(long flags, long objectId)
     {
-        return xtrade.ListenSignal(flags, objectId);
+        return xtrade.ListenSignal(objectId, flags);
     }
 
     public void PostSignal(SignalInfo signal, IMessagingServer server)
@@ -84,7 +84,7 @@ public class ServerSignalsHandler : ISignalHandler
                 }
                 catch (Exception e)
                 {
-                    log.Info(string.Format($"GetBYNUSDRates Error: {0}", e));
+                    log.Error("GetBYNUSDRates Error", e);
                 }
             }
                 break;

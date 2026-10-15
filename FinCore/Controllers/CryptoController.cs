@@ -20,7 +20,6 @@ using OrderStatus = Kucoin.Net.Enums.OrderStatus;
 
 namespace FinCore.Controllers;
 
-[AllowAnonymous]
 [ApiController]
 [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
 public class CryptoController : BaseController
@@ -34,6 +33,8 @@ public class CryptoController : BaseController
         if (_kucoinClient == null)
         {
             var conf = XTradeConfig.Self();
+            if (!conf.IsKuCoinConfigured)
+                return false;
             _kucoinClient = new KucoinClient(new KucoinClientOptions()
             {
                 ApiCredentials = new KucoinApiCredentials(conf.KuCoinAPIKey, conf.KuCoinAPISecret, conf.KuCoinPassPhrase),

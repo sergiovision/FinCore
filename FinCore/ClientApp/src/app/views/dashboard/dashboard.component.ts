@@ -93,13 +93,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   loadData() {
     if (this.currentUser) {
       this.ws.doSend({ Type: WsMessageType.GetAllPositions, From: this.currentUser.userName, Message: '' });
-      this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
-        data => {
-          window.location.reload();
-        },
-        error => this.logNotifyError(error)
-      );
-  }
+    }
   }
 
   titleGainsPercent(): string {
@@ -152,6 +146,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
             });
             if (data) {
               this.dgauge.updateData(data);
+              clearInterval(this.timerId);
               this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
             }
             this.dataSource = new CustomStore({
@@ -299,13 +294,10 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   }
 
   public syncAll(e) {
-    this.loadData();
-    //this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
-    //  data => {
-    //    window.location.reload();
-    //  },
-    //  error => this.logNotifyError(error)
-    //);
+    this.subs.sink = this.deals.runJob('SYSTEM', 'TerminalsSyncJob').subscribe(
+      data => this.loadData(),
+      error => this.logNotifyError(error)
+    );
   }
 
   onToolbarPreparing(e) {

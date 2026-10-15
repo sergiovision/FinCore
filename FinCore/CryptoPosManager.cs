@@ -92,12 +92,22 @@ public class CryptoPosManager : ITerminalEvents
     #region KuCoinAPI 
     
     private KucoinClient _kucoinClient;
+    private bool kuCoinNotConfiguredLogged;
 
     private bool initKuCoin()
     {
         if (_kucoinClient == null)
         {
             var conf = XTradeConfig.Self();
+            if (!conf.IsKuCoinConfigured)
+            {
+                if (!kuCoinNotConfiguredLogged)
+                {
+                    log?.Info("KuCoin API keys are not set in appsettings.json: crypto positions are disabled");
+                    kuCoinNotConfiguredLogged = true;
+                }
+                return false;
+            }
             _kucoinClient = new KucoinClient(new KucoinClientOptions()
             {
                 ApiCredentials = new KucoinApiCredentials(conf.KuCoinAPIKey, conf.KuCoinAPISecret, conf.KuCoinPassPhrase),
@@ -418,6 +428,8 @@ public class CryptoPosManager : ITerminalEvents
         decimal totalValueInUSD24H = 0;
         decimal totalValueInUSD = 0;
 
+        if (!initKuCoin())
+            return todayStat;
         var accountsAsync = _kucoinClient.SpotApi.CommonSpotClient.GetBalancesAsync().GetAwaiter().GetResult();
         if (accountsAsync.Success)
         {

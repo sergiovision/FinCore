@@ -37,6 +37,11 @@ public class SignalInfo
         Data = strData;
     }
 
+    public SignalInfo Clone()
+    {
+        return (SignalInfo) MemberwiseClone();
+    }
+
     public static SignalInfo Create(string jsonString)
     {
         SignalInfo sig = new SignalInfo();

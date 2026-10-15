@@ -59,7 +59,7 @@ import { DashboardComponent } from './views/dashboard/dashboard.component';
 import { CryptoComponent } from './views/crypto/crypto.component';
 import { DealsService } from './services/deals.service';
 import { WebsocketService } from './services/websocket.service';
-import { TablesModule } from './views/tables/tables.module';
+import { PropertiesModule } from './views/tables/properties/properties.module';
 import { PropsService } from './services/props.service';
 import { DocComponent } from './views/doc/doc.component';
 import { DGaugeComponent } from './views/dgauge/dgauge.component';
@@ -93,7 +93,7 @@ import { DxLinearGaugeModule } from 'devextreme-angular';
     DxValidationSummaryModule,
     DxDataGridModule,
     DxTemplateModule,
-    TablesModule,
+    PropertiesModule,
     DxBarGaugeModule,
     DxLinearGaugeModule,
     DxBoxModule
@@ -120,14 +120,12 @@ import { DxLinearGaugeModule } from 'devextreme-angular';
       useClass: HashLocationStrategy
     },
     AuthenticationService,
-    JwtInterceptor,
     AuthGuard,
     DatePipe,
     PersonService,
     DealsService,
     WebsocketService,
     PropsService,
-    { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: JwtInterceptor, multi: true },
     { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
   ],

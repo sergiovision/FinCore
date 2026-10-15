@@ -95,6 +95,11 @@ public class XTradeConfig
     public string KuCoinFutureAPISecret => Value("KuCoinFutureAPISecret");
     
     public string KuCoinFuturePassPhrase => Value("KuCoinFuturePassPhrase");
+
+    // KucoinApiCredentials throws on an empty key/secret, so KuCoin is optional until both pairs are set
+    public bool IsKuCoinConfigured =>
+        !string.IsNullOrEmpty(KuCoinAPIKey) && !string.IsNullOrEmpty(KuCoinAPISecret) &&
+        !string.IsNullOrEmpty(KuCoinFutureAPIKey) && !string.IsNullOrEmpty(KuCoinFutureAPISecret);
     
     #endregion
     

@@ -1,12 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { BehaviorSubject, Observable, empty } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
-import notify from 'devextreme/ui/notify';
+import { BehaviorSubject, Observable, lastValueFrom } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { UserToken } from '../models/Entities';
 import { BaseService } from './base.service';
 import { Router } from '@angular/router';
-import { first } from 'rxjs/operators';
+import { clearStoredUser, getStoredUser, isUserAuthenticated, setStoredUser } from '../helpers/jwt.helper';
 
 
 @Injectable({ providedIn: 'root' })
@@ -16,7 +15,7 @@ export class AuthenticationService extends BaseService {
 
     constructor(http: HttpClient, private router: Router) {
         super(http);
-        this.currentUserSubject = new BehaviorSubject<UserToken>(JSON.parse(localStorage.getItem('currentUser')));
+        this.currentUserSubject = new BehaviorSubject<UserToken>(getStoredUser());
         this.currentUser = this.currentUserSubject.asObservable();
     }
 
@@ -24,10 +23,14 @@ export class AuthenticationService extends BaseService {
         return this.currentUserSubject.value;
     }
 
+    /** True when a token is stored and has not expired yet. */
+    public get isAuthenticated(): boolean {
+        return isUserAuthenticated(this.currentUserValue);
+    }
+
 
     login(username: string, password: string) {
       const url = this.baseURL + '/api/token';
-      console.log(url);
 
        const headers = new HttpHeaders()
         .append('Accept', 'application/json')
@@ -42,31 +45,27 @@ export class AuthenticationService extends BaseService {
         return this.http.post<any>(url, body, {headers: headers }  )
         .pipe(map(
           user => {
-            console.log('User: ' + user);
             if (user && user.access_token) {
               // store user details and jwt token in local storage to keep user logged in between page refreshes
-              localStorage.setItem('currentUser', JSON.stringify(user));
+              setStoredUser(user);
               this.currentUserSubject.next(user);
-              console.log('Success login');
             }
-          }),
-          catchError(error => {
-            const message = JSON.stringify(error);
-            console.log(message);
-            notify(message);
-            return empty();
+            return user;
           }));
 
     }
 
     logout() {
         // remove user from local storage to log user out
-        localStorage.removeItem('currentUser');
+        clearStoredUser();
         this.currentUserSubject.next(null);
     }
 
     async loginAndRedirect(username: string, password: string, redirect: string): Promise<void> {
-      await this.login(username, password).pipe(first()).toPromise();
-      this.router.navigate([redirect]);
+      const user = await lastValueFrom(this.login(username, password), { defaultValue: null });
+      if (!user || !user.access_token) {
+        throw new Error('Server returned no access token');
+      }
+      this.router.navigateByUrl(redirect);
     }
 }

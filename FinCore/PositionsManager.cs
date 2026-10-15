@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using Autofac;
@@ -421,19 +422,22 @@ public class PositionsManager : ITerminalEvents
     private void fillRiskProps()
     {
         var riskPerDay = xtrade.GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_RISK_PER_DAY);
-        var dRiskPerDay = new decimal(0.02);
-        decimal.TryParse(riskPerDay, out dRiskPerDay);
+        var dRiskPerDay = decimal.TryParse(riskPerDay, NumberStyles.Number, CultureInfo.InvariantCulture, out var riskPerDayValue)
+            ? riskPerDayValue
+            : 0.02m;
         todayStat.RISK_PER_DAY = dRiskPerDay;
 
         var riskDailyMinGain = xtrade.GetGlobalProp(xtradeConstants.SETTINGS_PROPERTY_RISK_DAILY_MIN_GAIN);
-        var dRiskDailyMinGain = new decimal(0.007);
-        decimal.TryParse(riskDailyMinGain, out dRiskDailyMinGain);
+        var dRiskDailyMinGain = decimal.TryParse(riskDailyMinGain, NumberStyles.Number, CultureInfo.InvariantCulture, out var riskDailyMinGainValue)
+            ? riskDailyMinGainValue
+            : 0.007m;
         todayStat.DAILY_MIN_GAIN = dRiskDailyMinGain;
 
         var riskDailyLossAfterGain =
             xtrade.GetGlobalProp(xtradeConstants.SETTINGS_PROPERY_RISK_DAILY_LOSS_AFTER_GAIN);
-        var dRiskDailyLossAfterGain = new decimal(0.3);
-        decimal.TryParse(riskDailyLossAfterGain, out dRiskDailyLossAfterGain);
+        var dRiskDailyLossAfterGain = decimal.TryParse(riskDailyLossAfterGain, NumberStyles.Number, CultureInfo.InvariantCulture, out var riskDailyLossAfterGainValue)
+            ? riskDailyLossAfterGainValue
+            : 0.3m;
         todayStat.DAILY_LOSS_AFTER_GAIN = dRiskDailyLossAfterGain;
     }
 
