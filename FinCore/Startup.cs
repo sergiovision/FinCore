@@ -75,8 +75,6 @@ public class Startup
             options.MinimumSameSitePolicy = SameSiteMode.None;
         });
 
-        services.AddAutoMapper(GetType().Assembly);
-
         services.AddAuthorization(options =>
         {
             options.AddPolicy("Bearer", new AuthorizationPolicyBuilder()

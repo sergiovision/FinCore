@@ -5,6 +5,4 @@ import { Component } from '@angular/core';
 })
 export class P404Component {
 
-  constructor() { }
-
 }

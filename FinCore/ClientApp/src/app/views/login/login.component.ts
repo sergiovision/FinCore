@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { first } from 'rxjs/operators';
 import { AuthenticationService } from '../../services/authentication.service';
@@ -7,7 +7,7 @@ import notify from 'devextreme/ui/notify';
 @Component({
   templateUrl: 'login.component.html'
 })
-export class LoginComponent implements OnInit, OnDestroy {
+export class LoginComponent implements OnInit {
   loading = false;
   submitted = false;
   returnUrl: string;
@@ -25,8 +25,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
     this.returnUrl = '/dashboard';
   }
-
-  ngOnDestroy() {}
 
   logError(error: any) {
     const message = error;

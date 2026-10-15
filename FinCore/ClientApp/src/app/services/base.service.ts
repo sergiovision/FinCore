@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../environments/environment';
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-// import 'rxjs/add/operator/map';
 import { UserToken, Env, JobParam, EntitiesEnum } from '../models/Entities';
 import { DatePipe } from '@angular/common';
 import CustomStore from 'devextreme/data/custom_store';

@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { EntitiesEnum, DynamicProperties } from '../models/Entities';
 
-declare var require: any;
+declare let require: any;
 
 @Injectable()
 export class PropsService extends BaseService {

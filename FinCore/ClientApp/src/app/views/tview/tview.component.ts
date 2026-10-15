@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, ViewChild, ElementRef, Inject, Input } from '@angular/core';
+import { Component, AfterViewInit, ViewChild, ElementRef, Inject, Input } from '@angular/core';
 import { DefaultLayoutComponent } from '../../containers';
 
 declare const TradingView: any;
@@ -8,7 +8,7 @@ declare const TradingView: any;
   templateUrl: 'tview.component.html',
   styleUrls: ['tview.component.css']
 })
-export class TviewComponent implements OnInit, AfterViewInit {
+export class TviewComponent implements AfterViewInit {
 
   @Input() symbol: string;
 
@@ -17,10 +17,6 @@ export class TviewComponent implements OnInit, AfterViewInit {
   constructor(@Inject(DefaultLayoutComponent) private parentView: DefaultLayoutComponent) {
     this.height =  this.parentView.mainView.nativeElement.offsetHeight;
     // console.log('MainView height: ' + this.height + ', Symbol: ' + this.symbol);
-  }
-
-  ngOnInit(): void {
-
   }
 
   ngAfterViewInit() {

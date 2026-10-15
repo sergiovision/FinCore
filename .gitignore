@@ -7,8 +7,9 @@
 /out-tsc
 
 # dependencies
-/node_modules
+node_modules/
 package-lock.json
+!FinCore/ClientApp/package-lock.json
 
 # IDEs and editors
 /.idea
@@ -144,3 +145,9 @@ BusinessObjects/bin/Debug/net8.0/BusinessObjects.pdb
 BusinessObjects/bin/Release/net8.0/BusinessObjects.deps.json
 BusinessObjects/bin/Release/net8.0/BusinessObjects.dll
 BusinessObjects/bin/Release/net8.0/BusinessObjects.pdb
+
+# build output
+bin/
+obj/
+FinCore/ClientApp/.angular/
+FinCore/ClientApp/dist/

@@ -1,4 +1,4 @@
-import { Component, Input, ViewChild, ElementRef, AfterViewInit, OnInit } from '@angular/core';
+import { Component, Input, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { navItems } from './../../_nav';
 import { ActivatedRoute } from '@angular/router';
 
@@ -6,7 +6,7 @@ import { ActivatedRoute } from '@angular/router';
   selector: 'app-dashboard',
   templateUrl: './default-layout.component.html'
 })
-export class DefaultLayoutComponent implements OnInit {
+export class DefaultLayoutComponent {
   public navItems = navItems;
   public sidebarMinimized = true;
   private changes: MutationObserver;
@@ -24,10 +24,6 @@ export class DefaultLayoutComponent implements OnInit {
       attributes: true
     });
 
-  }
-
-  ngOnInit() {
-    // console.log('height---' + this.element.offsetHeight);
   }
 
 

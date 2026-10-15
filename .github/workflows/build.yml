@@ -1,0 +1,35 @@
+name: build
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: FinCore/ClientApp
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: FinCore/ClientApp/.nvmrc
+          cache: npm
+          cache-dependency-path: FinCore/ClientApp/package-lock.json
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run build
+      - run: npm audit --audit-level=critical
+
+  server:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+      - run: dotnet build FinCore.sln -c Release
+      - run: dotnet test FinCore.sln -c Release --no-build
+      - run: dotnet list FinCore.sln package --vulnerable --include-transitive

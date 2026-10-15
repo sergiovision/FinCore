@@ -12,8 +12,8 @@ export class BaseComponent implements OnInit, OnDestroy {
 
   protected showRetired = false;
 
-  constructor() { }
-
+  // Overridable hook: subclasses call super.ngOnInit().
+  // eslint-disable-next-line @angular-eslint/no-empty-lifecycle-method, @typescript-eslint/no-empty-function
   ngOnInit() {
   }
 

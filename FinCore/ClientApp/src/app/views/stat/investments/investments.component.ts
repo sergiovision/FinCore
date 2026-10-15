@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { DealsService } from '../../../services/deals.service';
 import { PositionInfo, ENUM_ORDERROLE } from '../../../models/Entities';
 import { BaseComponent } from '../../../base/base.component';
-import { element } from 'protractor';
 import { ExpertsService } from '../../../services/experts.service';
 
 @Component({

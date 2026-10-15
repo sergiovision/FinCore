@@ -13,7 +13,7 @@ import { DxButtonModule, DxTemplateModule, DxTabPanelModule, DxBoxModule } from 
 import { WebsocketService } from '../../services/websocket.service';
 import { CommonModule } from '@angular/common';
 
-declare var monaco: any;
+declare let monaco: any;
 
 export function onMonacoLoad() {
 
@@ -56,14 +56,14 @@ const monacoConfig: NgxMonacoEditorConfig = {
   baseUrl: 'assets',
   defaultOptions: {
     scrollBeyondLastLine: false,
-  	lineNumbers: 'off',
-	  readOnly: true,
-  	includeInlayParameterNameHintsWhenArgumentMatchesName: false,
-	  includeInlayFunctionParameterTypeHints: false,
-	  includeInlayVariableTypeHints: false,
-	  includeInlayPropertyDeclarationTypeHints: false,
-	  includeInlayFunctionLikeReturnTypeHints: false,
-	  includeInlayEnumMemberValueHints: false
+    lineNumbers: 'off',
+    readOnly: true,
+    includeInlayParameterNameHintsWhenArgumentMatchesName: false,
+    includeInlayFunctionParameterTypeHints: false,
+    includeInlayVariableTypeHints: false,
+    includeInlayPropertyDeclarationTypeHints: false,
+    includeInlayFunctionLikeReturnTypeHints: false,
+    includeInlayEnumMemberValueHints: false
  },
   onMonacoLoad
 };

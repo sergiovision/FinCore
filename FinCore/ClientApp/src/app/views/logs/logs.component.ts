@@ -26,14 +26,14 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
   //public editorHeight:number = 600;
   public editor: any;
 
-  code: string = '';
+  code = '';
 
   // https://microsoft.github.io/monaco-editor/playground.html#creating-the-editor-syntax-highlighting-for-html-elements
   ///look file for options monako-editor/esm/vs/editor/editor.api.d.ts
   options: any = {
     theme: 'vs-dark', language: 'javascript',
     lineNumbers: 'off',
-	  readOnly: true,
+    readOnly: true,
     verticalHasArrows: true,
 		horizontalHasArrows: true,
     contextmenu: false
@@ -97,7 +97,7 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
     this.logz[0].DataSource = '';
     this.ws.doSend({ Type: WsMessageType.ClearLog, From: this.logS.currentUserToken.userName, Message: '' });
     if (this.editor) {
-      var model = this.editor.getModel();
+      const model = this.editor.getModel();
       if (model)
          model.setValue(this.getText());
     }
@@ -155,11 +155,11 @@ export class LogsComponent extends BaseComponent implements AfterViewInit, OnIni
           this.code = data;
         }
         if (this.editor) {
-           var model = this.editor.getModel();
+           const model = this.editor.getModel();
            if (model) {
               model.setValue(data);
 
-              var lineCount = model.getLineCount();
+              const lineCount = model.getLineCount();
               console.log(' OnInit countlines: ' + lineCount);
               this.editor.revealLine(lineCount, 1);
 

@@ -40,9 +40,6 @@ export class PropertiesComponent extends BaseComponent implements OnInit, OnDest
      return result;
   }
 
-  set UpdatedProperty(val: Date) {
-  }
-
   setData(val: number, entityName: string, dbData?: any): void {
     this.objId = val;
     this.entityName = entityName;
@@ -125,9 +122,6 @@ export class PropertiesComponent extends BaseComponent implements OnInit, OnDest
         }
       }
 
-      if (this.responseData) {
-        this.UpdatedProperty = this.responseData.updated;
-      }
       this.parentVisibleChange.emit(true);
   }
 

@@ -26,7 +26,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
   @ViewChild('positionsContainer') positionsContainer: DxDataGridComponent;
   @ViewChild(PropertiesComponent) propsContainer: PropertiesComponent;
   @ViewChild('dgauge') dgauge: DGaugeComponent;
-  @Input() sidebarId: string = "sidebar1";
+  @Input() sidebarId = "sidebar1";
 
   dataSource: CustomStore;
   connectionStarted: boolean;
@@ -121,7 +121,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
       }
     }
     if (typeof data === 'number') {
-      var d = data as ENUM_ORDERROLE;
+      const d = data as ENUM_ORDERROLE;
       if (d === ENUM_ORDERROLE.LongInvestment || data === ENUM_ORDERROLE.ShortInvestment) {
         return false;
       }
@@ -180,7 +180,7 @@ export class DashboardComponent extends BaseComponent implements OnInit, OnDestr
           {
               const balance = JSON.parse(msg.Message) as BalanceInfo;
               if (balance && this.stat.Accounts) {
-                var totalBalance = 0;
+                let totalBalance = 0;
                 this.stat.Accounts.forEach(element => {
                   if (balance.Account === element.Number && balance.Balance > 0) {
                     // console.log('Updated balance for account=' + balance.Account + 'to ' + balance.Balance);
