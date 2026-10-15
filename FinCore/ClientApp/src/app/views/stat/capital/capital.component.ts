@@ -26,9 +26,9 @@ export class CapitalComponent extends BaseComponent implements OnInit, OnDestroy
   public years: Array<SelectYear>;
 
   public getYears()  {
-    let arr = new Array<SelectYear>();
-    var d = new Date(Date.now());
-    var cY = d.getFullYear();
+    const arr = new Array<SelectYear>();
+    const d = new Date(Date.now());
+    const cY = d.getFullYear();
     let i = 0;
     for (let index = cY; index >= 2015; index--) {
       const yearX:number = index;
@@ -129,12 +129,6 @@ export class CapitalComponent extends BaseComponent implements OnInit, OnDestroy
             ]);
           }
         }
-        break;
-        case WsMessageType.ChartDone:
-          {
-            this.ws.doDisconnect();
-            this.chartLoaded = true;
-          }
         break;
         case WsMessageType.ChartDone:
           {

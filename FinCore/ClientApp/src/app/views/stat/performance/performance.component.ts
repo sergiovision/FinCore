@@ -236,7 +236,7 @@ export class PerformanceComponent extends BaseComponent implements OnInit, OnDes
         case WsMessageType.ChartValue:
         {
           const data: TimeStat = JSON.parse(msg.Message);
-          const dp_data: DeepPartial<TimeStat> = data as DeepPartial<TimeStat>;;
+          const dp_data: DeepPartial<TimeStat> = data as DeepPartial<TimeStat>;
           if (this.store && data) {
             this.dataSource.push(data);
             this.store.push([

@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Autofac;
-using AutoMapper;
 using BusinessLogic.BusinessObjects;
 using BusinessLogic.Repo.Domain;
 using BusinessObjects;
@@ -30,7 +29,6 @@ public class DataService : IDataService
     private readonly IRepository<DBSymbol> symbols;
     private readonly WalletsRepository wallets;
     private IRepository<DBDeals> deals;
-    private readonly IMapper mapper;
     private RatesService rates;
     private static ConcurrentDictionary<DateTime, TimeStat> cache;
     
@@ -47,12 +45,8 @@ public class DataService : IDataService
         props = new BaseRepository<DBProperties>();
         metaSymbols = new BaseRepository<DBMetasymbol>();
         log = l;
-        mapper = MainService.thisGlobal.Container.Resolve<IMapper>();
         rates = MainService.thisGlobal.Container.Resolve<RatesService>();
         wallets = new WalletsRepository(rates);
-#if DEBUG
-        mapper.ConfigurationProvider.AssertConfigurationIsValid();
-#endif
         cache = new ConcurrentDictionary<DateTime, TimeStat>();
     }
     
@@ -856,7 +850,7 @@ public class DataService : IDataService
                 .ToList()
                 .ForEach(item =>
                 {
-                    var dtObj = mapper.Map(item, t.Item1, t.Item2);
+                    var dtObj = EntityMapper.Map(item, t.Item1, t.Item2);
                     if (dtObj is Idable obj)
                     {
                         if (showRetired)
@@ -899,7 +893,7 @@ public class DataService : IDataService
                         {
                             if (showRetired == false && item.Retired == 1)
                                 continue;
-                            dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
+                            dtObj = EntityMapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj); 
                         }
                         catch (Exception e)
@@ -929,7 +923,7 @@ public class DataService : IDataService
                         {
                             if (showRetired == false && item.Retired == true)
                                 continue;
-                            dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
+                            dtObj = EntityMapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj); 
                         }
                         catch (Exception e)
@@ -958,7 +952,7 @@ public class DataService : IDataService
                         {
                             if (showRetired == false && item.Retired == true)
                                 continue;
-                            dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
+                            dtObj = EntityMapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj); 
                         }
                         catch (Exception e)
@@ -989,7 +983,7 @@ public class DataService : IDataService
                         {
                             if (showRetired == false && item.Retired == true)
                                 continue;
-                            dtObj = mapper.Map(item, childTuple.Item1, childTuple.Item2);
+                            dtObj = EntityMapper.Map(item, childTuple.Item1, childTuple.Item2);
                             result.Add(dtObj); 
                         }
                         catch (Exception e)
@@ -1016,7 +1010,7 @@ public class DataService : IDataService
             var dbObj = Session.Get(t.Item1, id);
             if (dbObj == null)
                 return "";
-            var obj = mapper.Map(dbObj, t.Item1, t.Item2);
+            var obj = EntityMapper.Map(dbObj, t.Item1, t.Item2);
             return obj;
         }
     }
@@ -1033,7 +1027,7 @@ public class DataService : IDataService
                 return -1;
             using (var Transaction = Session.BeginTransaction())
             {
-                var dbNew = mapper.Map(obj, tuple.Item2, tuple.Item1);
+                var dbNew = EntityMapper.Map(obj, tuple.Item2, tuple.Item1);
                 var id = Session.Save(dbNew);
                 Transaction.Commit();
                 return (int) id;
@@ -1056,7 +1050,7 @@ public class DataService : IDataService
                 return -1;
             using (var Transaction = Session.BeginTransaction())
             {
-                var dbNew = mapper.Map(obj, dbObj, tuple.Item2, tuple.Item1);
+                var dbNew = EntityMapper.Map(obj, dbObj, tuple.Item2, tuple.Item1);
                 Session.Update(dbNew);
                 Transaction.Commit();
                 return 1;

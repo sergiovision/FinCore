@@ -3,6 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { BaseComponent } from './base/base.component';
 
 @Component({
+  // eslint-disable-next-line @angular-eslint/component-selector
   selector: 'body',
   template: '<router-outlet></router-outlet>'
 })

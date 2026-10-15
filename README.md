@@ -3,8 +3,10 @@
 # About FinCore
 <p id="doc_about">
 </p>
-  New version 0.9.18 released. 
-  FinCore is a cool and free cross-platform personal finances manager written in .NET 8 with Angular 14 frontend. <br>
+  Version 0.9.20, maintenance refresh 2026-10 (library updates and security fixes, see [RELEASE-NOTES.md](RELEASE-NOTES.md) and [SECURITY-NOTES.md](SECURITY-NOTES.md)).
+  FinCore is a cool and free cross-platform personal finances manager written in .NET 10 with Angular 14 frontend. <br>
+
+  > This repository is the legacy FinCore, kept as a demo. Active development continues in the new FinCore product.
 
   <p>   This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.</p>
   
@@ -27,41 +29,78 @@ Program fits for anybody. <br>
   **This version is free of charge but if you want a better and secured version you can write me to hi@sergego.com we can talk about improving/installation/support and agree about $.**
   <br>
 
-## How to build:
-1. Clone this repository
-2. Build Client 
+## Requirements
 
-App. 
-  Go to FinCore/ClientApp folder 
-  Run: `npm install`
-  For UI Debug run: : `npm run start` and use URL http://127.0.0.1:4200 for running debug version of UI
+- Node.js 18 (see `FinCore/ClientApp/.nvmrc`; Angular 14 does not run on Node 20+)
+- .NET 10 SDK (pinned in `global.json`)
+- Docker (optional, for the quick start below)
+- Optional: Metatrader 5 terminal, MySQL Server 5+, .NET Framework 4.8 (for the dlls used inside Metatrader 5)
 
-3. Build Whole application 
-  To build as a Windows Service or Console app:
-  Run from command line: `build.bat`
-  To build as a docker image:
-  Run: `docker.sh`
+## Main versions
 
-4. If you fail to build or do not want to build on your machine then there is an option to get docker image from my docker hub. Run this commands:
+| Component | Version |
+|---|---|
+| .NET (FinCore, BusinessLogic, BusinessObjects) | net10.0, ASP.NET Core / Microsoft.Extensions / Microsoft.Data.Sqlite 10.0.13 |
+| NHibernate / FluentNHibernate | 5.7.0 / 3.5.0 |
+| log4net | 3.5.0 |
+| Autofac / Quartz / MySql.Data | 8.4.0 / 3.22.6 / 8.4.0 |
+| Object mapping | hand-written `BusinessLogic/EntityMapper.cs` (AutoMapper removed) |
+| Angular / Angular CLI | 14.3.0 / 14.2.13 |
+| CoreUI Angular | 2.14.1 |
+| DevExtreme | 23.2.15 |
+| TypeScript / RxJS / zone.js | 4.8.4 / 7.8.2 / 0.11.8 |
+| Lint | ESLint 8 + angular-eslint 14 (`npm run lint`) |
 
-`git clone https://github.com/sergiovision/FinCore.git`
+Known open security alerts and why they are not exploitable here are listed in [SECURITY-NOTES.md](SECURITY-NOTES.md).
 
-`docker pull dockersergio/fincore:latest`
+## Quick start with Docker
 
-`docker-compose up`
+```
+git clone https://github.com/sergiovision/FinCore.git
+cd FinCore
+scripts/docker.sh          # same as: docker compose build
+docker compose up
+```
 
-To make build succeeded the following apps should be installed: Visual Studio 2019, Visual Studio 2019 Build tools, latest NPM from http://nodejs.org.
-Applications need to be installed to run server properly: 
+Then open http://localhost:2020/#/login (default login below). Websockets use port `2021`.
 
-1. Metatrader 5 Terminal
-2. Optionally MySQL Server version 5 or later.
-3. .NET Core 8
-4. Framework 4.8 (for dlls in Metatrader5) should be installed
-  
+## Scripts
+
+All helper scripts live in [`/scripts`](/scripts) and can be run from any folder:
+
+| Script | What it does |
+|---|---|
+| `scripts/restore.sh` / `scripts/restore.bat` | Restores NuGet packages and runs `npm ci` for the client |
+| `scripts/build.sh` / `scripts/build.bat` | Builds the Angular client and publishes the server into `./bin` (Windows Service / console app) |
+| `scripts/test.sh` | Same checks as CI: client lint, build and `npm audit --audit-level=critical`; server build and unit tests |
+| `scripts/run.sh` | Runs the server locally on http://localhost:2020 (build the client first) |
+| `scripts/docker.sh` | Builds the docker image (`docker compose build`) |
+
+## How to build
+
+1. Clone this repository.
+2. Build the client app:
+   ```
+   cd FinCore/ClientApp
+   nvm use            # Node 18
+   npm ci
+   npm run lint
+   npm run build
+   ```
+   For UI debugging run `npm run start` and open http://127.0.0.1:4200.
+3. Build and test the server:
+   ```
+   dotnet build FinCore.sln -c Release
+   dotnet test FinCore.sln -c Release
+   ```
+   Or run `scripts/build.sh` (`scripts\build.bat` on Windows) to build everything and publish into `./bin`.
+4. Debug locally (JetBrains Rider / Visual Studio): use the `FinCore` launch profile. It runs from the repo `bin/` folder
+   (`workingDirectory: ../bin` in `FinCore/Properties/launchSettings.json`). In `Development` the server proxies the UI to
+   the Angular dev server, so also run `npm run start` in `FinCore/ClientApp`, then open http://localhost:2020.
 
 SQLite database located in `/DB` folder. By default SQLite DB file used, but MySQL also supported, you can switch to MySQL in `/FinCore/appSettings.json` file.
 
-For configuring crypto module setup Api Keys for KuCoin and/or FTX providers:
+For configuring crypto module setup Api Keys for KuCoin:
 
    For KuCoin exchange set the following properties in `/FinCore/appSettings.json`:
   `KuCoinAPIKey`  - KuCoin Main API Key
@@ -71,10 +110,6 @@ For configuring crypto module setup Api Keys for KuCoin and/or FTX providers:
   `KuCoinFutureAPIKey` - KuCoin Futures API Key
   `KuCoinFutureAPISecret` - API Secret
   `KuCoinFuturePassPhrase` - Futures Pass Phrase
-
-   For FTX Exchange:
-  `FTXAPIKey` - FTX API Key
-  `FTXAPISecret` - FTX API Secret
 
 
 Open `fincore_empty.sqlite` file in any DB editor that works with SQLite ( like Navicat ).

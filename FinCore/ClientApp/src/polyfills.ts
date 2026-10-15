@@ -44,9 +44,6 @@ import 'core-js/es/set';
 /** IE10 and IE11 requires the following for the Reflect API. */
 import 'core-js/es/reflect';
 
-// for IE10
-import 'mutationobserver-shim';
-
 /**
  * Required to support Web Animations `@angular/platform-browser/animations`.
  * Needed for: All but Chrome, Firefox and Opera. http://caniuse.com/#feat=web-animation

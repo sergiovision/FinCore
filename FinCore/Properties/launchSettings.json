@@ -28,7 +28,7 @@
     },
     "FinCore": {
       "commandName": "Project",
-      "workingDirectory": "C:\\dev\\FinCore\\bin",
+      "workingDirectory": "../bin",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
@@ -36,7 +36,7 @@
     },
     "FinCoreRider": {
       "commandName": "Project",
-      "workingDirectory": "$(HOME)/Documents/Projects/Git/FinCore/bin",
+      "workingDirectory": "../bin",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

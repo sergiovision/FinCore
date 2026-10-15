@@ -7,8 +7,11 @@
 /out-tsc
 
 # dependencies
-/node_modules
-package-lock.json
+**/node_modules
+**/bin
+**/obj
+FinCore/ClientApp/.angular
+FinCore/ClientApp/dist
 
 # IDEs and editors
 /.idea
