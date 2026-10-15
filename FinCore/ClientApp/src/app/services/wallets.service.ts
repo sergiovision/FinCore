@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import notify from 'devextreme/ui/notify';
 import { AccountState, Terminal } from '../models/Entities';
 
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class WalletsService extends BaseService {
     constructor(http: HttpClient) { super(http); }
 

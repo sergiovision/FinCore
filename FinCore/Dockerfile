@@ -1,29 +1,21 @@
 #See https://aka.ms/containerfastmode to understand how Visual Studio uses this Dockerfile to build your images for faster debugging.
 
-FROM mcr.microsoft.com/dotnet/sdk:10.0 AS base
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
-EXPOSE 2020 2021
-ENV ASPNETCORE_ENVIRONMENT Production
-
-RUN  apt-get update \
-  && apt-get install -y wget \
-  && apt-get install -y mc \
-  && apt-get install -y htop \
-  && apt-get install -y nano
+EXPOSE 2020 2021 2022
+ENV ASPNETCORE_ENVIRONMENT=Production
 
 
-FROM node:18-alpine AS client
+FROM node:24-alpine AS client
 ARG skip_client_build=false
 WORKDIR /app
 COPY FinCore/ClientApp .
-RUN [[ ${skip_client_build} = true ]] && echo "Skipping npm install" || npm ci
-RUN [[ ${skip_client_build} = true ]] && mkdir dist || npm run docker
+RUN if [ "$skip_client_build" = "true" ]; then mkdir -p dist; else npm ci && npm run docker; fi
 
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
-WORKDIR /
-COPY DB/ DB/
 WORKDIR /src
+COPY global.json .
 COPY FinCore/FinCore.csproj FinCore/
 COPY BusinessLogic/BusinessLogic.csproj BusinessLogic/
 COPY BusinessObjects/BusinessObjects.csproj BusinessObjects/
@@ -37,7 +29,11 @@ RUN dotnet publish "FinCore.csproj" -c Release -p:IsDocker=True -o /app/publish
 
 FROM base AS final
 WORKDIR /app
-COPY --from=publish /app/publish .
-COPY --from=client /app/dist /app/dist
-COPY --from=build /src/FinCore/appsettings.Docker.json /app/appsettings.json
+# the app writes its log file next to the binaries and the SQLite DB lives in /DB (see appsettings.Docker.json)
+COPY --chown=app:app --from=publish /app/publish .
+COPY --chown=app:app --from=client /app/dist /app/dist
+COPY --chown=app:app --from=build /src/FinCore/appsettings.Docker.json /app/appsettings.json
+COPY --chown=app:app DB/ /DB/
+RUN chown app:app /app
+USER app
 ENTRYPOINT ["dotnet", "FinCore.dll"]

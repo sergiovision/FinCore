@@ -141,7 +141,6 @@ public class Startup
         {
             // Add Header
             context.Response.Headers["FinCore"] = "FinCore Web Api Self Host";
-            context.Response.Headers["Access-Control-Allow-Origin"] = "*";
             // Call next middleware
             await next.Invoke();
         });

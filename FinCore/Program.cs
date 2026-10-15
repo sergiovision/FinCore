@@ -76,9 +76,8 @@ public class Program
             x.Service(factory => { return QuartzServer.Server; });
         });
         var exitCode = (int) Convert.ChangeType(rc, rc.GetTypeCode());
-        var msg = string.Format(
-            "------------------------------- FinCore Exited with code: (%d) --------------------------------",
-            exitCode);
+        var msg =
+            $"------------------------------- FinCore Exited with code: ({exitCode}) --------------------------------";
         Log.Info(msg);
         Environment.ExitCode = exitCode;
     }

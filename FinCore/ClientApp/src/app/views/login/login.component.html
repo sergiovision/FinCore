@@ -1,54 +1,62 @@
-<div class="app-body">
-  <main class="main d-flex align-items-center">
-    <div class="container">
-      <div class="row">
-        <div class="col-md-8 mx-auto">
-          <div class="card-group">
-            <div class="card p-4">
-              <div class="card-body">
-                <form (submit)="onSubmit()">
-                    <div class="dx-fieldset">
-                        <div class="dx-fieldset-header">Credentials</div>
-                        <div class="dx-field">
-                            <div class="dx-field-label">Email</div>
-                            <div class="dx-field-value">
-                                <dx-text-box mode="email" [(value)]="username">
-                                    <dx-validator>
-                                        <dxi-validation-rule type="required" message="Email is required"></dxi-validation-rule>
-                                        <dxi-validation-rule type="email" message="Email is invalid"></dxi-validation-rule>
-                                    </dx-validator>
-                                </dx-text-box>
-                            </div>
-                        </div>
-                        <div class="dx-field">
-                            <div class="dx-field-label">Password</div>
-                            <div class="dx-field-value">
-                                <dx-text-box
-                                    mode="password"
-                                    [(value)]="password">
-                                    <dx-validator>
-                                        <dxi-validation-rule type="required" message="Password is required"></dxi-validation-rule>
-                                    </dx-validator>
-                                </dx-text-box>
-                            </div>
-                        </div>
-                  </div>
-                  <div class="dx-fieldset">
-                      <dx-validation-summary id="summary"></dx-validation-summary>
-                      <dx-button
-                          id="button"
-                          text="Login"
-                          type="success"
-                          [useSubmitBehavior]="true">
-                      </dx-button>
-                      <!-- <a routerLink="/register" class="btn btn-link">Register</a> -->
-                  </div>
-              </form>
-              </div>
-</div>
-</div>
-</div>
-</div>
-</div>
-</main>
+<div class="login-wrapper d-flex min-vh-100">
+  <!-- Left branding panel -->
+  <div class="login-brand d-none d-md-flex flex-column justify-content-center align-items-center col-md-5">
+    <img src="assets/img/brand/logo.png" alt="FinCore" class="mb-4" width="120">
+    <h2 class="login-brand-title text-white">FinCore</h2>
+    <p class="login-brand-text text-center px-4">Personal finances manager for traders, investors, and merchants.</p>
+  </div>
+
+  <!-- Right form panel -->
+  <div class="d-flex flex-column justify-content-center align-items-center flex-grow-1 col-md-7 p-4">
+    <div class="login-form-container">
+      <h3 class="mb-1">Welcome back</h3>
+      <p class="text-muted mb-2">Sign in to your account</p>
+
+      <div class="login-server mb-4">
+        <div class="login-server-host" [title]="serverUrl">
+          <span class="text-muted">Server</span>
+          <strong>{{ serverHost }}</strong>
+        </div>
+        <div class="small text-muted">FinCore · {{ buildEnv }}</div>
+      </div>
+
+      <form (submit)="onSubmit()">
+        <div class="mb-3">
+          <label class="login-label small text-muted">Email</label>
+          <dx-text-box mode="email" [(value)]="username" placeholder="Enter your email">
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Email is required"></dxi-validation-rule>
+              <dxi-validation-rule type="email" message="Email is invalid"></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+
+        <div class="mb-3">
+          <label class="login-label small text-muted">Password</label>
+          <dx-text-box mode="password" [(value)]="password" placeholder="Enter your password">
+            <dx-validator>
+              <dxi-validation-rule type="required" message="Password is required"></dxi-validation-rule>
+            </dx-validator>
+          </dx-text-box>
+        </div>
+
+        <div class="mb-3">
+          <dx-check-box text="Remember me" [(value)]="rememberMe"></dx-check-box>
+        </div>
+
+        <dx-validation-summary id="summary"></dx-validation-summary>
+
+        <div *ngIf="errorMessage" class="login-error">{{ errorMessage }}</div>
+
+        <dx-button
+          id="button"
+          text="Sign In"
+          type="default"
+          width="100%"
+          [disabled]="loading"
+          [useSubmitBehavior]="true">
+        </dx-button>
+      </form>
+    </div>
+  </div>
 </div>

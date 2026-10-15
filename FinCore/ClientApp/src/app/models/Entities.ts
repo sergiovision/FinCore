@@ -87,7 +87,7 @@ export class Person {
 
       this.Created = new Date();
       this.Languageid = 0;
-      this.Credential = 'password';
+      this.Credential = '';
       this.Regip = '127.0.0.1';
       this.Mail = 'undef@mail.com';
       this.Privilege = 'GUEST';

@@ -13,7 +13,6 @@ namespace FinCore.Controllers;
 [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
 public class ExpertsController : BaseController
 {
-    [AllowAnonymous]
     [HttpGet]
     [AcceptVerbs("GET")]
     [Route("[action]")]

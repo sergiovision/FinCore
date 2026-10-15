@@ -81,6 +81,7 @@ export class CryptoComponent extends BaseComponent implements OnInit, OnDestroy,
               key: 'Ticket'
             });
             this.dgauge.updateData(data);
+            clearInterval(this.timerId);
             this.timerId = setInterval(() => this.dgauge.updateData(data), 20000);
           }
           break;

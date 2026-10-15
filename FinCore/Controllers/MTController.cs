@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace FinCore.Controllers;
 
-[AllowAnonymous]
 [ApiController]
 [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
 public class MTController : BaseController
 {
+    [AllowAnonymous]
     [HttpGet]
     [Route("[action]")]
     [AcceptVerbs("GET")]
@@ -44,6 +44,7 @@ public class MTController : BaseController
         }
     }
 
+    [AllowAnonymous]
     [HttpPost]
     [AcceptVerbs("POST")]
     [Route("[action]")]
@@ -82,6 +83,7 @@ public class MTController : BaseController
         }
     }
 
+    [AllowAnonymous]
     [HttpGet]
     [AcceptVerbs("GET")]
     [Route("[action]")]

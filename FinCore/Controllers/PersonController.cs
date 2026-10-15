@@ -9,11 +9,11 @@ namespace FinCore.Controllers;
 // Angular example of login
 // https://github.com/tjoudeh/AngularJSAuthentication
 //http://bitoftech.net/2014/06/01/token-based-authentication-asp-net-web-api-2-owin-asp-net-identity/
-[AllowAnonymous]
 [ApiController]
 [Route(xtradeConstants.API_ROUTE_CONTROLLER)]
 public class PersonController : BaseController
 {
+    [AllowAnonymous]
     [HttpPost]
     [Route("[action]")]
     public ActionResult Register(Person userModel)
