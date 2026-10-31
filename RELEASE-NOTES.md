@@ -1,5 +1,14 @@
 # Release notes
 
+## 0.9.21 (2026-10-31)
+
+- Security: `fast-uri` 3.1.8 → 3.1.9 in the client lockfile (GHSA-w74x-v6f9-j3xg, GHSA-wjr9-j795-jxcr,
+  GHSA-xhq7-xmqj-769h, GHSA-333x-w4r6-6crp). Replaces Dependabot PR #13, whose regenerated lockfile dropped the
+  `chokidar` / `readdirp` entries and broke `npm ci`.
+- README: link to the new FinCore at [capitaltools.app/fincore](https://capitaltools.app/fincore), new
+  "What this project demonstrates" section, note on why Angular 14 is pinned.
+- `*.user` IDE files are no longer tracked.
+
 ## Code review fixes and Docker refresh (2026-10-16)
 
 Fixes from a full code review, a reworked login page and a smaller Docker image. No database schema changes.

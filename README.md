@@ -1,12 +1,31 @@
 <img src="/FinCore/ClientApp/src/assets/img/brand/logo.png" width="100"/>
 
 # About FinCore
+
+> ### 👉 Looking for the current FinCore? Go to **[capitaltools.app/fincore](https://capitaltools.app/fincore)**
+> This repository is the **legacy** FinCore, kept online as a free demo and code sample. It only gets dependency and
+> security updates. New features and support are in the new FinCore.
+
+## Legacy vs. the new FinCore
+
+| | Legacy FinCore (this repo) | [New FinCore](https://capitaltools.app/fincore) |
+|---|---|---|
+| Status | Frozen demo, maintenance only | Active development, regular releases |
+| Front end | Angular 14 (end of life) | Angular 22 |
+| AI analyst | — | Reviews robot alerts and open deals against your own written rules; pending-order scenarios per symbol |
+| Exchanges | MetaTrader 5, KuCoin | MetaTrader 5, KuCoin, Gate.io, Coinbase |
+| Forecasting | — | ML price forecasts (`fincorepy` analytics service) |
+| Licence | Free, as is | Free tier, free trial key, paid plans |
+| Support | None | Yes, for licensed users |
+
+Same idea, same self-hosted model (your data stays on your server), rebuilt with a modern stack and more features.
+**[Download it, get a free trial key and see the docs at capitaltools.app/fincore →](https://capitaltools.app/fincore)**
+
 <p id="doc_about">
 </p>
-  Version 0.9.20, maintenance refresh 2026-10 (library updates and security fixes, see [RELEASE-NOTES.md](RELEASE-NOTES.md) and [SECURITY-NOTES.md](SECURITY-NOTES.md)).
+  Version 0.9.21, maintenance refresh 2026-10 (library updates and security fixes, see [RELEASE-NOTES.md](RELEASE-NOTES.md) and [SECURITY-NOTES.md](SECURITY-NOTES.md)).
   FinCore is a cool and free cross-platform personal finances manager written in .NET 10 with Angular 14 frontend. <br>
 
-  > This repository is the legacy FinCore, kept as a demo. Active development continues in the new FinCore product: [capitaltools.app/fincore](https://capitaltools.app/fincore).
 
 ## What this project demonstrates
 
@@ -54,7 +73,7 @@ Program fits for anybody. <br>
   These screens will show and track in time your performance and personal relations with finances <a href="#doc_capital">Yearly Capital State</a> and
   <a href="#doc_performance">Earning/Spending Performance per day/month</a>.</p>
 
-  Consulting / commercial support: [hi@sergego.com](mailto:hi@sergego.com)
+  Consulting / commercial support: [hi@sergego.com](mailto:hi@sergego.com). For the supported, actively developed version see [capitaltools.app/fincore](https://capitaltools.app/fincore).
   <br>
 
 ## Requirements
