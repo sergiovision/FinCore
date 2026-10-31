@@ -6,7 +6,35 @@
   Version 0.9.20, maintenance refresh 2026-10 (library updates and security fixes, see [RELEASE-NOTES.md](RELEASE-NOTES.md) and [SECURITY-NOTES.md](SECURITY-NOTES.md)).
   FinCore is a cool and free cross-platform personal finances manager written in .NET 10 with Angular 14 frontend. <br>
 
-  > This repository is the legacy FinCore, kept as a demo. Active development continues in the new FinCore product.
+  > This repository is the legacy FinCore, kept as a demo. Active development continues in the new FinCore product: [capitaltools.app/fincore](https://capitaltools.app/fincore).
+
+## What this project demonstrates
+
+A complete, self-hosted trading and personal-finance back office, built from my experience as a developer and team lead at banks and FOREX brokers and working with individual traders:
+
+- **ASP.NET Core (.NET 10) + Angular SPA**: Web API controllers with JWT auth, the Angular client is served by the same host (Windows Service, console app or Docker).
+- **Real-time over WebSockets**: a NetCoreServer-based WebSocket server (`ws`/`wss`, port `2021`) pushes positions, quotes and logs to the dashboard without polling.
+- **Background jobs with Quartz.NET**: exchange rates, terminal sync and terminal monitoring jobs scheduled by cron expressions stored in the DB, and controlled from the UI.
+- **Persistence with NHibernate / FluentNHibernate**: one domain model over SQLite (default) or MySQL, Autofac for dependency injection.
+- **MetaTrader 5 bridge**: MQL5 Expert Advisers plus a .NET Framework 4.8 `MQLConnector.dll` sync terminals, accounts, deals and adviser settings with the server over Web API (port `2020`) and a TCP channel (port `2022`), so several terminals and brokers are managed from one place.
+- **Crypto exchange integration**: KuCoin spot and futures positions in the same views.
+
+```
+ Browser (Angular 14 SPA)
+   │  HTTPS / REST (2020)        ▲ WebSocket push (2021)
+   ▼                             │
+ ┌──────────────────────── FinCore server (ASP.NET Core, .NET 10) ───────────────────────┐
+ │  Web API controllers ── BusinessLogic ── NHibernate ──► SQLite / MySQL                │
+ │  Quartz.NET jobs     ── Messaging (WebSocket + TCP servers) ── KuCoin API client      │
+ └───────────────────────────────────────────────────────────────────────────────────────┘
+   ▲  Web API (2020) + TCP (2022)
+   │
+ MetaTrader 5 terminals (MQL5 Expert Advisers + MQLConnector.dll), one per broker/account
+```
+
+**Why Angular 14?** This repository is a frozen legacy demo. The front end stays on Angular 14 because it depends on CoreUI Angular 2 and the matching DevExtreme release, and upgrading means rewriting the UI layer. That work was done in the new FinCore product (Angular 22). Only dependency and security updates go here, see [SECURITY-NOTES.md](SECURITY-NOTES.md).
+
+## For users
 
   <p>   This project is a summary of my experience working as a developer and team leader for various financial institutions (banks and FOREX brokers) and individual traders. I made application as simple as possible to use with such complex thing as finances.</p>
   
@@ -26,7 +54,7 @@ Program fits for anybody. <br>
   These screens will show and track in time your performance and personal relations with finances <a href="#doc_capital">Yearly Capital State</a> and
   <a href="#doc_performance">Earning/Spending Performance per day/month</a>.</p>
 
-  **This version is free of charge but if you want a better and secured version you can write me to hi@sergego.com we can talk about improving/installation/support and agree about $.**
+  Consulting / commercial support: [hi@sergego.com](mailto:hi@sergego.com)
   <br>
 
 ## Requirements

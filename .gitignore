@@ -151,3 +151,6 @@ bin/
 obj/
 FinCore/ClientApp/.angular/
 FinCore/ClientApp/dist/
+
+# Per-user IDE state
+*.user
